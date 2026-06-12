@@ -3,7 +3,10 @@ import crypto from "node:crypto";
 import log from "electron-log";
 import { ToolDefinition, AgentContext, escapeXmlAttr } from "./types";
 import { setAppBlueprintForChat } from "@/ipc/handlers/app_blueprint_handlers";
-import { AppBlueprintVisualTypeSchema } from "@/ipc/types/app_blueprint";
+import type {
+  AppBlueprintVisual,
+  APP_BLUEPRINT_VISUAL_TYPES,
+} from "@/ipc/types/app_blueprint";
 import { encodeAppBlueprintData } from "@/lib/app_blueprint_data";
 import { safeSend } from "@/ipc/utils/safe_sender";
 import { readSettings } from "@/main/settings";
@@ -58,19 +61,144 @@ function getCachedSettings(): UserSettings {
   return value;
 }
 
-const VisualEntrySchema = z.object({
-  type: AppBlueprintVisualTypeSchema.describe(
-    "The type of visual asset needed",
-  ),
-  description: z
-    .string()
-    .describe("What this visual is for and where it will be used in the app"),
-  prompt: z
-    .string()
-    .describe(
-      "A detailed image generation prompt for creating this visual. Be specific about style, composition, colors, and mood.",
-    ),
-});
+type AppBlueprintVisualType = (typeof APP_BLUEPRINT_VISUAL_TYPES)[number];
+
+type RawVisualEntry = z.infer<typeof VisualEntrySchema>;
+
+const VisualEntrySchema = z
+  .object({
+    type: z
+      .string()
+      .optional()
+      .describe(
+        'The type of visual asset needed. Use exactly one of: "logo", "photo", "illustration", "icon", "background", "other".',
+      ),
+    description: z
+      .string()
+      .optional()
+      .describe("What this visual is for and where it will be used in the app"),
+    prompt: z
+      .string()
+      .optional()
+      .describe(
+        "A detailed image generation prompt for creating this visual. Be specific about style, composition, colors, and mood.",
+      ),
+    name: z.string().optional(),
+    title: z.string().optional(),
+    purpose: z.string().optional(),
+    usage: z.string().optional(),
+    asset_type: z.string().optional(),
+    visual_type: z.string().optional(),
+    image_prompt: z.string().optional(),
+    generation_prompt: z.string().optional(),
+    details: z.string().optional(),
+    style: z.string().optional(),
+  })
+  .passthrough();
+
+function firstNonEmptyString(
+  ...values: Array<string | undefined>
+): string | undefined {
+  return values.find((value) => value && value.trim().length > 0)?.trim();
+}
+
+function normalizeVisualType(
+  value: string | undefined,
+): AppBlueprintVisualType {
+  const normalized = value
+    ?.trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+
+  switch (normalized) {
+    case "logo":
+    case "logomark":
+    case "wordmark":
+      return "logo";
+    case "photo":
+    case "photograph":
+    case "image":
+    case "hero":
+    case "hero_image":
+    case "product_image":
+    case "screenshot":
+    case "portrait":
+      return "photo";
+    case "illustration":
+    case "graphic":
+    case "vector":
+    case "scene":
+    case "mascot":
+      return "illustration";
+    case "icon":
+    case "icons":
+    case "glyph":
+    case "pictogram":
+      return "icon";
+    case "background":
+    case "hero_background":
+    case "backdrop":
+    case "banner":
+    case "wallpaper":
+      return "background";
+    default:
+      return "other";
+  }
+}
+
+function normalizeVisualEntry(
+  visual: RawVisualEntry,
+  index: number,
+  args: Pick<
+    WriteAppBlueprintArgs,
+    "app_name" | "design_direction" | "primary_color"
+  >,
+): Omit<AppBlueprintVisual, "id"> {
+  const type = normalizeVisualType(
+    firstNonEmptyString(visual.type, visual.asset_type, visual.visual_type),
+  );
+  const description =
+    firstNonEmptyString(
+      visual.description,
+      visual.purpose,
+      visual.usage,
+      visual.title,
+      visual.name,
+      visual.details,
+    ) ?? `${type} visual ${index + 1} for ${args.app_name}`;
+  const prompt =
+    firstNonEmptyString(
+      visual.prompt,
+      visual.image_prompt,
+      visual.generation_prompt,
+      visual.details,
+      visual.style,
+      visual.description,
+      visual.purpose,
+      visual.usage,
+      visual.title,
+      visual.name,
+    ) ??
+    `Create a ${type} visual for ${args.app_name}: ${description}. Match this design direction: ${args.design_direction}. Use ${args.primary_color} as the primary accent color.`;
+
+  return {
+    type,
+    description,
+    prompt,
+  };
+}
+
+function normalizeVisuals(
+  visuals: RawVisualEntry[] | undefined,
+  args: Pick<
+    WriteAppBlueprintArgs,
+    "app_name" | "design_direction" | "primary_color"
+  >,
+): Array<Omit<AppBlueprintVisual, "id">> {
+  return (visuals ?? []).map((visual, index) =>
+    normalizeVisualEntry(visual, index, args),
+  );
+}
 
 const writeAppBlueprintSchema = z.object({
   app_name: z
@@ -116,12 +244,15 @@ const writeAppBlueprintSchema = z.object({
     ),
   visuals: z
     .array(VisualEntrySchema)
-    .min(1, "At least one visual must be planned")
     .max(10, "Maximum 10 visuals per blueprint")
+    .optional()
+    .default([])
     .describe(
       "Array of visual assets the app needs (logo, photos, illustrations, icons, backgrounds). Generate detailed image prompts for each.",
     ),
 });
+
+type WriteAppBlueprintArgs = z.infer<typeof writeAppBlueprintSchema>;
 
 const DESCRIPTION = `Create or update the app blueprint for the user to review before building begins.
 
@@ -163,9 +294,7 @@ Use this tool AFTER gathering any needed preferences (via planning_questionnaire
 }
 </example>`;
 
-export const writeAppBlueprintTool: ToolDefinition<
-  z.infer<typeof writeAppBlueprintSchema>
-> = {
+export const writeAppBlueprintTool: ToolDefinition<WriteAppBlueprintArgs> = {
   name: "write_app_blueprint",
   description: DESCRIPTION,
   inputSchema: writeAppBlueprintSchema,
@@ -190,25 +319,30 @@ export const writeAppBlueprintTool: ToolDefinition<
       ? escapeXmlAttr(args.primary_color)
       : "";
     const data =
-      args.user_prompt &&
-      args.design_direction &&
-      args.primary_color &&
-      args.visuals
-        ? ` data="${encodeAppBlueprintData({
-            appName: args.app_name,
-            userPrompt: args.user_prompt,
-            attachments: args.attachments ?? [],
-            templateId: resolveTemplateId(args.template_id, settings),
-            themeId: resolveThemeId(args.theme_id, settings),
-            designDirection: args.design_direction,
-            primaryColor: args.primary_color,
-            visuals: args.visuals.map((visual, index) => ({
-              id: `visual_${index}`,
-              type: visual.type,
-              description: visual.description,
-              prompt: visual.prompt,
-            })),
-          })}"`
+      args.user_prompt && args.design_direction && args.primary_color
+        ? (() => {
+            const visuals = normalizeVisuals(args.visuals, {
+              app_name: args.app_name,
+              design_direction: args.design_direction,
+              primary_color: args.primary_color,
+            });
+
+            return ` data="${encodeAppBlueprintData({
+              appName: args.app_name,
+              userPrompt: args.user_prompt,
+              attachments: args.attachments ?? [],
+              templateId: resolveTemplateId(args.template_id, settings),
+              themeId: resolveThemeId(args.theme_id, settings),
+              designDirection: args.design_direction,
+              primaryColor: args.primary_color,
+              visuals: visuals.map((visual, index) => ({
+                id: `visual_${index}`,
+                type: visual.type,
+                description: visual.description,
+                prompt: visual.prompt,
+              })),
+            })}"`;
+          })()
         : "";
 
     return `<dyad-app-blueprint app-name="${appName}" template="${template}" theme="${theme}" design-direction="${designDirection}" primary-color="${primaryColor}"${data} complete="${isComplete}"></dyad-app-blueprint>`;
@@ -219,7 +353,7 @@ export const writeAppBlueprintTool: ToolDefinition<
 
     const settings = readSettings();
 
-    const visuals = args.visuals.map((v) => ({
+    const visuals = normalizeVisuals(args.visuals, args).map((v) => ({
       id: `visual_${crypto.randomUUID().slice(0, 8)}`,
       type: v.type,
       description: v.description,

@@ -182,6 +182,37 @@ describe("app blueprint tools", () => {
     });
   });
 
+  it("normalizes lenient visual inputs from model tool calls", async () => {
+    const chatId = 1004;
+    const ctx = createAgentContext(chatId);
+
+    const args = writeAppBlueprintTool.inputSchema.parse({
+      app_name: "Landing Studio",
+      user_prompt: "Build a landing page",
+      design_direction: "Editorial and confident with crisp sections.",
+      primary_color: "#2563EB",
+      visuals: [
+        {
+          type: "hero_image",
+          purpose: "Hero section visual",
+        },
+      ],
+    });
+
+    await writeAppBlueprintTool.execute(args, ctx);
+
+    expect(getAppBlueprintForChat(chatId)).toMatchObject({
+      appName: "Landing Studio",
+      visuals: [
+        expect.objectContaining({
+          type: "photo",
+          description: "Hero section visual",
+          prompt: "Hero section visual",
+        }),
+      ],
+    });
+  });
+
   it("embeds recoverable blueprint data in the final XML", () => {
     const xml = writeAppBlueprintTool.buildXml?.(
       {
