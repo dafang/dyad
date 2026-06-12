@@ -4,7 +4,10 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { NEXT_APP_ROUTER_RULES_START } from "../utils/ai_rules_patcher";
-import { createFromTemplate } from "./createFromTemplate";
+import {
+  createFromTemplate,
+  getBundledScaffoldPath,
+} from "./createFromTemplate";
 
 const templatePath = vi.hoisted(() => ({
   value: "",
@@ -88,6 +91,21 @@ describe("createFromTemplate", () => {
     expect(aiRules).toContain("# Existing template rules");
     expect(aiRules).toContain(NEXT_APP_ROUTER_RULES_START);
     expect(aiRules).toContain("Event handlers cannot be passed");
+  });
+
+  it("copies the bundled React scaffold from the repository root", async () => {
+    const scaffoldPath = getBundledScaffoldPath();
+
+    expect(scaffoldPath).toBe(path.resolve(process.cwd(), "scaffold"));
+
+    await createFromTemplate({
+      fullAppPath: appPath,
+      templateId: "react",
+    });
+
+    await expect(
+      fs.readFile(path.join(appPath, "package.json"), "utf8"),
+    ).resolves.toContain("@vitejs/plugin-react");
   });
 
   it("does not append Next.js App Router rules to non-Next templates", async () => {

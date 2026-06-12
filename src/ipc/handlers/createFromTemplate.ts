@@ -11,6 +11,46 @@ import { appendNextAppRouterRules } from "../utils/ai_rules_patcher";
 
 const logger = log.scope("createFromTemplate");
 
+function isScaffoldPath(candidate: string): boolean {
+  return (
+    fs.existsSync(path.join(candidate, "package.json")) &&
+    fs.existsSync(path.join(candidate, "src"))
+  );
+}
+
+export function getBundledScaffoldPath(): string {
+  const candidates = [
+    // Local web and Electron dev mode run from the repo root.
+    path.resolve(process.cwd(), "scaffold"),
+    // vite-node keeps __dirname at src/ipc/handlers.
+    path.resolve(__dirname, "..", "..", "..", "scaffold"),
+    // Vite main bundle resolves __dirname under .vite/build.
+    path.resolve(__dirname, "..", "..", "scaffold"),
+  ];
+
+  const resourcesPath = (process as NodeJS.Process & { resourcesPath?: string })
+    .resourcesPath;
+  if (resourcesPath) {
+    candidates.push(
+      path.join(resourcesPath, "app.asar", "scaffold"),
+      path.join(resourcesPath, "app", "scaffold"),
+    );
+  }
+
+  const uniqueCandidates = Array.from(new Set(candidates));
+  const scaffoldPath = uniqueCandidates.find(isScaffoldPath);
+  if (scaffoldPath) {
+    return scaffoldPath;
+  }
+
+  throw new DyadError(
+    `Could not find the bundled React scaffold. Checked: ${uniqueCandidates.join(
+      ", ",
+    )}`,
+    DyadErrorKind.Internal,
+  );
+}
+
 export async function createFromTemplate({
   fullAppPath,
   templateId: requestedTemplateId,
@@ -22,10 +62,7 @@ export async function createFromTemplate({
   const templateId = requestedTemplateId ?? settings.selectedTemplateId;
 
   if (templateId === "react") {
-    await copyDirectoryRecursive(
-      path.join(__dirname, "..", "..", "scaffold"),
-      fullAppPath,
-    );
+    await copyDirectoryRecursive(getBundledScaffoldPath(), fullAppPath);
     return;
   }
 
