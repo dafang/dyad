@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { IpcMainInvokeEvent, WebContents } from "electron";
 import { streamText } from "ai";
+import type { IpcInvokeEventLike } from "@/ipc/utils/ipc_event";
+import type { WebContentsLike } from "@/ipc/utils/safe_sender";
 
 // ============================================================================
 // Test Fakes & Builders
@@ -18,7 +19,7 @@ function createFakeWebContents() {
       send: (channel: string, ...args: unknown[]) => {
         sentMessages.push({ channel, args });
       },
-    } as unknown as WebContents,
+    } as WebContentsLike,
     sentMessages,
     getMessagesByChannel(channel: string) {
       return sentMessages.filter((m) => m.channel === channel);
@@ -32,7 +33,7 @@ function createFakeWebContents() {
 function createFakeEvent() {
   const webContents = createFakeWebContents();
   return {
-    event: { sender: webContents.sender } as IpcMainInvokeEvent,
+    event: { sender: webContents.sender } as IpcInvokeEventLike,
     ...webContents,
   };
 }
@@ -330,6 +331,10 @@ const dyadRequestId = "test-request-id";
 describe("handleLocalAgentStream", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    delete process.env.DYAD_TODO_FOLLOW_UP_IDLE_TIMEOUT_MS;
+    delete process.env.DYAD_TODO_FOLLOW_UP_FIRST_EVENT_TIMEOUT_MS;
+    delete process.env.DYAD_STREAM_IDLE_TIMEOUT_MS;
+    delete process.env.DYAD_STREAM_FINALIZATION_TIMEOUT_MS;
     dbOperations.updates = [];
     dbOperations.queries = [];
     mockChatData = null;
@@ -1175,6 +1180,108 @@ describe("handleLocalAgentStream", () => {
   });
 
   describe("Stream processing - text content", () => {
+    it("should surface an error when the model stream completes without output", async () => {
+      // Arrange
+      const { event, getMessagesByChannel } = createFakeEvent();
+      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockChatData = buildTestChat({
+        messages: [{ id: 1, role: "user", content: "Hello" }],
+      });
+      mockStreamResult = createFakeStream([]);
+
+      // Act
+      await handleLocalAgentStream(
+        event,
+        { chatId: 1, prompt: "test" },
+        new AbortController(),
+        {
+          placeholderMessageId: 10,
+          systemPrompt: "You are helpful",
+          dyadRequestId,
+        },
+      );
+
+      // Assert
+      expect(getMessagesByChannel("chat:response:end")).toHaveLength(0);
+      const errorMessages = getMessagesByChannel("chat:response:error");
+      expect(errorMessages).toHaveLength(1);
+      expect(errorMessages[0].args[0]).toMatchObject({
+        chatId: 1,
+        error: expect.stringContaining(
+          "The selected model returned an empty response",
+        ),
+      });
+    });
+
+    it("should surface an error when the initial model stream is idle", async () => {
+      // Arrange
+      process.env.DYAD_STREAM_IDLE_TIMEOUT_MS = "5";
+      const { event, getMessagesByChannel } = createFakeEvent();
+      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockChatData = buildTestChat({
+        messages: [{ id: 1, role: "user", content: "Hello" }],
+      });
+      mockStreamTextImpl = (options) => ({
+        fullStream: (async function* () {
+          await new Promise<void>((_resolve, reject) => {
+            options.abortSignal.addEventListener(
+              "abort",
+              () => reject(options.abortSignal.reason),
+              { once: true },
+            );
+          });
+        })(),
+        response: new Promise(() => undefined),
+        steps: new Promise(() => undefined),
+      });
+
+      // Act
+      await handleLocalAgentStream(
+        event,
+        { chatId: 1, prompt: "test" },
+        new AbortController(),
+        {
+          placeholderMessageId: 10,
+          systemPrompt: "You are helpful",
+          dyadRequestId,
+        },
+      );
+
+      // Assert
+      expect(getMessagesByChannel("chat:response:end")).toHaveLength(0);
+      const errorMessages = getMessagesByChannel("chat:response:error");
+      expect(errorMessages).toHaveLength(1);
+      expect(errorMessages[0].args[0]).toMatchObject({
+        chatId: 1,
+        error: expect.stringContaining(
+          "Timed out waiting for model stream stream after 5ms",
+        ),
+      });
+      expect(
+        dbOperations.updates.some((u) => {
+          const content = u.data.content;
+          return (
+            typeof content === "string" &&
+            content.includes("<dyad-output") &&
+            content.includes(
+              "Timed out waiting for model stream stream after 5ms",
+            )
+          );
+        }),
+      ).toBe(true);
+      const chunks = getMessagesByChannel("chat:response:chunk");
+      expect(
+        chunks.some((chunk) => {
+          const payload = chunk.args[0] as any;
+          return (
+            payload.chatId === 1 &&
+            payload.streamingMessageId === 10 &&
+            payload.streamingPatch?.content?.includes("Local agent failed")
+          );
+        }),
+      ).toBe(true);
+    });
+
     it("should accumulate text-delta parts and update database", async () => {
       // Arrange
       const { event, getMessagesByChannel } = createFakeEvent();
@@ -1842,6 +1949,180 @@ describe("handleLocalAgentStream", () => {
           ),
       );
       expect(hasTodoReminder).toBe(true);
+    });
+
+    it("finishes the turn when a todo follow-up pass never produces a stream event", async () => {
+      // Arrange
+      process.env.DYAD_TODO_FOLLOW_UP_IDLE_TIMEOUT_MS = "5";
+      const { event, getMessagesByChannel } = createFakeEvent();
+      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockChatData = buildTestChat();
+
+      vi.mocked(buildAgentToolSet).mockImplementation((ctx) => {
+        return {
+          update_todos: {
+            execute: async (args: any) => {
+              ctx.todos = args.todos;
+              ctx.onUpdateTodos(ctx.todos);
+              return "Updated todos";
+            },
+          },
+        } as any;
+      });
+
+      let passCount = 0;
+      mockStreamTextImpl = (options) => {
+        passCount += 1;
+
+        if (passCount === 1) {
+          return {
+            fullStream: (async function* () {
+              yield { type: "text-delta", text: "I started the work." };
+              await options.tools.update_todos.execute({
+                merge: false,
+                todos: [
+                  {
+                    id: "todo-1",
+                    content: "Finish the requested work",
+                    status: "pending",
+                  },
+                ],
+              });
+            })(),
+            response: Promise.resolve({
+              messages: [
+                {
+                  role: "assistant",
+                  content: [{ type: "text", text: "I started the work." }],
+                },
+              ],
+            }),
+            steps: Promise.resolve([{ toolCalls: [], response: {} }]),
+          };
+        }
+
+        return {
+          fullStream: (async function* () {
+            await new Promise<void>((_resolve, reject) => {
+              options.abortSignal.addEventListener(
+                "abort",
+                () => reject(new Error("follow-up aborted")),
+                { once: true },
+              );
+            });
+          })(),
+          response: new Promise(() => undefined),
+          steps: new Promise(() => undefined),
+        };
+      };
+
+      // Act
+      await handleLocalAgentStream(
+        event,
+        { chatId: 1, prompt: "test" },
+        new AbortController(),
+        {
+          placeholderMessageId: 10,
+          systemPrompt: "You are helpful",
+          dyadRequestId,
+        },
+      );
+
+      // Assert
+      expect(passCount).toBe(2);
+      expect(getMessagesByChannel("chat:response:end")).toHaveLength(1);
+      expect(getMessagesByChannel("chat:response:error")).toHaveLength(0);
+
+      const approvalUpdate = dbOperations.updates.find(
+        (u) => u.data.approvalState === "approved",
+      );
+      expect(approvalUpdate).toBeDefined();
+    });
+
+    it("finishes the turn when a todo follow-up pass hangs during finalization", async () => {
+      // Arrange
+      process.env.DYAD_TODO_FOLLOW_UP_IDLE_TIMEOUT_MS = "5";
+      const { event, getMessagesByChannel } = createFakeEvent();
+      mockSettings = buildTestSettings({ enableDyadPro: true });
+      mockChatData = buildTestChat();
+
+      vi.mocked(buildAgentToolSet).mockImplementation((ctx) => {
+        return {
+          update_todos: {
+            execute: async (args: any) => {
+              ctx.todos = args.todos;
+              ctx.onUpdateTodos(ctx.todos);
+              return "Updated todos";
+            },
+          },
+        } as any;
+      });
+
+      let passCount = 0;
+      mockStreamTextImpl = (options) => {
+        passCount += 1;
+
+        if (passCount === 1) {
+          return {
+            fullStream: (async function* () {
+              yield { type: "text-delta", text: "I started the work." };
+              await options.tools.update_todos.execute({
+                merge: false,
+                todos: [
+                  {
+                    id: "todo-1",
+                    content: "Finish the requested work",
+                    status: "pending",
+                  },
+                ],
+              });
+            })(),
+            response: Promise.resolve({
+              messages: [
+                {
+                  role: "assistant",
+                  content: [{ type: "text", text: "I started the work." }],
+                },
+              ],
+            }),
+            steps: Promise.resolve([{ toolCalls: [], response: {} }]),
+          };
+        }
+
+        return {
+          fullStream: (async function* () {
+            yield { type: "text-delta", text: "Follow-up text." };
+          })(),
+          response: new Promise(() => undefined),
+          steps: new Promise(() => undefined),
+        };
+      };
+
+      // Act
+      await handleLocalAgentStream(
+        event,
+        { chatId: 1, prompt: "test" },
+        new AbortController(),
+        {
+          placeholderMessageId: 10,
+          systemPrompt: "You are helpful",
+          dyadRequestId,
+        },
+      );
+
+      // Assert
+      expect(passCount).toBe(2);
+      expect(getMessagesByChannel("chat:response:end")).toHaveLength(1);
+      expect(getMessagesByChannel("chat:response:error")).toHaveLength(0);
+
+      const finalContent = [...dbOperations.updates]
+        .reverse()
+        .find((update) => typeof update.data.content === "string")
+        ?.data.content;
+      expect(finalContent).toContain("Follow-up text.");
+      expect(
+        dbOperations.updates.find((u) => u.data.approvalState === "approved"),
+      ).toBeDefined();
     });
   });
 

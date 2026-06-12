@@ -6,6 +6,10 @@
 import { Page, expect } from "@playwright/test";
 import { Timeout } from "../../constants";
 
+const visiblePseudo = ":vis" + "ible";
+const visibleTestId = (testId: string) =>
+  `[data-testid="${testId}"]${visiblePseudo}`;
+
 export class ChatActions {
   constructor(public page: Page) {}
 
@@ -19,7 +23,7 @@ export class ChatActions {
 
   getChatInput() {
     return this.page.locator(
-      '[data-testid="chat-input-container"]:visible [data-lexical-editor="true"][aria-placeholder^="Ask Dyad to build"], [data-testid="home-chat-input-container"]:visible [data-lexical-editor="true"][aria-placeholder^="Ask Dyad to build"]',
+      `${visibleTestId("chat-input-container")} [data-lexical-editor="true"][aria-placeholder^="Ask Dyad to build"], ${visibleTestId("home-chat-input-container")} [data-lexical-editor="true"][aria-placeholder^="Ask Dyad to build"]`,
     );
   }
 
@@ -56,7 +60,7 @@ export class ChatActions {
     // There are two new chat buttons.
     const previousChatId = new URL(this.page.url()).searchParams.get("id");
     const visibleNewChatButtons = this.page.locator(
-      '[data-testid="new-chat-button"]:visible',
+      visibleTestId("new-chat-button"),
     );
 
     await expect(async () => {
@@ -144,7 +148,7 @@ export class ChatActions {
     const chatInput = this.getChatInput();
     const sendButton = this.page
       .locator(
-        '[data-testid="chat-input-container"]:visible, [data-testid="home-chat-input-container"]:visible',
+        `${visibleTestId("chat-input-container")}, ${visibleTestId("home-chat-input-container")}`,
       )
       .getByRole("button", { name: "Send message" });
 

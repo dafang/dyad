@@ -34,6 +34,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
+      electron: resolve(__dirname, "./src/test/electron_stub.ts"),
       "pg-schema-classifier": resolve(
         __dirname,
         "./packages/pg-schema-classifier/src/index.ts",

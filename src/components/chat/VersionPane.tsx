@@ -16,6 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toLocalWebPublicUrl } from "@/lib/local_web_transport";
 
 import { useRunApp } from "@/hooks/useRunApp";
 
@@ -73,7 +74,10 @@ export function VersionPane({ isVisible, onClose }: VersionPaneProps) {
   const screenshotByHash = useMemo(
     () =>
       new Map(
-        screenshotsData?.screenshots.map((s) => [s.commitHash, s.url]) ?? [],
+        screenshotsData?.screenshots.map((s) => [
+          s.commitHash,
+          toLocalWebPublicUrl(s.url),
+        ]) ?? [],
       ),
     [screenshotsData],
   );

@@ -17,13 +17,13 @@ vi.mock("electron-log", () => ({
   },
 }));
 
-// Mock only the ripgrep path resolver to point to the real binary in node_modules
+// Mock only the ripgrep path resolver. Some installs skip @vscode/ripgrep's
+// postinstall script, so fall back to PATH like the production resolver.
 vi.mock("@/ipc/utils/ripgrep_utils", () => ({
   getRgExecutablePath: () => {
     const isWindows = os.platform() === "win32";
     const executableName = isWindows ? "rg.exe" : "rg";
-    // Point to the actual ripgrep binary in node_modules
-    return path.join(
+    const bundledPath = path.join(
       process.cwd(),
       "node_modules",
       "@vscode",
@@ -31,6 +31,7 @@ vi.mock("@/ipc/utils/ripgrep_utils", () => ({
       "bin",
       executableName,
     );
+    return fs.existsSync(bundledPath) ? bundledPath : executableName;
   },
   MAX_FILE_SEARCH_SIZE: 1024 * 1024,
   RIPGREP_EXCLUDED_GLOBS: ["!node_modules/**", "!.git/**", "!.next/**"],

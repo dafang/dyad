@@ -1,8 +1,8 @@
 import { db } from "../../db";
 import { mcpToolConsents } from "../../db/schema";
 import { and, eq } from "drizzle-orm";
-import { IpcMainInvokeEvent } from "electron";
 import crypto from "node:crypto";
+import type { IpcInvokeEventLike } from "./ipc_event";
 
 export type Consent = "ask" | "always" | "denied";
 
@@ -77,7 +77,7 @@ export async function setStoredConsent(
 }
 
 export async function requireMcpToolConsent(
-  event: IpcMainInvokeEvent,
+  event: IpcInvokeEventLike,
   params: {
     serverId: number;
     serverName: string;

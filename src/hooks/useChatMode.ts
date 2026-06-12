@@ -14,6 +14,7 @@ import {
 import { queryKeys } from "@/lib/queryKeys";
 import { useSettings } from "./useSettings";
 import { useFreeAgentQuota } from "./useFreeAgentQuota";
+import { isLocalWebRuntime } from "@/lib/runtime_client";
 
 type ChatModeMutationContext = {
   previousChat?: Chat;
@@ -30,6 +31,9 @@ export function useChatMode(chatId: number | null | undefined) {
   const { settings, envVars, updateSettings } = useSettings();
   const { isQuotaExceeded, isLoading: isQuotaLoading } = useFreeAgentQuota();
   const activeChatId = chatId ?? null;
+  const isLocalWeb = isLocalWebRuntime();
+  const localAgentQuotaRequired = !isLocalWeb;
+  const localAgentProviderRestrictionRequired = !isLocalWeb;
 
   const chatQuery = useQuery({
     queryKey: queryKeys.chats.detail({ chatId: activeChatId }),
@@ -39,7 +43,10 @@ export function useChatMode(chatId: number | null | undefined) {
 
   const freeAgentQuotaAvailable = isQuotaLoading ? undefined : !isQuotaExceeded;
   const effectiveDefaultMode = settings
-    ? getEffectiveDefaultChatMode(settings, envVars, freeAgentQuotaAvailable)
+    ? getEffectiveDefaultChatMode(settings, envVars, freeAgentQuotaAvailable, {
+        localAgentQuotaRequired,
+        localAgentProviderRestrictionRequired,
+      })
     : "build";
 
   const storedChatMode = chatQuery.data?.chatMode ?? null;
@@ -56,8 +63,15 @@ export function useChatMode(chatId: number | null | undefined) {
       mode: storedChatMode,
       settings,
       freeAgentQuotaAvailable,
+      localAgentQuotaRequired,
     });
-  }, [activeChatId, freeAgentQuotaAvailable, settings, storedChatMode]);
+  }, [
+    activeChatId,
+    freeAgentQuotaAvailable,
+    localAgentQuotaRequired,
+    settings,
+    storedChatMode,
+  ]);
 
   const effectiveMode =
     activeChatId && fallbackReason ? effectiveDefaultMode : selectedMode;

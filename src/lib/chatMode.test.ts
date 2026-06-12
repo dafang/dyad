@@ -73,6 +73,41 @@ describe("chat mode resolution", () => {
     ).toEqual({ mode: "build", fallbackReason: "quota-exhausted" });
   });
 
+  it("keeps stored local-agent mode when quota is not required", () => {
+    const settings = makeSettings({
+      defaultChatMode: "build",
+      providerSettings: {
+        google: { apiKey: { value: "test-key" } },
+      },
+    });
+
+    expect(
+      resolveChatMode({
+        storedChatMode: "local-agent",
+        settings,
+        envVars: {},
+        freeAgentQuotaAvailable: false,
+        localAgentQuotaRequired: false,
+      }),
+    ).toEqual({ mode: "local-agent" });
+  });
+
+  it("allows local-agent default without quota or provider restriction", () => {
+    const settings = makeSettings({
+      defaultChatMode: "local-agent",
+      providerSettings: {
+        google: { apiKey: { value: "test-key" } },
+      },
+    });
+
+    expect(
+      getEffectiveDefaultChatMode(settings, {}, false, {
+        localAgentQuotaRequired: false,
+        localAgentProviderRestrictionRequired: false,
+      }),
+    ).toBe("local-agent");
+  });
+
   it("allows stored local-agent mode with a non-OpenAI/Anthropic provider", () => {
     const settings = makeSettings({
       defaultChatMode: "build",

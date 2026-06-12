@@ -4,21 +4,22 @@ import log from "electron-log";
 import type { Worker } from "node:worker_threads";
 import type { RuntimeMode2 } from "@/lib/schemas";
 import { withLock } from "./lock_utils";
-import {
-  destroyCloudSandbox,
-  stopCloudSandboxFileSync,
-  unregisterRunningCloudSandbox,
-} from "./cloud_sandbox_provider";
-import { readSettings } from "../../main/settings";
+import type { WebContentsLike } from "./safe_sender";
+import { readSettings } from "@/main/settings";
 
 const logger = log.scope("process_manager");
+
+export interface RunningAppEventSink {
+  send(channel: string, payload: unknown): void;
+}
 
 // Define a type for the value stored in runningApps
 export interface RunningAppInfo {
   process: ChildProcess | null;
   processId: number;
   mode: RuntimeMode2;
-  rendererSender?: Electron.WebContents;
+  eventSink?: RunningAppEventSink;
+  rendererSender?: WebContentsLike;
   containerName?: string;
   cloudSandboxId?: string;
   cloudPreviewUrl?: string;
@@ -142,11 +143,11 @@ export async function stopAppByInfo(
   appId: number,
   appInfo: RunningAppInfo,
 ): Promise<void> {
-  stopCloudSandboxFileSync(appId);
-
   if (appInfo.mode === "cloud") {
+    const cloudSandboxProvider = await getCloudSandboxProvider();
+    cloudSandboxProvider.stopCloudSandboxFileSync(appId);
     if (appInfo.cloudSandboxId) {
-      await destroyCloudSandbox(appInfo.cloudSandboxId);
+      await cloudSandboxProvider.destroyCloudSandbox(appInfo.cloudSandboxId);
     }
   } else if (appInfo.mode === "docker") {
     const containerName = appInfo.containerName || `dyad-app-${appId}`;
@@ -162,7 +163,10 @@ export async function stopAppByInfo(
 
   appInfo.cloudLogAbortController?.abort();
   appInfo.cloudLogAbortController = undefined;
-  unregisterRunningCloudSandbox({ appId });
+  if (appInfo.mode === "cloud") {
+    const cloudSandboxProvider = await getCloudSandboxProvider();
+    cloudSandboxProvider.unregisterRunningCloudSandbox({ appId });
+  }
   runningApps.delete(appId);
 }
 
@@ -183,8 +187,12 @@ export function removeAppIfCurrentProcess(
     }
     currentAppInfo.cloudLogAbortController?.abort();
     currentAppInfo.cloudLogAbortController = undefined;
-    stopCloudSandboxFileSync(appId);
-    unregisterRunningCloudSandbox({ appId });
+    if (currentAppInfo.mode === "cloud") {
+      void getCloudSandboxProvider().then((cloudSandboxProvider) => {
+        cloudSandboxProvider.stopCloudSandboxFileSync(appId);
+        cloudSandboxProvider.unregisterRunningCloudSandbox({ appId });
+      });
+    }
     runningApps.delete(appId);
     logger.info(
       `Removed app ${appId} (processId ${currentAppInfo.processId}) from running map. Current size: ${runningApps.size}`,
@@ -245,7 +253,7 @@ export function getCurrentlySelectedAppId(): number | null {
  * and are not the currently selected app.
  */
 export async function garbageCollectIdleApps(): Promise<void> {
-  if (readSettings().previewIdleTimeoutPolicy === "never") {
+  if (readSettingsForProcessManager().previewIdleTimeoutPolicy === "never") {
     return;
   }
 
@@ -302,6 +310,10 @@ export async function garbageCollectIdleApps(): Promise<void> {
       `Garbage collection complete. Stopped ${appsToStop.length} idle app(s). Running apps: ${runningApps.size}`,
     );
   }
+}
+
+function readSettingsForProcessManager() {
+  return readSettings();
 }
 
 // Start the garbage collection timer
@@ -369,15 +381,19 @@ export function stopAllAppsSync(): void {
     if (appInfo.mode === "cloud") {
       appInfo.cloudLogAbortController?.abort();
       appInfo.cloudLogAbortController = undefined;
-      stopCloudSandboxFileSync(appId);
-      unregisterRunningCloudSandbox({ appId });
-      if (appInfo.cloudSandboxId) {
-        void destroyCloudSandbox(appInfo.cloudSandboxId).catch((error) => {
-          logger.warn(
-            `Failed to destroy cloud sandbox ${appInfo.cloudSandboxId} for app ${appId} during quit: ${error}`,
-          );
-        });
-      }
+      void getCloudSandboxProvider().then((cloudSandboxProvider) => {
+        cloudSandboxProvider.stopCloudSandboxFileSync(appId);
+        cloudSandboxProvider.unregisterRunningCloudSandbox({ appId });
+        if (appInfo.cloudSandboxId) {
+          void cloudSandboxProvider
+            .destroyCloudSandbox(appInfo.cloudSandboxId)
+            .catch((error) => {
+              logger.warn(
+                `Failed to destroy cloud sandbox ${appInfo.cloudSandboxId} for app ${appId} during quit: ${error}`,
+              );
+            });
+        }
+      });
       logger.info(
         `Cloud sandbox ${appInfo.cloudSandboxId ?? "<unknown>"} for app ${appId} will be reconciled asynchronously after quit if needed.`,
       );
@@ -407,4 +423,10 @@ export function stopAllAppsSync(): void {
     }
     runningApps.delete(appId);
   }
+}
+
+async function getCloudSandboxProvider(): Promise<
+  typeof import("@/ipc/utils/cloud_sandbox_provider")
+> {
+  return import("@/ipc/utils/cloud_sandbox_provider");
 }

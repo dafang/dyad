@@ -1,0 +1,52 @@
+{
+  "step_id": "verify_targeted",
+  "status": "failed",
+  "summary": "Verification command failed: npm test -- src/ipc/contracts/core.test.ts",
+  "output": {
+    "status": "failed",
+    "step_id": "verify_targeted",
+    "checks": [
+      {
+        "id": "test_contract_core",
+        "command": "npm test -- src/ipc/contracts/core.test.ts",
+        "exit_code": 127,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 139,
+        "stdout": "\n> dyad@1.3.0 test\n> cross-env NODE_OPTIONS=--no-deprecation VITE_CJS_IGNORE_WARNING=true vitest run src/ipc/contracts/core.test.ts\n\n",
+        "stderr": "sh: cross-env: command not found\n",
+        "stdout_bytes": 133,
+        "stderr_bytes": 33,
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "acceptable": false,
+        "soft_failed": false,
+        "failure_category": "shell_error",
+        "repair_hint": "Fix quoting, executable path, or permission assumptions."
+      }
+    ]
+  },
+  "verify": {
+    "ok": false,
+    "checks": [
+      {
+        "id": "test_contract_core",
+        "command": "npm test -- src/ipc/contracts/core.test.ts",
+        "exit_code": 127,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 139,
+        "stdout": "\n> dyad@1.3.0 test\n> cross-env NODE_OPTIONS=--no-deprecation VITE_CJS_IGNORE_WARNING=true vitest run src/ipc/contracts/core.test.ts\n\n",
+        "stderr": "sh: cross-env: command not found\n",
+        "stdout_bytes": 133,
+        "stderr_bytes": 33,
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "acceptable": false,
+        "soft_failed": false,
+        "failure_category": "shell_error",
+        "repair_hint": "Fix quoting, executable path, or permission assumptions."
+      }
+    ]
+  }
+}

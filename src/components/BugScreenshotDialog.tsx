@@ -4,6 +4,10 @@ import { Button } from "./ui/button";
 import { BugIcon, Camera } from "lucide-react";
 import { useState } from "react";
 import { ScreenshotSuccessDialog } from "./ScreenshotSuccessDialog";
+import {
+  getWebHostUnsupportedMessage,
+  webHostCapabilities,
+} from "@/lib/web_host_capabilities";
 
 interface BugScreenshotDialogProps {
   isOpen: boolean;
@@ -25,6 +29,11 @@ export function BugScreenshotDialog({
     onClose();
     setTimeout(async () => {
       try {
+        if (webHostCapabilities.isLocalWeb) {
+          const result = await webHostCapabilities.takeScreenshot();
+          setScreenshotError(getWebHostUnsupportedMessage(result));
+          return;
+        }
         await ipc.system.takeScreenshot();
         setIsScreenshotSuccessOpen(true);
       } catch (error) {

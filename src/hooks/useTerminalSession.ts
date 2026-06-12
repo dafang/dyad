@@ -46,14 +46,6 @@ function getChunkAfterScrollback(
   return payload.chunk.slice(scrollbackEndOffset - payload.startOffset);
 }
 
-function getIpcRenderer():
-  | {
-      on(channel: string, listener: (payload: unknown) => void): () => void;
-    }
-  | undefined {
-  return (window as any).electron?.ipcRenderer;
-}
-
 export function useTerminalSession({
   appId,
   enabled,
@@ -124,8 +116,8 @@ export function useTerminalSession({
 
         activeSessionId = result.sessionId;
         setSession(result);
-        const ipcRenderer = getIpcRenderer();
-        if (!ipcRenderer) {
+        const eventSubscribe = ipc.events.on;
+        if (!eventSubscribe) {
           if (result.scrollback) {
             onDataRef.current(result.scrollback);
           }
@@ -138,7 +130,7 @@ export function useTerminalSession({
           return;
         }
 
-        unsubscribeData = ipcRenderer.on(
+        unsubscribeData = eventSubscribe(
           terminalDataChannel(result.sessionId),
           (payload) => {
             const parsed = TerminalDataPayloadSchema.safeParse(payload);
@@ -152,7 +144,7 @@ export function useTerminalSession({
           },
         );
 
-        unsubscribeExit = ipcRenderer.on(
+        unsubscribeExit = eventSubscribe(
           terminalExitChannel(result.sessionId),
           (payload) => {
             const parsed = TerminalExitPayloadSchema.safeParse(payload);

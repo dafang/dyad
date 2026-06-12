@@ -71,7 +71,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { useRunApp } from "@/hooks/useRunApp";
+import { type RestartAppOptions, useRunApp } from "@/hooks/useRunApp";
 import { useSettings } from "@/hooks/useSettings";
 import { useShortcut } from "@/hooks/useShortcut";
 import { cn } from "@/lib/utils";
@@ -88,6 +88,12 @@ import { resolvePreviewBrowserUrl } from "./previewBrowserUrl";
 import { PreviewToolbar } from "./PreviewToolbar";
 import { PreviewLoadingScreen } from "./PreviewLoadingScreen";
 import { useTranslation } from "react-i18next";
+import {
+  getPreviewDisplayPath,
+  isPreviewRootUrl,
+  isSamePreviewOrigin,
+  normalizePreviewUrlForApp,
+} from "./previewUrl";
 
 interface ErrorBannerProps {
   error:
@@ -195,6 +201,28 @@ const ErrorBanner = ({ error, onDismiss, onAIFix }: ErrorBannerProps) => {
 
 const SCREENSHOT_CAPTURE_DELAY_MS = 3_000;
 
+function updatePreservedPreviewUrl({
+  setPreservedUrls,
+  appId,
+  url,
+}: {
+  setPreservedUrls: (
+    update: (prev: Map<number, string>) => Map<number, string>,
+  ) => void;
+  appId: number;
+  url: string;
+}) {
+  setPreservedUrls((prev) => {
+    const next = new Map(prev);
+    if (isPreviewRootUrl(url, appId)) {
+      next.delete(appId);
+    } else {
+      next.set(appId, url);
+    }
+    return next;
+  });
+}
+
 // Preview iframe component
 export const PreviewIframe = ({ loading }: { loading: boolean }) => {
   const { t } = useTranslation("home");
@@ -231,13 +259,22 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
   const [preservedUrls, setPreservedUrls] = useAtom(previewCurrentUrlAtom);
 
   // Get the initial URL to use - check if we have a preserved URL from before HMR remount
-  const initialUrl = selectedAppId
-    ? (preservedUrls.get(selectedAppId) ?? null)
-    : null;
+  const initialUrl = normalizePreviewUrlForApp({
+    url: selectedAppId ? (preservedUrls.get(selectedAppId) ?? null) : null,
+    appUrl,
+    appId: selectedAppId,
+  });
 
   // Navigation state - initialize with preserved URL if available
   const [isComponentSelectorInitialized, setIsComponentSelectorInitialized] =
     useState(false);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
   const [canGoBack, setCanGoBack] = useState(!!initialUrl);
   const [canGoForward, setCanGoForward] = useState(false);
   const [navigationHistory, setNavigationHistory] = useState<string[]>(() => {
@@ -1075,16 +1112,11 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
         // Also update UI state
         appendConsoleEntries({ appId: logEntry.appId, entries: [logEntry] });
       } else if (type === "pushState" || type === "replaceState") {
-        // Resolve relative URLs against the app's base URL so that all
-        // entries in navigationHistory are always absolute URLs.
-        let resolvedUrl = payload?.newUrl;
-        if (resolvedUrl) {
-          try {
-            resolvedUrl = new URL(resolvedUrl, appUrl ?? undefined).href;
-          } catch {
-            // If it can't be resolved at all, keep the raw value
-          }
-        }
+        const resolvedUrl = normalizePreviewUrlForApp({
+          url: payload?.newUrl,
+          appUrl,
+          appId: selectedAppId,
+        });
 
         // Update navigation history based on the type of state change
         if (type === "pushState" && resolvedUrl) {
@@ -1095,72 +1127,23 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
           ];
           setNavigationHistory(newHistory);
           setCurrentHistoryPosition(newHistory.length - 1);
-          // Update the current iframe URL ref to match the navigation
           currentIframeUrlRef.current = resolvedUrl;
-          // Preserve URL for HMR remounts - only if it's a different route from root
-          // Compare origins and check if there's a meaningful path
-          if (selectedAppId && appUrl) {
-            try {
-              const newUrlObj = new URL(resolvedUrl);
-              const appUrlObj = new URL(appUrl);
-              // Only preserve if there's a non-root path
-              if (
-                newUrlObj.origin === appUrlObj.origin &&
-                newUrlObj.pathname !== "/" &&
-                newUrlObj.pathname !== ""
-              ) {
-                setPreservedUrls((prev) => {
-                  const next = new Map(prev);
-                  next.set(selectedAppId, resolvedUrl);
-                  return next;
-                });
-              } else if (newUrlObj.origin === appUrlObj.origin) {
-                // Clear preserved URL when navigating back to root
-                setPreservedUrls((prev) => {
-                  const next = new Map(prev);
-                  next.delete(selectedAppId);
-                  return next;
-                });
-              }
-            } catch {
-              // Invalid URL, don't preserve
-            }
-          }
+          updatePreservedPreviewUrl({
+            setPreservedUrls,
+            appId: selectedAppId!,
+            url: resolvedUrl,
+          });
         } else if (type === "replaceState" && resolvedUrl) {
           // For replaceState, we replace the current URL
           const newHistory = [...navigationHistory];
           newHistory[currentHistoryPosition] = resolvedUrl;
           setNavigationHistory(newHistory);
-          // Update the current iframe URL ref to match the navigation
           currentIframeUrlRef.current = resolvedUrl;
-          // Preserve URL for HMR remounts - only if it's a different route from root
-          if (selectedAppId && appUrl) {
-            try {
-              const newUrlObj = new URL(resolvedUrl);
-              const appUrlObj = new URL(appUrl);
-              // Only preserve if there's a non-root path
-              if (
-                newUrlObj.origin === appUrlObj.origin &&
-                newUrlObj.pathname !== "/" &&
-                newUrlObj.pathname !== ""
-              ) {
-                setPreservedUrls((prev) => {
-                  const next = new Map(prev);
-                  next.set(selectedAppId, resolvedUrl);
-                  return next;
-                });
-              } else if (newUrlObj.origin === appUrlObj.origin) {
-                // Clear preserved URL when navigating back to root
-                setPreservedUrls((prev) => {
-                  const next = new Map(prev);
-                  next.delete(selectedAppId);
-                  return next;
-                });
-              }
-            } catch {
-              // Invalid URL, don't preserve
-            }
-          }
+          updatePreservedPreviewUrl({
+            setPreservedUrls,
+            appId: selectedAppId!,
+            url: resolvedUrl,
+          });
         }
       }
     };
@@ -1258,7 +1241,11 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
     if (canGoBack && iframeRef.current?.contentWindow) {
       const newPosition = currentHistoryPosition - 1;
       if (newPosition < 0 || newPosition >= navigationHistory.length) return;
-      const targetUrl = navigationHistory[newPosition];
+      const targetUrl = normalizePreviewUrlForApp({
+        url: navigationHistory[newPosition],
+        appUrl,
+        appId: selectedAppId,
+      });
       if (!targetUrl) return;
 
       // Send the target URL to navigate to (browser history.back() doesn't work in Electron iframes)
@@ -1278,29 +1265,12 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
       currentIframeUrlRef.current = targetUrl;
 
       // Update preservedUrls to match navigation (for HMR remounts)
-      if (selectedAppId && appUrl) {
-        try {
-          const targetUrlObj = new URL(targetUrl);
-          const appUrlObj = new URL(appUrl);
-          if (targetUrlObj.origin === appUrlObj.origin) {
-            // Clear preserved URL if navigating back to root, otherwise update it
-            if (targetUrlObj.pathname === "/" || targetUrlObj.pathname === "") {
-              setPreservedUrls((prev) => {
-                const next = new Map(prev);
-                next.delete(selectedAppId);
-                return next;
-              });
-            } else {
-              setPreservedUrls((prev) => {
-                const next = new Map(prev);
-                next.set(selectedAppId, targetUrl);
-                return next;
-              });
-            }
-          }
-        } catch {
-          // Invalid URL, don't update preservedUrls
-        }
+      if (selectedAppId !== null) {
+        updatePreservedPreviewUrl({
+          setPreservedUrls,
+          appId: selectedAppId,
+          url: targetUrl,
+        });
       }
     }
   };
@@ -1310,7 +1280,11 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
     if (canGoForward && iframeRef.current?.contentWindow) {
       const newPosition = currentHistoryPosition + 1;
       if (newPosition < 0 || newPosition >= navigationHistory.length) return;
-      const targetUrl = navigationHistory[newPosition];
+      const targetUrl = normalizePreviewUrlForApp({
+        url: navigationHistory[newPosition],
+        appUrl,
+        appId: selectedAppId,
+      });
       if (!targetUrl) return;
 
       // Send the target URL to navigate to (browser history.forward() doesn't work in Electron iframes)
@@ -1330,29 +1304,12 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
       currentIframeUrlRef.current = targetUrl;
 
       // Update preservedUrls to match navigation (for HMR remounts)
-      if (selectedAppId && appUrl) {
-        try {
-          const targetUrlObj = new URL(targetUrl);
-          const appUrlObj = new URL(appUrl);
-          if (targetUrlObj.origin === appUrlObj.origin) {
-            // Clear preserved URL if navigating forward to root, otherwise update it
-            if (targetUrlObj.pathname === "/" || targetUrlObj.pathname === "") {
-              setPreservedUrls((prev) => {
-                const next = new Map(prev);
-                next.delete(selectedAppId);
-                return next;
-              });
-            } else {
-              setPreservedUrls((prev) => {
-                const next = new Map(prev);
-                next.set(selectedAppId, targetUrl);
-                return next;
-              });
-            }
-          }
-        } catch {
-          // Invalid URL, don't update preservedUrls
-        }
+      if (selectedAppId !== null) {
+        updatePreservedPreviewUrl({
+          setPreservedUrls,
+          appId: selectedAppId,
+          url: targetUrl,
+        });
       }
     }
   };
@@ -1360,25 +1317,20 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
   // Function to handle reload
   const handleReload = () => {
     // Store the current URL to preserve the route during reload
-    const currentUrl = navigationHistory[currentHistoryPosition] || appUrl;
+    const currentUrl = normalizePreviewUrlForApp({
+      url: navigationHistory[currentHistoryPosition] || appUrl,
+      appUrl,
+      appId: selectedAppId,
+    });
 
     // Validate that the URL is same-origin as appUrl to prevent XSS/URL injection
     if (currentUrl && appUrl) {
-      try {
-        const currentOrigin = new URL(currentUrl).origin;
-        const appOrigin = new URL(appUrl).origin;
-
-        // Only use the current URL if it has the same origin as the app URL
-        if (currentOrigin === appOrigin) {
-          currentIframeUrlRef.current = currentUrl;
-        } else {
-          console.warn(
-            `Rejecting reload URL ${currentUrl} - origin mismatch with app URL ${appUrl}`,
-          );
-          currentIframeUrlRef.current = appUrl;
-        }
-      } catch (e) {
-        console.error("Invalid URL during reload validation", e);
+      if (isSamePreviewOrigin(currentUrl, appUrl)) {
+        currentIframeUrlRef.current = currentUrl;
+      } else {
+        console.warn(
+          `Rejecting reload URL ${currentUrl} - origin mismatch with app URL ${appUrl}`,
+        );
         currentIframeUrlRef.current = appUrl;
       }
     } else {
@@ -1397,9 +1349,14 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
   // Function to navigate to a specific route
   const navigateToRoute = (path: string) => {
     if (iframeRef.current?.contentWindow && appUrl) {
-      // Create the full URL by combining the base URL with the path
-      const baseUrl = new URL(appUrl).origin;
-      const newUrl = `${baseUrl}${path}`;
+      const newUrl = normalizePreviewUrlForApp({
+        url: path,
+        appUrl,
+        appId: selectedAppId,
+      });
+      if (!newUrl) {
+        return;
+      }
 
       // Use postMessage to navigate (same as back/forward) - this uses location.replace()
       // which provides smooth navigation without the black screen flicker that location.href causes
@@ -1425,21 +1382,12 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
       currentIframeUrlRef.current = newUrl;
 
       // Update preservedUrls to match navigation (for HMR remounts)
-      if (selectedAppId) {
-        // Clear preserved URL if navigating to root, otherwise update it
-        if (path === "/" || path === "") {
-          setPreservedUrls((prev) => {
-            const next = new Map(prev);
-            next.delete(selectedAppId);
-            return next;
-          });
-        } else {
-          setPreservedUrls((prev) => {
-            const next = new Map(prev);
-            next.set(selectedAppId, newUrl);
-            return next;
-          });
-        }
+      if (selectedAppId !== null) {
+        updatePreservedPreviewUrl({
+          setPreservedUrls,
+          appId: selectedAppId,
+          url: newUrl,
+        });
       }
     }
   };
@@ -1457,9 +1405,14 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
     }
 
     try {
-      const currentOrigin = new URL(currentUrl).origin;
-      const appOrigin = new URL(appUrl).origin;
-      return currentOrigin === appOrigin ? currentUrl : appUrl;
+      const normalizedUrl = normalizePreviewUrlForApp({
+        url: currentUrl,
+        appUrl,
+        appId: selectedAppId,
+      });
+      return normalizedUrl && isSamePreviewOrigin(normalizedUrl, appUrl)
+        ? normalizedUrl
+        : appUrl;
     } catch {
       return appUrl;
     }
@@ -1474,16 +1427,26 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
     );
   }
 
+  const restartSelectedApp = (options: RestartAppOptions = {}) => {
+    const restartingAppId = selectedAppId;
+    restartApp({
+      ...options,
+      isCancelled: () =>
+        !isMountedRef.current || selectedAppIdRef.current !== restartingAppId,
+      suppressCancelledError: true,
+    });
+  };
+
   const onRestart = () => {
-    restartApp();
+    restartSelectedApp();
   };
 
   const onCleanRestart = () => {
-    restartApp({ removeNodeModules: true });
+    restartSelectedApp({ removeNodeModules: true });
   };
 
   const onRecreateSandbox = () => {
-    restartApp({ recreateSandbox: true });
+    restartSelectedApp({ recreateSandbox: true });
   };
 
   return (
@@ -1492,7 +1455,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
       {!annotatorMode && (
         <PreviewToolbar>
           {/* Browser navigation group */}
-          <div className="flex items-center space-x-2 ml-auto">
+          <div className="flex items-center gap-2 sm:ml-auto">
             {isCloudMode && (
               <Tooltip>
                 <TooltipTrigger
@@ -1547,7 +1510,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
           </div>
 
           {/* Address Bar - white pill with device mode, refresh + external inside */}
-          <div className="relative w-1/2 min-w-20 flex items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-full pl-1 pr-1">
+          <div className="relative order-3 flex w-full min-w-0 items-center rounded-full border border-gray-200 bg-white pl-1 pr-1 sm:order-none sm:w-1/2 sm:min-w-20 dark:border-gray-700 dark:bg-gray-900">
             <Popover open={isDevicePopoverOpen} modal={false}>
               <Tooltip>
                 <TooltipTrigger
@@ -1635,14 +1598,10 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                   className="truncate flex-1 min-w-0 text-left"
                   data-testid="preview-address-bar-path"
                 >
-                  {(() => {
-                    try {
-                      return new URL(navigationHistory[currentHistoryPosition])
-                        .pathname;
-                    } catch {
-                      return "/";
-                    }
-                  })()}
+                  {getPreviewDisplayPath({
+                    url: navigationHistory[currentHistoryPosition],
+                    appId: selectedAppId,
+                  })}
                 </span>
                 <ChevronDown
                   size={12}
@@ -1705,6 +1664,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                         const url = await resolvePreviewBrowserUrl({
                           isCloudMode,
                           selectedAppId,
+                          appUrl,
                           originalUrl,
                           createCloudSandboxShareLink,
                         });
@@ -1721,7 +1681,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                       isCloudMode
                         ? selectedAppId === null ||
                           isCreatingCloudSandboxShareLink
-                        : !originalUrl
+                        : !appUrl && !originalUrl
                     }
                     className="flex-shrink-0 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
                   />
@@ -1734,7 +1694,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
           </div>
 
           {/* Right action group - restart, editing tools, panel toggle */}
-          <div className="flex items-center space-x-1 ml-auto pl-2">
+          <div className="flex items-center gap-1 sm:ml-auto sm:pl-2">
             <Tooltip>
               <TooltipTrigger
                 render={

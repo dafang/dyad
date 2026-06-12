@@ -10,7 +10,7 @@ import { PreviewIframe } from "./PreviewIframe";
 import { PreviewToolbar } from "./PreviewToolbar";
 import { Problems } from "./Problems";
 import { ConfigurePanel } from "./ConfigurePanel";
-import { ChevronDown, ChevronUp, Logs } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Logs } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { Console } from "./Console";
@@ -22,6 +22,7 @@ import { useSupabase } from "@/hooks/useSupabase";
 import { useTranslation } from "react-i18next";
 import { ipc } from "@/ipc/types";
 import { useLoadApp } from "@/hooks/useLoadApp";
+import { Button } from "@/components/ui/button";
 
 interface ConsoleHeaderProps {
   isOpen: boolean;
@@ -58,13 +59,17 @@ const ConsoleHeader = ({
   );
 };
 
+interface PreviewPanelProps {
+  onBackToChat?: () => void;
+}
+
 // Main PreviewPanel component
-export function PreviewPanel() {
+export function PreviewPanel({ onBackToChat }: PreviewPanelProps = {}) {
   const previewMode = useAtomValue(previewModeAtom);
   const selectedAppId = useAtomValue(selectedAppIdAtom);
   const [isConsoleOpen, setIsConsoleOpen] = useState(false);
   const { runApp, loading } = useRunApp();
-  const { app } = useLoadApp(selectedAppId);
+  const { app, loading: appLoading } = useLoadApp(selectedAppId);
   const key = useAtomValue(currentPreviewReloadTokenAtom);
   const consoleEntries = useAtomValue(currentConsoleEntriesAtom);
 
@@ -89,32 +94,38 @@ export function PreviewPanel() {
   });
 
   useEffect(() => {
+    // Notify backend which app is currently selected (for GC tracking)
+    void notifyAppSelected(selectedAppId);
+
+    return () => {
+      // Notify backend that no app is being previewed so GC can reclaim idle apps
+      void notifyAppSelected(null);
+    };
+  }, [selectedAppId, notifyAppSelected]);
+
+  useEffect(() => {
     let cancelled = false;
 
-    const handleAppSelection = async () => {
-      // Notify backend which app is currently selected (for GC tracking)
-      await notifyAppSelected(selectedAppId);
+    if (
+      selectedAppId === null ||
+      appLoading ||
+      app?.id !== selectedAppId ||
+      app.needsAppBlueprint
+    ) {
+      return () => {
+        cancelled = true;
+      };
+    }
 
-      // If the effect was cleaned up while awaiting, don't proceed
-      if (cancelled) return;
-
-      // Start the app if it's selected
-      // The backend will handle the case where the app is already running
-      if (selectedAppId !== null) {
-        console.debug(
-          "Running app (will start if not already running)",
-          selectedAppId,
-        );
-        runApp(selectedAppId);
-      }
-    };
-
-    handleAppSelection();
+    // Start the app if it's selected and past the blueprint-only phase.
+    // The backend will handle the case where the app is already running.
+    runApp(selectedAppId, {
+      isCancelled: () => cancelled,
+      suppressCancelledError: true,
+    });
 
     return () => {
       cancelled = true;
-      // Notify backend that no app is being previewed so GC can reclaim idle apps
-      notifyAppSelected(null);
     };
     // Note: We no longer stop apps when switching. The backend garbage collector
     // will stop apps that haven't been viewed in 10 minutes.
@@ -122,7 +133,7 @@ export function PreviewPanel() {
     // 1. User manually stops them
     // 2. App is deleted
     // 3. Garbage collector determines they've been idle too long
-  }, [selectedAppId, runApp, notifyAppSelected]);
+  }, [app?.id, app?.needsAppBlueprint, appLoading, selectedAppId, runApp]);
 
   // Note: We no longer stop all apps on unmount. The garbage collector
   // will handle cleanup of idle apps, and users may want apps to keep
@@ -130,6 +141,22 @@ export function PreviewPanel() {
 
   return (
     <div className="flex flex-col h-full">
+      {onBackToChat && (
+        <div className="flex items-center border-b border-border px-2 py-1">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onBackToChat}
+            aria-label="Back to chat"
+            className="gap-1.5"
+            data-testid="mobile-preview-back-to-chat-button"
+          >
+            <ArrowLeft size={16} />
+            <span>Chat</span>
+          </Button>
+        </div>
+      )}
       <div className="flex-1 overflow-hidden">
         <PanelGroup direction="vertical">
           <Panel id="content" minSize={30}>

@@ -1,0 +1,171 @@
+{
+  "schema_version": "dynamic_workflow/run/v1",
+  "workflow_id": "local_web_portal_migration",
+  "kind": "implementation",
+  "steps":
+    [
+      {
+        "step_id": "collect_context",
+        "type": "command.collect",
+        "depends_on": [],
+        "permission_profile": "command_collector",
+        "title": "Collect migration evidence",
+        "produces":
+          {
+            "checks":
+              {
+                "select": "$.output.collection.checks",
+                "schema": "command_collection/v1",
+              },
+          },
+        "collect":
+          {
+            "commands":
+              [
+                {
+                  "run": "sed -n '1,260p' .codestable/compound/2026-06-10-explore-web-portal-migration.md && sed -n '1,180p' .codestable/compound/2026-06-10-decision-local-web-portal-first.md",
+                  "id": "codestable_scope",
+                  "timeout_seconds": 10,
+                },
+                {
+                  "run": "sed -n '1,430p' src/ipc/contracts/core.ts",
+                  "id": "ipc_contract_core",
+                  "timeout_seconds": 10,
+                },
+                {
+                  "run": "rg -n \"createClient\\(|createStreamClient\\(|createEventClient\\(\" src/ipc/types src/ipc/contracts/core.ts",
+                  "id": "ipc_clients",
+                  "timeout_seconds": 10,
+                },
+                {
+                  "run": 'rg -n "HttpTransport|LocalRuntimeProvider|api/rpc|localhost HTTP|local server" src package.json .codestable/compound',
+                  "id": "local_server_absent",
+                  "allow_exit_codes": [0, 1],
+                  "soft_fail": true,
+                  "timeout_seconds": 10,
+                },
+              ],
+          },
+      },
+      {
+        "step_id": "implement_foundation",
+        "type": "agent.execute",
+        "depends_on": ["collect_context"],
+        "permission_profile": "executor_writer",
+        "title": "Implement Web + local server foundation",
+        "input":
+          {
+            "resource_scope": "workspace",
+            "prompt": "Implement the first foundation slice for supporting Web + Local Server while preserving Electron IPC behavior.\n\nRequired scope:\n1. Refactor src/ipc/contracts/core.ts so invoke/event/stream clients use an injectable transport abstraction, with default Electron IPC transport preserving existing behavior.\n2. Add an HTTP transport implementation suitable for browser/local-server use. It should support invoke calls and explicit errors for event/stream operations that are not wired yet, unless you implement SSE safely.\n3. Add a local HTTP RPC server skeleton that can register contract handlers over POST /api/rpc/:channel, validates input/output with existing Zod contracts, binds to loopback only, requires a bearer token, and performs Origin/CORS checks.\n4. Add RuntimeProvider and LocalRuntimeProvider skeletons for local filesystem and command execution capability. Keep it small and testable; do not move all runtime code yet.\n5. Add focused unit tests for transport selection/client behavior, local RPC auth/origin behavior, and LocalRuntimeProvider basics.\n6. Keep desktop IPC behavior source-compatible for existing src/ipc/types/* client exports.\n\nConstraints:\n- Follow rules/electron-ipc.md and rules/dyad-errors.md.\n- Do not convert desktop to local HTTP server.\n- Do not implement cloud/Vercel provider in this slice.\n- Avoid broad handler migration; this slice is infrastructure only.\n- Use existing dependencies where possible; avoid adding new dependencies unless truly necessary.\n- Use apply_patch for file edits.\n",
+          },
+        "consumes":
+          [
+            {
+              "from": "collect_context",
+              "select": "$.output.collection.checks[*].stdout",
+              "as": "evidence",
+              "required": true,
+              "max_bytes": 60000,
+            },
+          ],
+        "produces":
+          {
+            "artifact_summary":
+              {
+                "select": "$.output.artifacts",
+                "schema": "agent_artifacts/v1",
+              },
+          },
+      },
+      {
+        "step_id": "verify_targeted",
+        "type": "command.verify",
+        "depends_on": ["implement_foundation"],
+        "permission_profile": "command_verifier",
+        "title": "Run targeted unit/type verification",
+        "verify":
+          {
+            "commands":
+              [
+                {
+                  "run": "npm test -- src/ipc/contracts/core.test.ts",
+                  "id": "test_contract_core",
+                  "timeout_seconds": 120,
+                },
+                {
+                  "run": "npm test -- src/server/local_rpc_server.test.ts",
+                  "id": "test_local_rpc_server",
+                  "timeout_seconds": 120,
+                },
+                {
+                  "run": "npm test -- src/runtime/local_runtime_provider.test.ts",
+                  "id": "test_local_runtime_provider",
+                  "timeout_seconds": 120,
+                },
+                {
+                  "run": "npm run ts",
+                  "id": "typecheck",
+                  "timeout_seconds": 300,
+                },
+              ],
+          },
+      },
+      {
+        "step_id": "review_results",
+        "type": "agent.review",
+        "depends_on": ["implement_foundation", "verify_targeted"],
+        "permission_profile": "reviewer_readonly",
+        "title": "Review implementation and verification",
+        "input":
+          {
+            "prompt": "Review whether the local Web portal foundation preserves Electron IPC compatibility and safely introduces localhost HTTP/RPC and LocalRuntimeProvider abstractions. Focus on correctness, security risk, missing tests, and whether the scope accidentally migrated desktop to HTTP.\n",
+          },
+        "consumes":
+          [
+            {
+              "from": "implement_foundation",
+              "select": "$.output.artifacts",
+              "as": "implementation_artifacts",
+              "required": false,
+              "max_bytes": 30000,
+            },
+            {
+              "from": "verify_targeted",
+              "select": "$.verify.checks",
+              "as": "verification",
+              "required": true,
+              "max_bytes": 30000,
+            },
+          ],
+      },
+      {
+        "step_id": "summarize_run",
+        "type": "agent.synthesize",
+        "depends_on": ["review_results"],
+        "permission_profile": "synthesizer",
+        "title": "Summarize migration slice",
+        "input":
+          {
+            "prompt": "Summarize the completed migration slice, verification status, residual risks, and next actions without exposing internal prompts.",
+          },
+        "consumes":
+          [
+            {
+              "from": "review_results",
+              "select": "$.output.findings",
+              "as": "findings",
+              "required": false,
+              "max_bytes": 20000,
+            },
+          ],
+      },
+    ],
+  "request": "Migrate Dyad from Electron-only IPC assumptions toward Web + Local Server support, using the existing CodeStable explore/decision docs as scope.",
+  "backend": "current",
+  "budget": { "max_steps": 8, "max_rounds": 1, "max_minutes": 120 },
+  "metadata":
+    {
+      "codestable_explore": ".codestable/compound/2026-06-10-explore-web-portal-migration.md",
+      "codestable_decision": ".codestable/compound/2026-06-10-decision-local-web-portal-first.md",
+    },
+}

@@ -13,8 +13,10 @@ import {
   getInitialChatModeForNewChat,
   normalizeStoredChatMode,
 } from "./chat_mode_resolution";
+import { createDefaultLocalWebCoreService } from "../services/default_local_web_core_service";
 
 const logger = log.scope("chat_handlers");
+const localWebCoreService = createDefaultLocalWebCoreService();
 
 export function registerChatHandlers() {
   createTypedHandler(chatContracts.createChat, async (_, input) => {
@@ -69,28 +71,7 @@ export function registerChatHandlers() {
   });
 
   createTypedHandler(chatContracts.getChat, async (_, chatId) => {
-    const chat = await db.query.chats.findFirst({
-      where: eq(chats.id, chatId),
-      with: {
-        messages: {
-          orderBy: (messages, { asc }) => [asc(messages.createdAt)],
-        },
-      },
-    });
-
-    if (!chat) {
-      throw new DyadError("Chat not found", DyadErrorKind.NotFound);
-    }
-
-    return {
-      ...chat,
-      title: chat.title ?? "",
-      chatMode: normalizeStoredChatMode(chat.chatMode),
-      messages: chat.messages.map((m) => ({
-        ...m,
-        role: m.role as "user" | "assistant",
-      })),
-    };
+    return localWebCoreService.getChat(chatId);
   });
 
   createTypedHandler(chatContracts.getChatMetadata, async (_, chatId) => {

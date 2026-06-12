@@ -15,12 +15,13 @@ const logger = log.scope("db");
 
 // Database connection factory
 let _db: ReturnType<typeof drizzle> | null = null;
+let configuredUserDataPath: string | undefined;
 
 /**
  * Get the database path based on the current environment
  */
 export function getDatabasePath(): string {
-  return path.join(getUserDataPath(), "sqlite.db");
+  return path.join(getConfiguredUserDataPath(), "sqlite.db");
 }
 
 export function getDatabaseFilePaths(): string[] {
@@ -52,7 +53,7 @@ export function initializeDatabase(): BetterSQLite3Database<typeof schema> & {
     logger.error("Error checking database file:", error);
   }
 
-  fs.mkdirSync(getUserDataPath(), { recursive: true });
+  fs.mkdirSync(getConfiguredUserDataPath(), { recursive: true });
 
   const sqlite = new Database(dbPath, { timeout: 10000 });
   sqlite.pragma("foreign_keys = ON");
@@ -97,6 +98,13 @@ export function closeDatabase(): void {
   database.$client.close();
 }
 
+export function configureDatabaseUserDataPath(userDataPath: string): void {
+  if (_db) {
+    throw new Error("Cannot configure database path after initialization");
+  }
+  configuredUserDataPath = userDataPath;
+}
+
 /**
  * Get the database instance (throws if not initialized)
  */
@@ -119,3 +127,7 @@ export const db = new Proxy({} as any, {
 }) as BetterSQLite3Database<typeof schema> & {
   $client: Database.Database;
 };
+
+function getConfiguredUserDataPath(): string {
+  return configuredUserDataPath ?? getUserDataPath();
+}

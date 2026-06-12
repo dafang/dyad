@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
 import { executeSandboxScriptInProcess } from "@/ipc/utils/sandbox/execution";
 import { runSandboxScript } from "@/ipc/utils/sandbox/runner";
 import { sendTelemetryEvent } from "@/ipc/utils/telemetry";
@@ -124,6 +125,35 @@ describe("executeSandboxScriptTool", () => {
         error: "Unexpected token ?.",
       }),
     );
+  });
+
+  it("does not label runtime host-call failures as unsupported syntax", async () => {
+    const script = 'const files = await list_files(".dyad/media");\nfiles;';
+    vi.mocked(executeSandboxScriptInProcess).mockRejectedValue(
+      new DyadError("Directory not found: .dyad/media", DyadErrorKind.NotFound),
+    );
+
+    let thrown: unknown;
+    try {
+      await executeSandboxScriptTool.execute(
+        { script, execution_thread: "main" },
+        createMockContext(),
+      );
+    } catch (error) {
+      thrown = error;
+    }
+
+    expect(thrown).toBeInstanceOf(DyadError);
+    expect((thrown as Error).message).toContain(
+      "This script failed while running.",
+    );
+    expect((thrown as Error).message).not.toContain(
+      "This script contains unsupported syntax.",
+    );
+    expect((thrown as Error).message).toContain(
+      "Original error:\nDirectory not found: .dyad/media",
+    );
+    expect((thrown as DyadError).kind).toBe(DyadErrorKind.NotFound);
   });
 
   it("defaults execution_thread to main and runs in-process", async () => {

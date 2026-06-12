@@ -1,5 +1,15 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
 import { createStore } from "jotai";
+
+vi.mock("jotai/utils", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("jotai/utils")>();
+  const { atom } = await import("jotai");
+  return {
+    ...actual,
+    atomWithStorage: <T>(_key: string, initialValue: T) => atom(initialValue),
+  };
+});
+
 import {
   recentViewedChatIdsAtom,
   closedChatIdsAtom,

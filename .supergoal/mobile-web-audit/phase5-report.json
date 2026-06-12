@@ -1,0 +1,81 @@
+{
+  "source": ".supergoal/web-e2e/summary.json",
+  "purpose": "Phase 5 mobile audit index for the final desktop+mobile Web E2E run.",
+  "provider": {
+    "source": "codex",
+    "baseUrlHost": "sub2global.bzy.ai",
+    "model": "gpt-5.5",
+    "key": "present"
+  },
+  "failures": {
+    "consoleMessages": 0,
+    "networkFailures": 0,
+    "backendFailures": 0
+  },
+  "mobileRoutes": {
+    "home": {
+      "innerWidth": 390,
+      "documentScrollWidth": 390,
+      "horizontalOverflow": false,
+      "hasVisibleSurface": true
+    },
+    "apps": {
+      "innerWidth": 390,
+      "documentScrollWidth": 390,
+      "horizontalOverflow": false,
+      "hasVisibleSurface": true
+    },
+    "chat": {
+      "innerWidth": 390,
+      "documentScrollWidth": 390,
+      "horizontalOverflow": false,
+      "hasVisibleSurface": true
+    },
+    "preview": {
+      "innerWidth": 390,
+      "documentScrollWidth": 390,
+      "horizontalOverflow": false,
+      "hasVisibleSurface": true
+    },
+    "backToChat": {
+      "innerWidth": 390,
+      "documentScrollWidth": 390,
+      "horizontalOverflow": false,
+      "hasVisibleSurface": true
+    },
+    "settings": {
+      "innerWidth": 390,
+      "documentScrollWidth": 390,
+      "horizontalOverflow": false,
+      "hasVisibleSurface": true
+    }
+  },
+  "accessibility": {
+    "mobileSendButton": true,
+    "mobilePreviewSwitch": true,
+    "mobileBackToChat": true,
+    "mobileDeviceMode": true,
+    "mobilePreviewModeOverflow": true,
+    "mobileMoreOptions": true,
+    "mobileNavigation": true
+  },
+  "mobileChat": {
+    "provider": "openai",
+    "model": "gpt-5.5",
+    "responseVisible": true
+  },
+  "mobilePreview": {
+    "iframeSrc": "http://127.0.0.1:61905/api/preview/1/",
+    "iframeHasText": true,
+    "addressPath": "/"
+  },
+  "screenshots": [
+    ".supergoal/web-e2e/mobile-home.png",
+    ".supergoal/web-e2e/mobile-chat.png",
+    ".supergoal/web-e2e/mobile-chat-real-provider.png",
+    ".supergoal/web-e2e/mobile-preview.png",
+    ".supergoal/web-e2e/mobile-preview-controls.png",
+    ".supergoal/web-e2e/mobile-back-to-chat.png",
+    ".supergoal/web-e2e/mobile-settings.png"
+  ]
+}

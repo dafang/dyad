@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { selectedAppIdAtom } from "@/atoms/appAtoms";
 import { planStateAtom } from "@/atoms/planAtoms";
 import { selectedChatIdAtom } from "@/atoms/chatAtoms";
-import { planClient } from "@/ipc/types/plan";
+import { ipc } from "@/ipc/types";
 import { queryKeys } from "@/lib/queryKeys";
 
 /**
@@ -27,7 +27,7 @@ export function usePlan({ enabled = true }: { enabled?: boolean } = {}) {
     }),
     queryFn: async () => {
       if (!appId || !chatId) return null;
-      return planClient.getPlanForChat({ appId, chatId });
+      return ipc.plan.getPlanForChat({ appId, chatId });
     },
     enabled: !!appId && !!chatId && !hasPlanInMemory && enabled,
     staleTime: 1000 * 60 * 5, // 5 minutes

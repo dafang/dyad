@@ -22,7 +22,6 @@ import { promises as fsPromises } from "node:fs";
 
 // Import our utility modules
 import { withLock } from "../utils/lock_utils";
-import { getFilesRecursively } from "../utils/file_utils";
 import {
   runningApps,
   processCounter,
@@ -43,13 +42,16 @@ import {
 } from "../utils/media_path_utils";
 import {
   cleanUpPort,
+  createAppRuntimeEventSinkFromElectronEvent,
   emitProxyServerStarted,
   ensureProxyForRunningApp,
   executeApp,
   formatCloudSandboxError,
+  getRunningAppPreview,
   registerCloudSandboxSyncUpdateListener,
   startCloudSandboxLogStream,
 } from "../services/app_runtime_service";
+import { createDefaultLocalWebCoreService } from "../services/default_local_web_core_service";
 import { getPtySessionManager } from "../utils/pty_session_manager";
 
 /**
@@ -80,10 +82,7 @@ async function readScreenshotEntries(
 }
 
 import log from "electron-log";
-import {
-  deploySupabaseFunction,
-  getSupabaseProjectName,
-} from "../../supabase_admin/supabase_management_client";
+import { deploySupabaseFunction } from "../../supabase_admin/supabase_management_client";
 import { createLoggedHandler } from "./safe_handle";
 import { getLanguageModelProviders } from "../shared/language_model_helpers";
 import {
@@ -112,7 +111,6 @@ import {
   deployAllSupabaseFunctions,
   extractFunctionNameFromPath,
 } from "@/supabase_admin/supabase_utils";
-import { getVercelTeamSlug } from "../utils/vercel_utils";
 import { storeDbTimestampAtCurrentVersion } from "../utils/neon_timestamp_utils";
 import type { AppSearchResult } from "@/lib/schemas";
 
@@ -123,10 +121,10 @@ import {
   RIPGREP_EXCLUDED_GLOBS,
 } from "../utils/ripgrep_utils";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
-import { detectFrameworkType } from "../utils/framework_utils";
 
 const logger = log.scope("app_handlers");
 const handle = createLoggedHandler(logger);
+const localWebCoreService = createDefaultLocalWebCoreService();
 
 function sanitizeSnippetText(text: string) {
   return text.replace(/\s+/g, " ").trim();
@@ -552,56 +550,7 @@ export function registerAppHandlers() {
   });
 
   createTypedHandler(appContracts.getApp, async (_, appId) => {
-    const app = await db.query.apps.findFirst({
-      where: eq(apps.id, appId),
-    });
-
-    if (!app) {
-      throw new DyadError("App not found", DyadErrorKind.NotFound);
-    }
-
-    // Get app files
-    const appPath = getDyadAppPath(app.path);
-    let files: string[] = [];
-
-    try {
-      files = getFilesRecursively(appPath, appPath);
-      // Normalize the path to use forward slashes so file tree (UI)
-      // can parse it more consistently across platforms.
-      files = files.map((path) => normalizePath(path));
-    } catch (error) {
-      logger.error(`Error reading files for app ${appId}:`, error);
-      // Return app even if files couldn't be read
-    }
-
-    let supabaseProjectName: string | null = null;
-    const settings = readSettings();
-    // Check for multi-organization credentials or legacy single account
-    const hasSupabaseCredentials =
-      (app.supabaseOrganizationSlug &&
-        settings.supabase?.organizations?.[app.supabaseOrganizationSlug]
-          ?.accessToken?.value) ||
-      settings.supabase?.accessToken?.value;
-    if (app.supabaseProjectId && hasSupabaseCredentials) {
-      supabaseProjectName = await getSupabaseProjectName(
-        app.supabaseParentProjectId || app.supabaseProjectId,
-        app.supabaseOrganizationSlug ?? undefined,
-      );
-    }
-
-    let vercelTeamSlug: string | null = null;
-    if (app.vercelTeamId) {
-      vercelTeamSlug = await getVercelTeamSlug(app.vercelTeamId);
-    }
-
-    return {
-      ...app,
-      files,
-      frameworkType: detectFrameworkType(appPath),
-      resolvedPath: appPath,
-      supabaseProjectName,
-      vercelTeamSlug,
-    };
+    return localWebCoreService.getApp(appId);
   });
 
   createTypedHandler(appContracts.listApps, async () => {
@@ -666,7 +615,7 @@ export function registerAppHandlers() {
         if (appInfo?.proxyUrl && appInfo?.originalUrl) {
           emitProxyServerStarted({
             appId,
-            event,
+            eventSink: createAppRuntimeEventSinkFromElectronEvent(event),
             proxyUrl: appInfo.proxyUrl,
             originalUrl: appInfo.originalUrl,
             mode: appInfo.mode,
@@ -822,6 +771,10 @@ export function registerAppHandlers() {
     },
   );
 
+  createTypedHandler(appContracts.getRunningAppPreview, async (_, params) => {
+    return getRunningAppPreview(params.appId);
+  });
+
   createTypedHandler(
     appContracts.createCloudSandboxShareLink,
     async (_, params) => {
@@ -896,7 +849,7 @@ export function registerAppHandlers() {
 
           startCloudSandboxLogStream({
             appId,
-            event,
+            eventSink: createAppRuntimeEventSinkFromElectronEvent(event),
             sandboxId: appInfo.cloudSandboxId,
             cloudLogAbortController: appInfo.cloudLogAbortController,
           });

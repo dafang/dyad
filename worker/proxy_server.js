@@ -347,6 +347,38 @@ function rewriteSetCookieHeaders(headers) {
   return headers;
 }
 
+function sanitizeResponseHeaders(headers, options = {}) {
+  const next = { ...headers };
+  delete next["connection"];
+  delete next["keep-alive"];
+  delete next["proxy-authenticate"];
+  delete next["proxy-authorization"];
+  delete next["te"];
+  delete next["trailer"];
+  delete next["upgrade"];
+
+  if (options.contentLength !== undefined) {
+    next["content-length"] = options.contentLength;
+    delete next["transfer-encoding"];
+  } else if (next["content-length"] && next["transfer-encoding"]) {
+    delete next["content-length"];
+  }
+
+  return rewriteSetCookieHeaders(next);
+}
+
+function sendProxyError(clientRes, statusCode, message) {
+  if (clientRes.destroyed || clientRes.writableEnded) {
+    return;
+  }
+  if (clientRes.headersSent) {
+    clientRes.destroy(new Error(message));
+    return;
+  }
+  clientRes.writeHead(statusCode, { "content-type": "text/plain" });
+  clientRes.end(message);
+}
+
 /* ----------------------------------------------------------------------- */
 /* 1. Plain HTTP request / response                                        */
 /* ----------------------------------------------------------------------- */
@@ -420,8 +452,10 @@ const server = http.createServer((clientReq, clientRes) => {
     const inject = wantsInjection && isHtml;
 
     if (!inject) {
-      rewriteSetCookieHeaders(upRes.headers);
-      clientRes.writeHead(upRes.statusCode, upRes.headers);
+      clientRes.writeHead(
+        upRes.statusCode,
+        sanitizeResponseHeaders(upRes.headers),
+      );
       return void upRes.pipe(clientRes);
     }
 
@@ -440,21 +474,26 @@ const server = http.createServer((clientReq, clientRes) => {
         delete hdrs["content-encoding"];
         // Also, remove ETag as content has changed
         delete hdrs["etag"];
-        rewriteSetCookieHeaders(hdrs);
 
-        clientRes.writeHead(upRes.statusCode, hdrs);
+        clientRes.writeHead(
+          upRes.statusCode,
+          sanitizeResponseHeaders(hdrs, {
+            contentLength: Buffer.byteLength(patched),
+          }),
+        );
         clientRes.end(patched);
       } catch (e) {
-        clientRes.writeHead(500, { "content-type": "text/plain" });
-        clientRes.end("Injection failed: " + e.message);
+        sendProxyError(clientRes, 500, "Injection failed: " + e.message);
       }
+    });
+    upRes.on("error", (e) => {
+      sendProxyError(clientRes, 502, "Upstream error: " + e.message);
     });
   });
 
   clientReq.pipe(upReq);
   upReq.on("error", (e) => {
-    clientRes.writeHead(502, { "content-type": "text/plain" });
-    clientRes.end("Upstream error: " + e.message);
+    sendProxyError(clientRes, 502, "Upstream error: " + e.message);
   });
 });
 

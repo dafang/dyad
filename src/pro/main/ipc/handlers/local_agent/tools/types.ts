@@ -3,10 +3,10 @@
  */
 
 import { z } from "zod";
-import { IpcMainInvokeEvent } from "electron";
 import { jsonrepair } from "jsonrepair";
 import { AgentToolConsent } from "@/lib/schemas";
 import { AgentTodo } from "@/ipc/types";
+import type { IpcInvokeEventLike } from "@/ipc/utils/ipc_event";
 import type { AppFrameworkType } from "@/lib/framework_constants";
 import type { McpToolDef } from "./mcp_type_defs";
 
@@ -39,7 +39,7 @@ export interface FileEditTracker {
 }
 
 export interface AgentContext {
-  event: IpcMainInvokeEvent;
+  event: IpcInvokeEventLike;
   appId: number;
   appPath: string;
   /**

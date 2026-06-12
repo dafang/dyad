@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { appBlueprintStateAtom } from "@/atoms/appBlueprintAtoms";
 import {
-  appBlueprintEventClient,
   type AppBlueprintUpdatePayload,
   type AppBlueprintVisualsUpdatePayload,
   type AppBlueprintApprovedPayload,
   type AppBlueprintTimeoutPayload,
 } from "@/ipc/types/app_blueprint";
+import { ipc } from "@/ipc/types";
 
 /**
  * Hook to handle app blueprint IPC events.
@@ -17,7 +17,7 @@ export function useAppBlueprintEvents() {
   const setAppBlueprintState = useSetAtom(appBlueprintStateAtom);
 
   useEffect(() => {
-    const unsubscribeUpdate = appBlueprintEventClient.onUpdate(
+    const unsubscribeUpdate = ipc.events.appBlueprint.onUpdate(
       (payload: AppBlueprintUpdatePayload) => {
         setAppBlueprintState((prev) => {
           const nextPlans = new Map(prev.plansByChatId);
@@ -44,7 +44,7 @@ export function useAppBlueprintEvents() {
       },
     );
 
-    const unsubscribeVisualsUpdate = appBlueprintEventClient.onVisualsUpdate(
+    const unsubscribeVisualsUpdate = ipc.events.appBlueprint.onVisualsUpdate(
       (payload: AppBlueprintVisualsUpdatePayload) => {
         setAppBlueprintState((prev) => {
           const nextPlans = new Map(prev.plansByChatId);
@@ -69,7 +69,7 @@ export function useAppBlueprintEvents() {
       },
     );
 
-    const unsubscribeApproved = appBlueprintEventClient.onApproved(
+    const unsubscribeApproved = ipc.events.appBlueprint.onApproved(
       (payload: AppBlueprintApprovedPayload) => {
         setAppBlueprintState((prev) => {
           const nextApproved = new Set(prev.approvedChatIds);
@@ -82,7 +82,7 @@ export function useAppBlueprintEvents() {
       },
     );
 
-    const unsubscribeTimeout = appBlueprintEventClient.onTimeout(
+    const unsubscribeTimeout = ipc.events.appBlueprint.onTimeout(
       (payload: AppBlueprintTimeoutPayload) => {
         setAppBlueprintState((prev) => {
           const nextTimedOut = new Set(prev.timedOutChatIds);

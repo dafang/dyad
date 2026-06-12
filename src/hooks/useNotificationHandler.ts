@@ -14,7 +14,6 @@ import {
 } from "../lib/chatUtils";
 
 import { useSettings } from "./useSettings";
-import { planEventClient } from "../ipc/types/plan";
 
 // Auto-close timer for completion notifications (give user enough time to navigate to chat completed)
 const AUTO_CLOSE_MS = 10_000;
@@ -362,7 +361,7 @@ export function useNotificationHandler() {
 
   // Planning Questionnaire Listener (IPC)
   useEffect(() => {
-    const unsubscribe = planEventClient.onQuestionnaire(async (payload) => {
+    const unsubscribe = ipc.events.plan.onQuestionnaire(async (payload) => {
       handleConsentRequest({
         chatId: payload.chatId,
         toolName: "Planning Questions",

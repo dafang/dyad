@@ -11,7 +11,7 @@ export function KeepPreviewsRunningSwitch() {
       <Switch
         id="keep-previews-running"
         aria-label="Keep app previews running forever"
-        checked={isEnabled}
+        checked={!!isEnabled}
         onCheckedChange={(checked) => {
           updateSettings({
             previewIdleTimeoutPolicy: checked ? "never" : "default",

@@ -35,9 +35,8 @@ import {
   shouldBypassNonProTelemetrySampling,
   shouldFilterPostHogExceptionEvent,
 } from "./lib/posthogTelemetry";
-
-// @ts-ignore
-console.log("Running in mode:", import.meta.env.MODE);
+import { LocalWebTransportConfigError } from "./lib/local_web_transport";
+import { getRuntimeMode } from "./lib/runtime_client";
 
 interface MyMeta extends Record<string, unknown> {
   showErrorToast: boolean;
@@ -302,12 +301,47 @@ function App() {
   return <RouterProvider router={router} />;
 }
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <PostHogProvider client={posthogClient}>
-        <App />
-      </PostHogProvider>
-    </QueryClientProvider>
-  </StrictMode>,
-);
+function LocalWebConfigurationErrorView({ error }: { error: Error }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background p-6 text-foreground">
+      <main className="w-full max-w-lg rounded-lg border border-border bg-card p-6 shadow-sm">
+        <h1 className="text-xl font-semibold">Local Web server required</h1>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          Dyad Web must be launched by the local server so the browser receives
+          its loopback API address and session token.
+        </p>
+        <p className="mt-4 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+          {error.message}
+        </p>
+        <p className="mt-4 text-sm text-muted-foreground">
+          Start the Web UI with <code>npm run dev:web</code>.
+        </p>
+      </main>
+    </div>
+  );
+}
+
+function renderApp(): void {
+  const root = createRoot(document.getElementById("root")!);
+  try {
+    getRuntimeMode();
+  } catch (error) {
+    if (error instanceof LocalWebTransportConfigError) {
+      root.render(<LocalWebConfigurationErrorView error={error} />);
+      return;
+    }
+    throw error;
+  }
+
+  root.render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <PostHogProvider client={posthogClient}>
+          <App />
+        </PostHogProvider>
+      </QueryClientProvider>
+    </StrictMode>,
+  );
+}
+
+renderApp();

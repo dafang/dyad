@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defineContract, createClient } from "../contracts/core";
 import { APP_FRAMEWORK_TYPES } from "../../lib/framework_constants";
-import { ChatModeSchema } from "../../lib/schemas";
+import { ChatModeSchema, RuntimeMode2Schema } from "../../lib/schemas";
 
 // =============================================================================
 // App Schemas
@@ -35,6 +35,7 @@ export const AppBaseSchema = z.object({
   installCommand: z.string().nullable(),
   startCommand: z.string().nullable(),
   isFavorite: z.boolean(),
+  needsAppBlueprint: z.boolean(),
   collectionId: z.number().nullable(),
 });
 
@@ -180,6 +181,13 @@ export const CloudSandboxStatusSchema = z.object({
   lastErrorCode: z.string().nullable(),
   lastErrorMessage: z.string().nullable(),
   localSyncErrorMessage: z.string().nullable().optional(),
+});
+
+export const RunningAppPreviewSchema = z.object({
+  appId: z.number(),
+  appUrl: z.string(),
+  originalUrl: z.string(),
+  mode: RuntimeMode2Schema,
 });
 
 export const CreateCloudSandboxShareLinkParamsSchema = z.object({
@@ -408,6 +416,12 @@ export const appContracts = {
     output: CloudSandboxStatusSchema.nullable(),
   }),
 
+  getRunningAppPreview: defineContract({
+    channel: "app:get-running-preview",
+    input: AppIdParamsSchema,
+    output: RunningAppPreviewSchema.nullable(),
+  }),
+
   createCloudSandboxShareLink: defineContract({
     channel: "create-cloud-sandbox-share-link",
     input: CreateCloudSandboxShareLinkParamsSchema,
@@ -572,3 +586,4 @@ export type UpdateAppCommandsParams = z.infer<
   typeof UpdateAppCommandsParamsSchema
 >;
 export type CloudSandboxStatus = z.infer<typeof CloudSandboxStatusSchema>;
+export type RunningAppPreview = z.infer<typeof RunningAppPreviewSchema>;

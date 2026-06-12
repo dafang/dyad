@@ -9,16 +9,7 @@ import {
   VertexProviderSetting,
   migrateStoredSettings,
 } from "../lib/schemas";
-import {
-  BrowserWindow,
-  safeStorage,
-  type WebContents,
-  type BrowserWindow as BrowserWindowInstance,
-} from "electron";
-import { v4 as uuidv4 } from "uuid";
 import log from "electron-log";
-import { DEFAULT_TEMPLATE_ID } from "@/shared/templates";
-import { DEFAULT_THEME_ID } from "@/shared/themes";
 import { IS_TEST_BUILD } from "@/ipc/utils/test_utils";
 import {
   getRemoteDesktopConfig,
@@ -26,43 +17,11 @@ import {
 } from "@/ipc/shared/remote_desktop_config";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
 import { ZodError } from "zod";
+import { DEFAULT_SETTINGS } from "@/lib/default_user_settings";
+import type { LocalWebSettingsStore } from "@/server/local_web_settings";
+import { getElectronModule } from "@/ipc/utils/electron_module";
 
 const logger = log.scope("settings");
-
-// WARNING: Do not change values once it's been
-// set in DEFAULT_SETTINGS.
-//
-// It is OK to add new fields to DEFAULT_SETTINGS.
-// However, be VERY careful about removing fields from DEFAULT_SETTINGS.
-const DEFAULT_SETTINGS: UserSettings = {
-  selectedModel: {
-    name: "auto",
-    provider: "auto",
-  },
-  providerSettings: {},
-  telemetryConsent: "unset",
-  telemetryUserId: uuidv4(),
-  hasRunBefore: false,
-  experiments: {},
-  enableProLazyEditsMode: true,
-  enableProSmartFilesContextMode: true,
-  selectedChatMode: "build",
-  enableAutoFixProblems: false,
-  enableAppBlueprint: true,
-  enableAutoUpdate: true,
-  releaseChannel: "stable",
-  selectedTemplateId: DEFAULT_TEMPLATE_ID,
-  selectedThemeId: DEFAULT_THEME_ID,
-  isRunning: false,
-  lastKnownPerformance: undefined,
-  // Enabled by default in 0.33.0-beta.1
-  enableNativeGit: true,
-  enableSandboxScriptExecution: true,
-  autoExpandPreviewPanel: true,
-  enableContextCompaction: true,
-  enablePnpmMinimumReleaseAgeWarning: false,
-  previewIdleTimeoutPolicy: "default",
-};
 
 const CRASH_SENTINEL_FILE = "session.lock";
 const RENDERER_CRASH_FILE = "renderer-crash.json";
@@ -70,6 +29,13 @@ const SETTINGS_FILE = "user-settings.json";
 const RESTORE_SETTINGS_DOCS_URL =
   "https://www.dyad.sh/docs/guides/migrate-restore#restoring-settings-from-backup";
 let initialLoadIsFirstSession = false;
+let localWebSettingsStore: LocalWebSettingsStore | undefined;
+
+export function configureLocalWebSettingsStore(
+  store: LocalWebSettingsStore | undefined,
+): void {
+  localWebSettingsStore = store;
+}
 
 export function setInitialLoadIsFirstSession(value: boolean): void {
   initialLoadIsFirstSession = value;
@@ -87,10 +53,47 @@ interface RendererErrorToast {
   };
 }
 
+interface SettingsWebContentsLike {
+  send(channel: string, ...args: unknown[]): void;
+}
+
+interface SettingsBrowserWindowLike {
+  webContents: SettingsWebContentsLike;
+}
+
+interface SettingsBrowserWindowConstructorLike {
+  getAllWindows(): SettingsBrowserWindowLike[];
+  fromWebContents(
+    webContents: SettingsWebContentsLike,
+  ): SettingsBrowserWindowLike | null;
+}
+
+interface SettingsSafeStorageLike {
+  isEncryptionAvailable(): boolean;
+  encryptString(data: string): Buffer;
+  decryptString(data: Buffer): string;
+}
+
+interface SettingsElectronModuleLike {
+  safeStorage: SettingsSafeStorageLike;
+  BrowserWindow: SettingsBrowserWindowConstructorLike;
+}
+
 const pendingRendererErrors: RendererErrorToast[] = [];
-const rendererErrorToastReadyWebContents = new WeakSet<WebContents>();
+const rendererErrorToastReadyWebContents =
+  new WeakSet<SettingsWebContentsLike>();
+let settingsElectronModuleOverride: SettingsElectronModuleLike | undefined;
+
+export function configureSettingsElectronModuleForTest(
+  electronModule: SettingsElectronModuleLike | undefined,
+): void {
+  settingsElectronModuleOverride = electronModule;
+}
 
 export function getSettingsFilePath(): string {
+  if (localWebSettingsStore) {
+    return localWebSettingsStore.settingsFilePath;
+  }
   return path.join(getUserDataPath(), SETTINGS_FILE);
 }
 
@@ -231,6 +234,9 @@ function parseRendererCrashPerformance(
 }
 
 export function readSettings(): UserSettings {
+  if (localWebSettingsStore) {
+    return localWebSettingsStore.readSettings();
+  }
   try {
     const filePath = getSettingsFilePath();
     if (!fs.existsSync(filePath)) {
@@ -266,6 +272,10 @@ export async function readEffectiveSettings(): Promise<UserSettings> {
 }
 
 export function writeSettings(settings: Partial<UserSettings>): void {
+  if (localWebSettingsStore) {
+    localWebSettingsStore.writeSettings(settings);
+    return;
+  }
   try {
     const filePath = getSettingsFilePath();
     const settingsForWrite = readSettingsForWrite(filePath);
@@ -569,6 +579,11 @@ function readSettingsForWrite(filePath: string): {
 }
 
 function notifyRendererError(payload: RendererErrorToast): void {
+  const BrowserWindow = getElectronBrowserWindow();
+  if (!BrowserWindow) {
+    pendingRendererErrors.push(payload);
+    return;
+  }
   const windows = BrowserWindow.getAllWindows().filter((window) =>
     rendererErrorToastReadyWebContents.has(window.webContents),
   );
@@ -580,8 +595,12 @@ function notifyRendererError(payload: RendererErrorToast): void {
 }
 
 export function notifyRendererErrorToastListenerReady(
-  webContents: WebContents,
+  webContents: SettingsWebContentsLike,
 ): void {
+  const BrowserWindow = getElectronBrowserWindow();
+  if (!BrowserWindow) {
+    return;
+  }
   rendererErrorToastReadyWebContents.add(webContents);
   const window = BrowserWindow.fromWebContents(webContents);
   if (window) {
@@ -589,7 +608,9 @@ export function notifyRendererErrorToastListenerReady(
   }
 }
 
-function flushPendingRendererErrors(windows: BrowserWindowInstance[]): void {
+function flushPendingRendererErrors(
+  windows: SettingsBrowserWindowLike[],
+): void {
   if (pendingRendererErrors.length === 0) {
     return;
   }
@@ -601,7 +622,7 @@ function flushPendingRendererErrors(windows: BrowserWindowInstance[]): void {
 }
 
 function sendRendererErrorToast(
-  windows: BrowserWindowInstance[],
+  windows: SettingsBrowserWindowLike[],
   payload: RendererErrorToast,
 ): void {
   for (const window of windows) {
@@ -643,7 +664,8 @@ function writeSettingsFileAtomically(
 
 export function encrypt(data: string): Secret {
   const trimmed = data.trim();
-  if (safeStorage.isEncryptionAvailable() && !IS_TEST_BUILD) {
+  const safeStorage = getElectronSafeStorage();
+  if (safeStorage?.isEncryptionAvailable() && !IS_TEST_BUILD) {
     return {
       value: safeStorage.encryptString(trimmed).toString("base64"),
       encryptionType: "electron-safe-storage",
@@ -657,7 +679,46 @@ export function encrypt(data: string): Secret {
 
 export function decrypt(data: Secret): string {
   if (data.encryptionType === "electron-safe-storage") {
+    const safeStorage = getElectronSafeStorage();
+    if (!safeStorage) {
+      throw new Error("safeStorage is not available outside Electron");
+    }
     return safeStorage.decryptString(Buffer.from(data.value, "base64")).trim();
   }
   return data.value.trim();
+}
+
+function getElectronSafeStorage(): SettingsSafeStorageLike | null {
+  if (settingsElectronModuleOverride) {
+    return settingsElectronModuleOverride.safeStorage;
+  }
+  try {
+    if (!process.versions.electron) {
+      return null;
+    }
+    return (
+      getElectronModule<{ safeStorage: SettingsSafeStorageLike }>()
+        ?.safeStorage ?? null
+    );
+  } catch {
+    return null;
+  }
+}
+
+function getElectronBrowserWindow(): SettingsBrowserWindowConstructorLike | null {
+  if (settingsElectronModuleOverride) {
+    return settingsElectronModuleOverride.BrowserWindow;
+  }
+  try {
+    if (!process.versions.electron) {
+      return null;
+    }
+    return (
+      getElectronModule<{
+        BrowserWindow: SettingsBrowserWindowConstructorLike;
+      }>()?.BrowserWindow ?? null
+    );
+  } catch {
+    return null;
+  }
 }

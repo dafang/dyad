@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import log from "electron-log/main";
+import log from "electron-log";
 
 const logger = log.scope("simpleSpawn");
 

@@ -63,6 +63,11 @@ import { AssignAppsToCollectionDialog } from "@/components/AssignAppsToCollectio
 import { useTranslation } from "react-i18next";
 import { queryKeys } from "@/lib/queryKeys";
 import { useInitialChatMode } from "@/hooks/useInitialChatMode";
+import {
+  getWebHostUnsupportedMessage,
+  webHostCapabilities,
+} from "@/lib/web_host_capabilities";
+import { toLocalWebPublicUrl } from "@/lib/local_web_transport";
 
 function UnavailableIntegrationCard({
   provider,
@@ -139,7 +144,9 @@ export default function AppDetailsPage() {
     enabled: !!appId,
   });
   const [screenshotLoadFailed, setScreenshotLoadFailed] = useState(false);
-  const latestScreenshotUrl = screenshotsData?.screenshots[0]?.url ?? null;
+  const latestScreenshotUrl = screenshotsData?.screenshots[0]?.url
+    ? toLocalWebPublicUrl(screenshotsData.screenshots[0].url)
+    : null;
   useEffect(() => {
     setScreenshotLoadFailed(false);
   }, [latestScreenshotUrl]);
@@ -520,7 +527,15 @@ export default function AppDetailsPage() {
                       variant="ghost"
                       size="icon"
                       className="ml-[-8px] p-0.5 h-auto cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                      onClick={() => {
+                      onClick={async () => {
+                        if (webHostCapabilities.isLocalWeb) {
+                          const result =
+                            await webHostCapabilities.showItemInFolder(
+                              currentAppPath,
+                            );
+                          showError(getWebHostUnsupportedMessage(result));
+                          return;
+                        }
                         ipc.system.showItemInFolder(currentAppPath);
                       }}
                     />

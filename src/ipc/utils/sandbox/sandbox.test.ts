@@ -131,6 +131,21 @@ describe("sandbox capabilities", () => {
     );
   });
 
+  it("treats a missing .dyad/media directory as an empty media list", async () => {
+    await fs.rm(getDyadMediaDir(appPath), { recursive: true, force: true });
+
+    await expect(sandboxListFiles(appPath, ".dyad/media")).resolves.toEqual([]);
+    await expect(
+      executeSandboxScriptInProcess({
+        appPath,
+        script: 'const files = await list_files(".dyad/media");\nfiles;',
+      }),
+    ).resolves.toMatchObject({
+      value: "[]",
+      truncated: false,
+    });
+  });
+
   it("normalizes and deduplicates logical attachment names", () => {
     const usedNames = new Set(["server.log"]);
 

@@ -1,0 +1,304 @@
+{
+  "config": {
+    "pageUrl": "http://127.0.0.1:5173",
+    "baseUrl": "http://127.0.0.1:62995",
+    "eventUrl": "http://127.0.0.1:62995/api/events"
+  },
+  "events": [
+    {
+      "channel": "chat:stream:start",
+      "event": "chat:stream:start",
+      "data": {
+        "chatId": 15
+      }
+    },
+    {
+      "channel": "chat:response:chunk",
+      "event": "chat:response:chunk",
+      "data": {
+        "chatId": 15,
+        "effectiveChatMode": "build"
+      }
+    },
+    {
+      "channel": "chat:response:chunk",
+      "event": "chat:response:chunk",
+      "data": {
+        "chatId": 15,
+        "messages": {
+          "arrayLength": 2
+        }
+      }
+    },
+    {
+      "channel": "chat:response:chunk",
+      "event": "chat:response:chunk",
+      "data": {
+        "chatId": 15,
+        "streamingMessageId": 12,
+        "streamingPatch": {
+          "offset": 0,
+          "content": "Hello world\n  <dyad-write path=\"src/hello.ts\" content=\"Hello world\">\n  console.log(\"Hello world\");\n  </dyad-write>\n  EOM"
+        },
+        "chunkSeq": 1
+      }
+    },
+    {
+      "channel": "chat:response:end",
+      "event": "chat:response:end",
+      "data": {
+        "chatId": 15,
+        "updatedFiles": false
+      }
+    },
+    {
+      "channel": "chat:stream:end",
+      "event": "chat:stream:end",
+      "data": {
+        "chatId": 15
+      }
+    },
+    {
+      "channel": "chat:stream:start",
+      "event": "chat:stream:start",
+      "data": {
+        "chatId": 15
+      }
+    },
+    {
+      "channel": "chat:response:chunk",
+      "event": "chat:response:chunk",
+      "data": {
+        "chatId": 15,
+        "effectiveChatMode": "build"
+      }
+    },
+    {
+      "channel": "chat:response:chunk",
+      "event": "chat:response:chunk",
+      "data": {
+        "chatId": 15,
+        "messages": {
+          "arrayLength": 2
+        }
+      }
+    },
+    {
+      "channel": "chat:response:chunk",
+      "event": "chat:response:chunk",
+      "data": {
+        "chatId": 15,
+        "streamingMessageId": 14,
+        "streamingPatch": {
+          "offset": 0,
+          "content": "Hello world\n  <dyad-write path=\"src/hello.ts\" content=\"Hello world\">\n  console.log(\"Hello world\");\n  </dyad-write>\n  EOM"
+        },
+        "chunkSeq": 1
+      }
+    },
+    {
+      "channel": "chat:response:end",
+      "event": "chat:response:end",
+      "data": {
+        "chatId": 15,
+        "updatedFiles": false
+      }
+    },
+    {
+      "channel": "chat:stream:end",
+      "event": "chat:stream:end",
+      "data": {
+        "chatId": 15
+      }
+    },
+    {
+      "channel": "chat:response:end",
+      "event": "chat:response:end",
+      "data": {
+        "chatId": 15,
+        "updatedFiles": false,
+        "wasCancelled": true
+      }
+    },
+    {
+      "channel": "chat:stream:end",
+      "event": "chat:stream:end",
+      "data": {
+        "chatId": 15
+      }
+    }
+  ],
+  "rpc": [
+    {
+      "channel": "create-app",
+      "ok": true,
+      "data": {
+        "app": {
+          "id": 14,
+          "name": "Phase8 Smoke 1781159458615",
+          "path": "Phase8 Smoke 1781159458615",
+          "createdAt": "2026-06-11T06:30:58.000Z",
+          "updatedAt": "2026-06-11T06:30:58.000Z",
+          "githubOrg": null,
+          "githubRepo": null,
+          "githubBranch": null,
+          "supabaseProjectId": null,
+          "supabaseParentProjectId": null,
+          "supabaseOrganizationSlug": null,
+          "neonProjectId": null,
+          "neonDevelopmentBranchId": null,
+          "neonPreviewBranchId": null,
+          "neonActiveBranchId": null,
+          "selectedDatabaseBranchType": null,
+          "vercelProjectId": null,
+          "vercelProjectName": null,
+          "vercelDeploymentUrl": null,
+          "vercelTeamId": null,
+          "installCommand": null,
+          "startCommand": null,
+          "isFavorite": false,
+          "collectionId": null,
+          "resolvedPath": "/Users/wyattfang/.dyad/local-web/dyad-apps/Phase8 Smoke 1781159458615"
+        },
+        "chatId": 15
+      }
+    },
+    {
+      "channel": "chat:count-tokens",
+      "ok": true,
+      "data": {
+        "estimatedTotalTokens": 9851,
+        "actualMaxTokens": null,
+        "messageHistoryTokens": 0,
+        "codebaseTokens": 6289,
+        "mentionedAppsTokens": 0,
+        "inputTokens": 4,
+        "systemPromptTokens": 3558,
+        "contextWindow": 200000
+      }
+    },
+    {
+      "channel": "chat:stream",
+      "ok": true,
+      "data": 15
+    },
+    {
+      "channel": "chat:response:ack",
+      "ok": true
+    },
+    {
+      "channel": "get-proposal",
+      "ok": true,
+      "data": {
+        "proposal": {
+          "type": "code-proposal",
+          "title": "Proposed File Changes",
+          "securityRisks": {
+            "arrayLength": 0
+          },
+          "filesChanged": {
+            "arrayLength": 1
+          },
+          "packagesAdded": {
+            "arrayLength": 0
+          },
+          "sqlQueries": {
+            "arrayLength": 0
+          }
+        },
+        "chatId": 15,
+        "messageId": 12
+      }
+    },
+    {
+      "channel": "reject-proposal",
+      "ok": true
+    },
+    {
+      "channel": "chat:stream",
+      "ok": true,
+      "data": 15
+    },
+    {
+      "channel": "chat:cancel",
+      "ok": true,
+      "data": true
+    },
+    {
+      "channel": "plan:create",
+      "ok": true,
+      "data": "chat-15-phase-8-smoke-plan-1781159458960"
+    },
+    {
+      "channel": "plan:get",
+      "ok": true,
+      "data": {
+        "id": "chat-15-phase-8-smoke-plan-1781159458960",
+        "appId": 14,
+        "chatId": 15,
+        "title": "Phase 8 Smoke Plan",
+        "summary": "Verify plan RPCs over local web.",
+        "content": "## Step\nShip the smoke plan.",
+        "createdAt": "2026-06-11T06:30:58.960Z",
+        "updatedAt": "2026-06-11T06:30:58.960Z"
+      }
+    },
+    {
+      "channel": "plan:update-plan",
+      "ok": true
+    },
+    {
+      "channel": "plan:questionnaire-response",
+      "ok": true
+    },
+    {
+      "channel": "integration:response",
+      "ok": false,
+      "data": "No pending integration request: phase8-smoke-integration"
+    },
+    {
+      "channel": "app-blueprint:add-visual",
+      "ok": false,
+      "data": "No app blueprint found for chat 15 when adding visual"
+    },
+    {
+      "channel": "agent-tool:get-tools",
+      "ok": true,
+      "data": {
+        "arrayLength": 31
+      }
+    },
+    {
+      "channel": "agent-tool:set-consent",
+      "ok": true
+    },
+    {
+      "channel": "agent-tool:consent-response",
+      "ok": true
+    }
+  ],
+  "summary": {
+    "appId": 14,
+    "chatId": 15,
+    "proposalMessageId": 12,
+    "chunkEventsBeforeAck": 3,
+    "chatChunkEvents": 6,
+    "chatEndEvents": 3,
+    "cancelEndEvents": 1,
+    "subscribedEventChannels": [
+      "chat:response:chunk",
+      "chat:response:end",
+      "chat:response:error",
+      "chat:stream:start",
+      "chat:stream:end",
+      "agent-tool:consent-request",
+      "agent-tool:todos-update",
+      "agent-tool:problems-update",
+      "plan:update",
+      "plan:questionnaire",
+      "integration:prompt",
+      "app-blueprint:update",
+      "app-blueprint:approved"
+    ]
+  }
+}

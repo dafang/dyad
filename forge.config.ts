@@ -26,6 +26,10 @@ const { isPrereleaseVersion } =
 const packageJson = JSON.parse(
   readFileSync(new URL("./package.json", import.meta.url), "utf8"),
 ) as { version: string };
+const electronChecksums = require("electron/checksums.json") as Record<
+  string,
+  string
+>;
 
 const pgRuntimeDependencies = [
   "pg",
@@ -121,6 +125,9 @@ if (isWindowsSigningEnabled && !process.env.AZURE_CODE_SIGNING_DLIB) {
 
 const config: ForgeConfig = {
   packagerConfig: {
+    download: {
+      checksums: electronChecksums,
+    },
     windowsSign: isWindowsSigningEnabled ? windowsSign : undefined,
     afterCopy: [
       (buildPath, _electronVersion, platform, arch, callback) => {

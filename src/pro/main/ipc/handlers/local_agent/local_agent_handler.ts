@@ -3,7 +3,6 @@
  * Main orchestrator for tool-based agent mode with parallel execution
  */
 
-import { IpcMainInvokeEvent } from "electron";
 import {
   streamText,
   ToolSet,
@@ -20,12 +19,14 @@ import { eq } from "drizzle-orm";
 import { mcpManager } from "@/ipc/utils/mcp_manager";
 import { requireMcpToolConsent } from "@/ipc/utils/mcp_consent";
 import { parseMcpToolKey, sanitizeMcpName } from "@/ipc/utils/mcp_tool_utils";
+import type { IpcInvokeEventLike } from "@/ipc/utils/ipc_event";
 
 import {
   isDyadProEnabled,
   isBasicAgentMode,
   type UserSettings,
 } from "@/lib/schemas";
+import { isLocalWebRuntimeContext } from "@/runtime/local_web_runtime_context";
 import { readSettings } from "@/main/settings";
 import { getDyadAppPath } from "@/paths/paths";
 import { detectFrameworkType } from "@/ipc/utils/framework_utils";
@@ -117,6 +118,15 @@ const logger = log.scope("local_agent_handler");
 const PLANNING_QUESTIONNAIRE_TOOL_NAME = "planning_questionnaire";
 const MAX_TERMINATED_STREAM_RETRIES = 3;
 const STREAM_RETRY_BASE_DELAY_MS = 400;
+const DEFAULT_TODO_FOLLOW_UP_IDLE_TIMEOUT_MS = 45_000;
+const TODO_FOLLOW_UP_TIMEOUT_ENV_VAR = "DYAD_TODO_FOLLOW_UP_IDLE_TIMEOUT_MS";
+const LEGACY_TODO_FOLLOW_UP_TIMEOUT_ENV_VAR =
+  "DYAD_TODO_FOLLOW_UP_FIRST_EVENT_TIMEOUT_MS";
+const DEFAULT_STREAM_FINALIZATION_TIMEOUT_MS = 30_000;
+const STREAM_FINALIZATION_TIMEOUT_ENV_VAR =
+  "DYAD_STREAM_FINALIZATION_TIMEOUT_MS";
+const DEFAULT_STREAM_IDLE_TIMEOUT_MS = 90_000;
+const STREAM_IDLE_TIMEOUT_ENV_VAR = "DYAD_STREAM_IDLE_TIMEOUT_MS";
 const STREAM_CONTINUE_MESSAGE =
   "[System] Your previous response stream was interrupted by a transient network error. Continue from exactly where you left off and do not repeat text that has already been sent.";
 
@@ -340,7 +350,7 @@ function isAttachmentAccessToolCall(toolName: string, input: unknown): boolean {
  * Handle a chat stream in local-agent mode
  */
 export async function handleLocalAgentStream(
-  event: IpcMainInvokeEvent,
+  event: IpcInvokeEventLike,
   req: ChatStreamParams,
   abortController: AbortController,
   {
@@ -448,11 +458,14 @@ export async function handleLocalAgentStream(
   // Check Pro status or Basic Agent mode
   // Basic Agent mode allows non-Pro users with quota (quota check is done in chat_stream_handlers)
   // Read-only mode (ask mode) is allowed for all users without Pro
+  const useBasicAgentMode =
+    !isLocalWebRuntimeContext() && isBasicAgentMode(settings);
   if (
     !readOnly &&
     !planModeOnly &&
     !isDyadProEnabled(settings) &&
-    !isBasicAgentMode(settings)
+    !useBasicAgentMode &&
+    !isLocalWebRuntimeContext()
   ) {
     const errorMessage =
       referencedApps.length > 0
@@ -646,12 +659,12 @@ export async function handleLocalAgentStream(
         streamingPreview = accumulatedXml;
         sendPreview(streamingPreview);
       },
-      onXmlComplete: (finalXml: string) => {
+      onXmlComplete: async (finalXml: string) => {
         // Commit final XML to fullResponse and clear the preview overlay.
         const xmlChunk = `${finalXml}\n`;
         fullResponse += xmlChunk;
         streamingPreview = "";
-        updateResponseInDb(placeholderMessageId, fullResponse);
+        await updateResponseInDb(placeholderMessageId, fullResponse);
         sendChunk(fullResponse);
         // Empty preview = renderer clears its overlay atom for this chat.
         sendPreview("");
@@ -693,7 +706,7 @@ export async function handleLocalAgentStream(
     const buildOptions = {
       readOnly,
       planModeOnly,
-      basicAgentMode: !readOnly && !planModeOnly && isBasicAgentMode(settings),
+      basicAgentMode: !readOnly && !planModeOnly && useBasicAgentMode,
       enableAppBlueprint:
         settings.enableAppBlueprint && chat.app.needsAppBlueprint,
     };
@@ -790,6 +803,7 @@ export async function handleLocalAgentStream(
     // there are still incomplete todos, we append a reminder and do another pass.
     const maxTodoFollowUpLoops = 1;
     let todoFollowUpLoops = 0;
+    let todoFollowUpTimedOut = false;
     let hasInjectedPlanningQuestionnaireReflection = false;
     let currentMessageHistory = messageHistory;
     const accumulatedAiMessages: ModelMessage[] = [];
@@ -864,6 +878,41 @@ export async function handleLocalAgentStream(
             ]
           : currentMessageHistory;
         const attemptToolInputIds = new Set<string>();
+        const isTodoFollowUpPass = todoFollowUpLoops > 0;
+        const attemptAbort = createChildAbortController(abortController.signal);
+        let attemptTimedOut = false;
+        let attemptTimeoutError: Error | undefined;
+        let attemptIdleTimer: ReturnType<typeof setTimeout> | undefined;
+        const clearAttemptIdleTimer = () => {
+          if (attemptIdleTimer) {
+            clearTimeout(attemptIdleTimer);
+            attemptIdleTimer = undefined;
+          }
+        };
+        const armAttemptIdleTimer = (phase: string) => {
+          if (attemptTimedOut || todoFollowUpTimedOut) {
+            return;
+          }
+          clearAttemptIdleTimer();
+          const timeoutMs = isTodoFollowUpPass
+            ? getTodoFollowUpIdleTimeoutMs()
+            : getStreamIdleTimeoutMs();
+          attemptIdleTimer = setTimeout(() => {
+            const error = new Error(
+              isTodoFollowUpPass
+                ? `Todo follow-up pass was idle during ${phase} for ${timeoutMs}ms`
+                : `Timed out waiting for model stream ${phase} after ${timeoutMs}ms`,
+            );
+            if (isTodoFollowUpPass) {
+              todoFollowUpTimedOut = true;
+            } else {
+              attemptTimedOut = true;
+              attemptTimeoutError = error;
+            }
+            attemptAbort.controller.abort(error);
+          }, timeoutMs);
+        };
+        armAttemptIdleTimer("stream");
         const cleanupAttemptToolStreamingEntries = () => {
           for (const toolCallId of attemptToolInputIds) {
             cleanupStreamingEntry(toolCallId);
@@ -872,6 +921,7 @@ export async function handleLocalAgentStream(
         };
 
         try {
+          ctx.abortSignal = attemptAbort.controller.signal;
           const streamResult = streamText({
             model: modelClient.model,
             headers: {
@@ -915,7 +965,7 @@ export async function handleLocalAgentStream(
                   ]
                 : []),
             ],
-            abortSignal: abortController.signal,
+            abortSignal: attemptAbort.controller.signal,
             // Inject pending user messages (e.g., images from web_crawl) between steps
             // We must re-inject all accumulated messages each step because the AI SDK
             // doesn't persist dynamically injected messages in its internal state.
@@ -1127,6 +1177,8 @@ export async function handleLocalAgentStream(
 
           try {
             for await (const part of fullStream) {
+              armAttemptIdleTimer("stream");
+
               if (abortController.signal.aborted) {
                 logger.log(`Stream aborted for chat ${req.chatId}`);
                 // Clean up pending consent/questionnaire/integration requests to prevent stale UI banners
@@ -1215,13 +1267,16 @@ export async function handleLocalAgentStream(
                   const entry = getOrCreateStreamingEntry(part.id);
                   if (entry) {
                     const toolDef = findToolDefinition(entry.toolName);
-                    if (toolDef?.buildXml) {
+                    if (
+                      toolDef?.buildXml &&
+                      entry.toolName !== writeAppBlueprintTool.name
+                    ) {
                       const argsPartial = parsePartialJson(
                         entry.argsAccumulated,
                       );
                       const xml = toolDef.buildXml(argsPartial, true);
                       if (xml) {
-                        ctx.onXmlComplete(xml);
+                        await ctx.onXmlComplete(xml);
                       }
                     }
                   }
@@ -1268,6 +1323,26 @@ export async function handleLocalAgentStream(
             sendChunk(fullResponse);
           }
           activeRetryReplayEvents = null;
+
+          if (attemptTimedOut) {
+            ignorePromiseLikeRejection(streamResult.response);
+            ignorePromiseLikeRejection(streamResult.steps);
+            throw (
+              attemptTimeoutError ??
+              new Error("Timed out waiting for model stream")
+            );
+          }
+
+          if (todoFollowUpTimedOut) {
+            ignorePromiseLikeRejection(streamResult.response);
+            ignorePromiseLikeRejection(streamResult.steps);
+            logger.warn(
+              `Skipping todo follow-up pass for chat ${req.chatId}; stream was idle before timeout`,
+            );
+            steps = [];
+            responseMessages = [];
+            break;
+          }
 
           if (abortController.signal.aborted) {
             break;
@@ -1321,10 +1396,40 @@ export async function handleLocalAgentStream(
           }
 
           try {
-            const response = await streamResult.response;
-            steps = (await streamResult.steps) ?? [];
+            armAttemptIdleTimer("finalization");
+            const response = await withAbortSignalAndTimeout(
+              streamResult.response,
+              attemptAbort.controller.signal,
+              getStreamFinalizationTimeoutMs(),
+              "response finalization",
+            );
+            armAttemptIdleTimer("steps");
+            steps =
+              (await withAbortSignalAndTimeout(
+                streamResult.steps ?? Promise.resolve([]),
+                attemptAbort.controller.signal,
+                getStreamFinalizationTimeoutMs(),
+                "steps finalization",
+              )) ?? [];
+            clearAttemptIdleTimer();
             responseMessages = response.messages;
           } catch (err) {
+            if (isFinalizationTimeoutError(err)) {
+              attemptAbort.controller.abort(err);
+              ignorePromiseLikeRejection(streamResult.response);
+              ignorePromiseLikeRejection(streamResult.steps);
+              throw err;
+            }
+            if (todoFollowUpTimedOut) {
+              ignorePromiseLikeRejection(streamResult.response);
+              ignorePromiseLikeRejection(streamResult.steps);
+              logger.warn(
+                `Skipping todo follow-up pass for chat ${req.chatId}; finalization did not complete before timeout`,
+              );
+              steps = [];
+              responseMessages = [];
+              break;
+            }
             if (
               shouldRetryTransientStreamError({
                 error: err,
@@ -1375,12 +1480,30 @@ export async function handleLocalAgentStream(
 
           break;
         } finally {
+          clearAttemptIdleTimer();
+          attemptAbort.cleanup();
+          if (ctx.abortSignal === attemptAbort.controller.signal) {
+            ctx.abortSignal = abortController.signal;
+          }
           cleanupAttemptToolStreamingEntries();
         }
       }
 
       if (abortController.signal.aborted) {
         break;
+      }
+      if (todoFollowUpTimedOut) {
+        break;
+      }
+
+      if (
+        !passProducedChatText &&
+        responseMessages.length === 0 &&
+        fullResponse.trim().length === 0
+      ) {
+        throw new Error(
+          "The selected model returned an empty response. Check that the provider base URL points to the OpenAI-compatible API endpoint, for example a URL ending in /v1.",
+        );
       }
 
       // Track total steps for step limit detection
@@ -1487,20 +1610,20 @@ export async function handleLocalAgentStream(
       // Deploy all Supabase functions if shared modules changed
       const deployResult = await deployAllFunctionsIfNeeded({
         ...ctx,
-        onXmlComplete: (finalXml) => {
+        onXmlComplete: async (finalXml) => {
           postTurnXmlParts.push(finalXml);
-          ctx.onXmlComplete(finalXml);
+          await ctx.onXmlComplete(finalXml);
         },
       });
       if (deployResult.warning) {
         const warningXml = `<dyad-output type="warning" message="${escapeXmlAttr("Supabase function deploy warning")}">${escapeXmlContent(deployResult.warning)}</dyad-output>`;
         postTurnXmlParts.push(warningXml);
-        ctx.onXmlComplete(warningXml);
+        await ctx.onXmlComplete(warningXml);
       }
       if (!deployResult.success) {
         const errorXml = `<dyad-output type="error" message="${escapeXmlAttr("Failed to deploy Supabase functions")}">${escapeXmlContent(deployResult.error ?? "Unknown deploy error")}</dyad-output>`;
         postTurnXmlParts.push(errorXml);
-        ctx.onXmlComplete(errorXml);
+        await ctx.onXmlComplete(errorXml);
       }
     }
 
@@ -1621,9 +1744,23 @@ export async function handleLocalAgentStream(
     }
 
     logger.error("Local agent error:", error);
+    const errorMessage = `Error: ${getErrorMessage(error)}`;
+    const separator =
+      fullResponse.length > 0 && !fullResponse.endsWith("\n") ? "\n\n" : "";
+    fullResponse = `${fullResponse}${separator}<dyad-output type="error" message="${escapeXmlAttr("Local agent failed")}">${escapeXmlContent(errorMessage)}</dyad-output>`;
+    await updateResponseInDb(placeholderMessageId, fullResponse);
+    const patch = computeStreamingPatch(fullResponse, lastSentRef.value);
+    if (patch) {
+      lastSentRef.value = fullResponse;
+      safeSend(event.sender, "chat:response:chunk", {
+        chatId: req.chatId,
+        streamingMessageId: placeholderMessageId,
+        streamingPatch: patch,
+      });
+    }
     safeSend(event.sender, "chat:response:error", {
       chatId: req.chatId,
-      error: `Error: ${getErrorMessage(error)}`,
+      error: errorMessage,
       warningMessages:
         warningMessages.length > 0 ? [...new Set(warningMessages)] : undefined,
     });
@@ -1745,6 +1882,130 @@ function shouldRetryTransientStreamError(params: {
   );
 }
 
+function createChildAbortController(parentSignal: AbortSignal): {
+  controller: AbortController;
+  cleanup: () => void;
+} {
+  const controller = new AbortController();
+  const abort = () => controller.abort(parentSignal.reason);
+  if (parentSignal.aborted) {
+    abort();
+    return {
+      controller,
+      cleanup: () => undefined,
+    };
+  }
+  parentSignal.addEventListener("abort", abort, { once: true });
+  return {
+    controller,
+    cleanup: () => parentSignal.removeEventListener("abort", abort),
+  };
+}
+
+async function withAbortSignal<T>(
+  promise: PromiseLike<T>,
+  signal: AbortSignal,
+): Promise<T> {
+  if (signal.aborted) {
+    throw signal.reason ?? new Error("Operation aborted");
+  }
+
+  let cleanup: (() => void) | undefined;
+  const abortPromise = new Promise<never>((_resolve, reject) => {
+    const onAbort = () =>
+      reject(signal.reason ?? new Error("Operation aborted"));
+    cleanup = () => signal.removeEventListener("abort", onAbort);
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+  try {
+    return await Promise.race([promise, abortPromise]);
+  } finally {
+    cleanup?.();
+  }
+}
+
+async function withAbortSignalAndTimeout<T>(
+  promise: PromiseLike<T>,
+  signal: AbortSignal,
+  timeoutMs: number,
+  label: string,
+): Promise<T> {
+  const timeoutController = new AbortController();
+  const timeout = setTimeout(() => {
+    timeoutController.abort(
+      new Error(
+        `Timed out waiting for model stream ${label} after ${timeoutMs}ms`,
+      ),
+    );
+  }, timeoutMs);
+
+  const combined = createChildAbortController(signal);
+  const onTimeout = () =>
+    combined.controller.abort(timeoutController.signal.reason);
+  timeoutController.signal.addEventListener("abort", onTimeout, { once: true });
+  try {
+    return await withAbortSignal(promise, combined.controller.signal);
+  } finally {
+    clearTimeout(timeout);
+    timeoutController.signal.removeEventListener("abort", onTimeout);
+    combined.cleanup();
+  }
+}
+
+function isFinalizationTimeoutError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    error.message.startsWith("Timed out waiting for model stream ")
+  );
+}
+
+function ignorePromiseLikeRejection<T>(
+  promise: PromiseLike<T> | null | undefined,
+): void {
+  if (!promise) {
+    return;
+  }
+  void Promise.resolve(promise).catch(() => undefined);
+}
+
+function getTodoFollowUpIdleTimeoutMs(): number {
+  const raw =
+    process.env[TODO_FOLLOW_UP_TIMEOUT_ENV_VAR] ??
+    process.env[LEGACY_TODO_FOLLOW_UP_TIMEOUT_ENV_VAR];
+  if (!raw) {
+    return DEFAULT_TODO_FOLLOW_UP_IDLE_TIMEOUT_MS;
+  }
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return DEFAULT_TODO_FOLLOW_UP_IDLE_TIMEOUT_MS;
+  }
+  return parsed;
+}
+
+function getStreamFinalizationTimeoutMs(): number {
+  const raw = process.env[STREAM_FINALIZATION_TIMEOUT_ENV_VAR];
+  if (!raw) {
+    return DEFAULT_STREAM_FINALIZATION_TIMEOUT_MS;
+  }
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return DEFAULT_STREAM_FINALIZATION_TIMEOUT_MS;
+  }
+  return parsed;
+}
+
+function getStreamIdleTimeoutMs(): number {
+  const raw = process.env[STREAM_IDLE_TIMEOUT_ENV_VAR];
+  if (!raw) {
+    return DEFAULT_STREAM_IDLE_TIMEOUT_MS;
+  }
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return DEFAULT_STREAM_IDLE_TIMEOUT_MS;
+  }
+  return parsed;
+}
+
 async function delay(ms: number): Promise<void> {
   await new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
@@ -1758,7 +2019,7 @@ async function updateResponseInDb(messageId: number, content: string) {
 }
 
 function sendResponseChunk(
-  event: IpcMainInvokeEvent,
+  event: IpcInvokeEventLike,
   chatId: number,
   chat: any,
   fullResponse: string,
@@ -1914,7 +2175,7 @@ function shouldRunTodoFollowUpPass(params: {
  * and surfaces tool errors as `<dyad-output type="error">`.
  */
 async function getMcpTools(
-  event: IpcMainInvokeEvent,
+  event: IpcInvokeEventLike,
   ctx: AgentContext,
 ): Promise<ToolSet> {
   const mcpToolSet: ToolSet = {};
@@ -1971,7 +2232,7 @@ async function getMcpTools(
               // Emit XML for UI (MCP tools don't stream, so use onXmlComplete directly)
               const { serverName, toolName } = parseMcpToolKey(key);
               const content = JSON.stringify(args, null, 2);
-              ctx.onXmlComplete(
+              await ctx.onXmlComplete(
                 `<dyad-mcp-tool-call server="${serverName}" tool="${toolName}">\n${content}\n</dyad-mcp-tool-call>`,
               );
 
@@ -1979,7 +2240,7 @@ async function getMcpTools(
               const resultStr =
                 typeof res === "string" ? res : JSON.stringify(res);
 
-              ctx.onXmlComplete(
+              await ctx.onXmlComplete(
                 `<dyad-mcp-tool-result server="${serverName}" tool="${toolName}">\n${resultStr}\n</dyad-mcp-tool-result>`,
               );
 
@@ -1989,7 +2250,7 @@ async function getMcpTools(
                 error instanceof Error ? error.message : String(error);
               const errorStack =
                 error instanceof Error && error.stack ? error.stack : "";
-              ctx.onXmlComplete(
+              await ctx.onXmlComplete(
                 `<dyad-output type="error" message="MCP tool '${key}' failed: ${escapeXmlAttr(errorMessage)}">${escapeXmlContent(errorStack || errorMessage)}</dyad-output>`,
               );
               throw error;

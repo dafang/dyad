@@ -7,31 +7,24 @@ import killPort from "kill-port";
 import log from "electron-log";
 
 import { getAppPort, getAppProxyPort } from "../../../shared/ports";
-import { readSettings } from "@/main/settings";
 import {
   shouldShowPnpmMinimumReleaseAgeWarning,
   type RuntimeMode2,
+  type UserSettings,
 } from "@/lib/schemas";
 import type { AppOutput } from "@/ipc/types/misc";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
 import { addLog } from "@/lib/log_store";
-import { safeSend } from "@/ipc/utils/safe_sender";
+import { safeSend, type WebContentsLike } from "@/ipc/utils/safe_sender";
 import { startProxy } from "@/ipc/utils/start_proxy_server";
-import {
-  buildCloudSandboxFileMap,
-  CloudSandboxApiError,
-  createCloudSandbox,
-  destroyCloudSandbox,
-  registerRunningCloudSandbox,
-  setCloudSandboxSyncUpdateListener,
-  streamCloudSandboxLogs,
-  uploadCloudSandboxFiles,
-} from "@/ipc/utils/cloud_sandbox_provider";
 import {
   processCounter,
   removeAppIfCurrentProcess,
+  type RunningAppInfo,
+  type RunningAppEventSink,
   runningApps,
 } from "@/ipc/utils/process_manager";
+import type { RunningAppPreview } from "@/ipc/types/app";
 import {
   ensurePnpmAllowBuildsConfigured,
   getPackageManagerCommandEnv,
@@ -45,8 +38,56 @@ const logger = log.scope("app_runtime_service");
 // Needed, otherwise Electron on macOS/Linux may not find node/pnpm.
 fixPath();
 
+type CloudSandboxProviderModule =
+  typeof import("@/ipc/utils/cloud_sandbox_provider");
+type CloudSandboxApiErrorLike = Error & {
+  code?: string;
+  status?: number;
+};
+type AppRuntimeEvent = {
+  sender: WebContentsLike;
+};
+type AppRuntimeSettingsReader = () => UserSettings | Promise<UserSettings>;
+
+async function defaultReadSettingsForRuntime(): Promise<UserSettings> {
+  const { readSettings } = await import("@/main/settings");
+  return readSettings();
+}
+
+function createElectronEventSink(event: AppRuntimeEvent): RunningAppEventSink {
+  return {
+    send(channel, payload) {
+      safeSend(event.sender, channel, payload);
+    },
+  };
+}
+
+function resolveEventSink(input: {
+  event?: AppRuntimeEvent;
+  eventSink?: RunningAppEventSink;
+}): RunningAppEventSink {
+  if (input.eventSink) {
+    return input.eventSink;
+  }
+  if (input.event) {
+    return createElectronEventSink(input.event);
+  }
+  throw new DyadError(
+    "App runtime event sink is required",
+    DyadErrorKind.Internal,
+  );
+}
+
+function sendRuntimeEvent(
+  eventSink: RunningAppEventSink | null | undefined,
+  channel: string,
+  payload: unknown,
+): void {
+  eventSink?.send(channel, payload);
+}
+
 export function formatCloudSandboxError(error: unknown) {
-  if (!(error instanceof CloudSandboxApiError)) {
+  if (!isCloudSandboxApiErrorLike(error)) {
     return error instanceof Error ? error.message : String(error);
   }
 
@@ -76,6 +117,16 @@ export function formatCloudSandboxError(error: unknown) {
   }
 }
 
+async function getCloudSandboxProvider(): Promise<CloudSandboxProviderModule> {
+  return import("@/ipc/utils/cloud_sandbox_provider");
+}
+
+function isCloudSandboxApiErrorLike(
+  error: unknown,
+): error is CloudSandboxApiErrorLike {
+  return error instanceof Error && error.name === "CloudSandboxApiError";
+}
+
 function getPnpmInstallCommand(): string {
   return `pnpm ${PNPM_INSTALL_POLICY_ARGS.join(" ")} install`;
 }
@@ -99,7 +150,7 @@ async function getDefaultCommand({
   runtimeMode: RuntimeMode2;
   appId: number;
   appPath: string;
-  onPnpmMinimumReleaseAgeWarning?: (message: string) => void;
+  onPnpmMinimumReleaseAgeWarning?: (message: string) => void | Promise<void>;
 }): Promise<AppRuntimeCommand> {
   const port = getAppPort(appId);
   if (runtimeMode === "docker") {
@@ -114,7 +165,7 @@ async function getDefaultCommand({
   const pnpmSupport = await getPnpmMinimumReleaseAgeSupport();
 
   if (!pnpmSupport.minimumReleaseAgeSupported && pnpmSupport.warningMessage) {
-    onPnpmMinimumReleaseAgeWarning?.(pnpmSupport.warningMessage);
+    await onPnpmMinimumReleaseAgeWarning?.(pnpmSupport.warningMessage);
   }
 
   if (!pnpmSupport.available) {
@@ -146,7 +197,7 @@ async function getCommand({
   appPath: string;
   installCommand?: string | null;
   startCommand?: string | null;
-  onPnpmMinimumReleaseAgeWarning?: (message: string) => void;
+  onPnpmMinimumReleaseAgeWarning?: (message: string) => void | Promise<void>;
 }): Promise<AppRuntimeCommand> {
   const hasCustomCommands = !!installCommand?.trim() && !!startCommand?.trim();
   if (hasCustomCommands) {
@@ -165,21 +216,23 @@ async function getCommand({
   });
 }
 
-function emitPnpmMinimumReleaseAgeWarning({
+async function emitPnpmMinimumReleaseAgeWarning({
   appId,
-  event,
+  eventSink,
   message,
+  readSettingsForRuntime,
 }: {
   appId: number;
-  event: Electron.IpcMainInvokeEvent;
+  eventSink: RunningAppEventSink;
   message: string;
-}) {
-  const settings = readSettings();
+  readSettingsForRuntime: AppRuntimeSettingsReader;
+}): Promise<void> {
+  const settings = await readSettingsForRuntime();
   if (!shouldShowPnpmMinimumReleaseAgeWarning(settings)) {
     return;
   }
 
-  safeSend(event.sender, "app:output", {
+  sendRuntimeEvent(eventSink, "app:output", {
     type: "package-manager-warning",
     message,
     appId,
@@ -190,18 +243,23 @@ export async function executeApp({
   appPath,
   appId,
   event,
+  eventSink,
   isNeon,
   installCommand,
   startCommand,
+  readSettingsForRuntime = defaultReadSettingsForRuntime,
 }: {
   appPath: string;
   appId: number;
-  event: Electron.IpcMainInvokeEvent;
+  event?: AppRuntimeEvent;
+  eventSink?: RunningAppEventSink;
   isNeon: boolean;
   installCommand?: string | null;
   startCommand?: string | null;
+  readSettingsForRuntime?: AppRuntimeSettingsReader;
 }): Promise<void> {
-  const settings = readSettings();
+  const resolvedEventSink = resolveEventSink({ event, eventSink });
+  const settings = await readSettingsForRuntime();
   const runtimeMode = settings.runtimeMode2 ?? "host";
 
   if (runtimeMode === "docker") {
@@ -209,15 +267,18 @@ export async function executeApp({
       appPath,
       appId,
       event,
+      eventSink: resolvedEventSink,
       isNeon,
       installCommand,
       startCommand,
+      readSettingsForRuntime,
     });
   } else if (runtimeMode === "cloud") {
     await executeAppInCloud({
       appPath,
       appId,
       event,
+      eventSink: resolvedEventSink,
       installCommand,
       startCommand,
     });
@@ -226,46 +287,79 @@ export async function executeApp({
       appPath,
       appId,
       event,
+      eventSink: resolvedEventSink,
       isNeon,
       installCommand,
       startCommand,
+      readSettingsForRuntime,
     });
   }
 }
 
+export function createAppRuntimeEventSinkFromElectronEvent(
+  event: AppRuntimeEvent,
+): RunningAppEventSink {
+  return createElectronEventSink(event);
+}
+
 export function emitProxyServerStarted({
   appId,
-  event,
+  eventSink,
   proxyUrl,
   originalUrl,
   mode,
 }: {
   appId: number;
-  event: Electron.IpcMainInvokeEvent;
+  eventSink: RunningAppEventSink;
   proxyUrl: string;
   originalUrl: string;
   mode: RuntimeMode2;
 }) {
-  safeSend(event.sender, "app:output", {
+  sendRuntimeEvent(eventSink, "app:output", {
     type: "stdout",
     message: `[dyad-proxy-server]started=[${proxyUrl}] original=[${originalUrl}] mode=[${mode}]`,
     appId,
   });
 }
 
+export function getRunningAppPreview(
+  appId: number,
+  appInfo: RunningAppInfo | undefined = runningApps.get(appId),
+): RunningAppPreview | null {
+  if (!appInfo?.proxyUrl || !appInfo.originalUrl) {
+    return null;
+  }
+
+  return {
+    appId,
+    appUrl: appInfo.proxyUrl,
+    originalUrl: appInfo.originalUrl,
+    mode: appInfo.mode,
+  };
+}
+
 export async function ensureProxyForRunningApp({
   appId,
   event,
+  eventSink,
   originalUrl,
   mode,
 }: {
   appId: number;
-  event: Electron.IpcMainInvokeEvent;
+  event?: AppRuntimeEvent;
+  eventSink?: RunningAppEventSink;
   originalUrl: string;
   mode: RuntimeMode2;
 }): Promise<void> {
   const appInfo = runningApps.get(appId);
   if (!appInfo) {
+    return;
+  }
+  const resolvedEventSink =
+    eventSink ??
+    appInfo.eventSink ??
+    (event ? createElectronEventSink(event) : undefined);
+  if (!resolvedEventSink) {
     return;
   }
 
@@ -280,7 +374,7 @@ export async function ensureProxyForRunningApp({
   ) {
     emitProxyServerStarted({
       appId,
-      event,
+      eventSink: resolvedEventSink,
       proxyUrl: appInfo.proxyUrl,
       originalUrl,
       mode,
@@ -312,7 +406,7 @@ export async function ensureProxyForRunningApp({
       }
       emitProxyServerStarted({
         appId,
-        event,
+        eventSink: resolvedEventSink,
         proxyUrl,
         originalUrl,
         mode,
@@ -320,7 +414,7 @@ export async function ensureProxyForRunningApp({
     },
     onError: (error) => {
       logger.error(`Failed to start proxy for app ${appId}:`, error);
-      safeSend(event.sender, "app:output", {
+      sendRuntimeEvent(resolvedEventSink, "app:output", {
         type: "stderr",
         message: `[dyad-proxy-server] ${error.message}`,
         appId,
@@ -348,16 +442,20 @@ async function executeAppLocalNode({
   appPath,
   appId,
   event,
+  eventSink,
   isNeon,
   installCommand,
   startCommand,
+  readSettingsForRuntime,
 }: {
   appPath: string;
   appId: number;
-  event: Electron.IpcMainInvokeEvent;
+  event?: AppRuntimeEvent;
+  eventSink: RunningAppEventSink;
   isNeon: boolean;
   installCommand?: string | null;
   startCommand?: string | null;
+  readSettingsForRuntime: AppRuntimeSettingsReader;
 }): Promise<void> {
   const command = await getCommand({
     runtimeMode: "host",
@@ -366,7 +464,12 @@ async function executeAppLocalNode({
     installCommand,
     startCommand,
     onPnpmMinimumReleaseAgeWarning: (message) =>
-      emitPnpmMinimumReleaseAgeWarning({ appId, event, message }),
+      emitPnpmMinimumReleaseAgeWarning({
+        appId,
+        eventSink,
+        message,
+        readSettingsForRuntime,
+      }),
   });
   let env = { ...process.env };
   if (!command.isCustom && command.packageManager === "pnpm") {
@@ -428,7 +531,8 @@ Details: ${details || "n/a"}
     process: spawnedProcess,
     processId: currentProcessId,
     mode: "host",
-    rendererSender: event.sender,
+    eventSink,
+    rendererSender: event?.sender,
     lastViewedAt: Date.now(),
   });
 
@@ -437,22 +541,23 @@ Details: ${details || "n/a"}
     appId,
     isNeon,
     event,
+    eventSink,
   });
 }
 
 const APP_OUTPUT_FLUSH_INTERVAL_MS = 100;
 
-const pendingOutputs = new Map<Electron.WebContents, AppOutput[]>();
+const pendingOutputs = new Map<RunningAppEventSink, AppOutput[]>();
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
 function enqueueAppOutput(
-  sender: Electron.WebContents,
+  eventSink: RunningAppEventSink,
   output: AppOutput,
 ): void {
-  let queue = pendingOutputs.get(sender);
+  let queue = pendingOutputs.get(eventSink);
   if (!queue) {
     queue = [];
-    pendingOutputs.set(sender, queue);
+    pendingOutputs.set(eventSink, queue);
   }
   queue.push(output);
 
@@ -463,9 +568,9 @@ function enqueueAppOutput(
 
 function flushAllAppOutputs(): void {
   flushTimer = null;
-  for (const [sender, outputs] of pendingOutputs) {
+  for (const [eventSink, outputs] of pendingOutputs) {
     if (outputs.length > 0) {
-      safeSend(sender, "app:output-batch", outputs);
+      sendRuntimeEvent(eventSink, "app:output-batch", outputs);
     }
   }
   pendingOutputs.clear();
@@ -478,61 +583,65 @@ export function registerCloudSandboxSyncUpdateListener(): void {
     return;
   }
 
-  setCloudSandboxSyncUpdateListener(({ appId, errorMessage }) => {
-    const appInfo = runningApps.get(appId);
-    if (!appInfo || appInfo.mode !== "cloud") {
-      return;
-    }
+  void getCloudSandboxProvider().then((cloudSandboxProvider) => {
+    cloudSandboxProvider.setCloudSandboxSyncUpdateListener(
+      ({ appId, errorMessage }) => {
+        const appInfo = runningApps.get(appId);
+        if (!appInfo || appInfo.mode !== "cloud") {
+          return;
+        }
 
-    const previousErrorMessage = appInfo.cloudSyncErrorMessage ?? null;
-    appInfo.cloudSyncErrorMessage = errorMessage ?? undefined;
+        const previousErrorMessage = appInfo.cloudSyncErrorMessage ?? null;
+        appInfo.cloudSyncErrorMessage = errorMessage ?? undefined;
 
-    const sender = appInfo.rendererSender;
-    if (!sender) {
-      return;
-    }
+        const eventSink = appInfo.eventSink;
+        if (!eventSink) {
+          return;
+        }
 
-    if (errorMessage) {
-      if (previousErrorMessage === errorMessage) {
-        return;
-      }
+        if (errorMessage) {
+          if (previousErrorMessage === errorMessage) {
+            return;
+          }
 
-      addLog({
-        level: "error",
-        type: "server",
-        message: errorMessage,
-        timestamp: Date.now(),
-        appId,
-      });
+          addLog({
+            level: "error",
+            type: "server",
+            message: errorMessage,
+            timestamp: Date.now(),
+            appId,
+          });
 
-      safeSend(sender, "app:output", {
-        type: "sync-error",
-        message: errorMessage,
-        appId,
-      });
-      return;
-    }
+          sendRuntimeEvent(eventSink, "app:output", {
+            type: "sync-error",
+            message: errorMessage,
+            appId,
+          });
+          return;
+        }
 
-    if (!previousErrorMessage) {
-      return;
-    }
+        if (!previousErrorMessage) {
+          return;
+        }
 
-    const recoveredMessage =
-      "Cloud sandbox sync recovered. Local changes are uploading again.";
+        const recoveredMessage =
+          "Cloud sandbox sync recovered. Local changes are uploading again.";
 
-    addLog({
-      level: "info",
-      type: "server",
-      message: recoveredMessage,
-      timestamp: Date.now(),
-      appId,
-    });
+        addLog({
+          level: "info",
+          type: "server",
+          message: recoveredMessage,
+          timestamp: Date.now(),
+          appId,
+        });
 
-    safeSend(sender, "app:output", {
-      type: "sync-recovered",
-      message: recoveredMessage,
-      appId,
-    });
+        sendRuntimeEvent(eventSink, "app:output", {
+          type: "sync-recovered",
+          message: recoveredMessage,
+          appId,
+        });
+      },
+    );
   });
 
   cloudSandboxSyncUpdateListenerRegistered = true;
@@ -543,11 +652,13 @@ function listenToProcess({
   appId,
   isNeon,
   event,
+  eventSink,
 }: {
   process: ChildProcess;
   appId: number;
   isNeon: boolean;
-  event: Electron.IpcMainInvokeEvent;
+  event?: AppRuntimeEvent;
+  eventSink: RunningAppEventSink;
 }) {
   spawnedProcess.stdout?.on("data", async (data) => {
     const message = util.stripVTControlCharacters(data.toString());
@@ -573,27 +684,30 @@ function listenToProcess({
     const inputRequestPattern = /\s*›\s*\([yY]\/[nN]\)\s*$/;
     const isInputRequest = inputRequestPattern.test(message);
     if (isInputRequest) {
-      safeSend(event.sender, "app:output", {
+      sendRuntimeEvent(eventSink, "app:output", {
         type: "input-requested",
         message,
         appId,
       });
     } else {
-      enqueueAppOutput(event.sender, {
-        type: "stdout",
+      const urlMatch = message.match(/(https?:\/\/localhost:\d+\/?)/);
+      const output = {
+        type: "stdout" as const,
         message,
         appId,
-      });
-
-      const urlMatch = message.match(/(https?:\/\/localhost:\d+\/?)/);
+      };
       if (urlMatch) {
+        sendRuntimeEvent(eventSink, "app:output", output);
         const originalUrl = urlMatch[1];
         await ensureProxyForRunningApp({
           appId,
           event,
+          eventSink,
           originalUrl,
           mode: "host",
         });
+      } else {
+        enqueueAppOutput(eventSink, output);
       }
     }
   });
@@ -612,7 +726,7 @@ function listenToProcess({
       appId,
     });
 
-    enqueueAppOutput(event.sender, {
+    enqueueAppOutput(eventSink, {
       type: "stderr",
       message,
       appId,
@@ -630,7 +744,7 @@ function listenToProcess({
       return;
     }
 
-    safeSend(event.sender, "app:output", {
+    sendRuntimeEvent(eventSink, "app:output", {
       type: "app-exit",
       message: `App process exited with code ${code ?? "null"}`,
       appId,
@@ -653,16 +767,20 @@ async function executeAppInDocker({
   appPath,
   appId,
   event,
+  eventSink,
   isNeon,
   installCommand,
   startCommand,
+  readSettingsForRuntime,
 }: {
   appPath: string;
   appId: number;
-  event: Electron.IpcMainInvokeEvent;
+  event?: AppRuntimeEvent;
+  eventSink: RunningAppEventSink;
   isNeon: boolean;
   installCommand?: string | null;
   startCommand?: string | null;
+  readSettingsForRuntime: AppRuntimeSettingsReader;
 }): Promise<void> {
   const containerName = `dyad-app-${appId}`;
 
@@ -781,7 +899,12 @@ RUN npm install -g pnpm
           installCommand,
           startCommand,
           onPnpmMinimumReleaseAgeWarning: (message) =>
-            emitPnpmMinimumReleaseAgeWarning({ appId, event, message }),
+            emitPnpmMinimumReleaseAgeWarning({
+              appId,
+              eventSink,
+              message,
+              readSettingsForRuntime,
+            }),
         })
       ).command,
     ],
@@ -834,7 +957,8 @@ ${errorOutput || "(empty)"}`,
     process,
     processId: currentProcessId,
     mode: "docker",
-    rendererSender: event.sender,
+    eventSink,
+    rendererSender: event?.sender,
     containerName,
     lastViewedAt: Date.now(),
   });
@@ -844,6 +968,7 @@ ${errorOutput || "(empty)"}`,
     appId,
     isNeon,
     event,
+    eventSink,
   });
 }
 
@@ -851,12 +976,14 @@ async function executeAppInCloud({
   appPath,
   appId,
   event,
+  eventSink,
   installCommand,
   startCommand,
 }: {
   appPath: string;
   appId: number;
-  event: Electron.IpcMainInvokeEvent;
+  event?: AppRuntimeEvent;
+  eventSink: RunningAppEventSink;
   installCommand?: string | null;
   startCommand?: string | null;
 }): Promise<void> {
@@ -864,9 +991,10 @@ async function executeAppInCloud({
   let sandboxId: string | undefined;
   let previewUrl: string | undefined;
   let previewAuthToken: string | undefined;
+  const cloudSandboxProvider = await getCloudSandboxProvider();
 
   try {
-    const createResult = await createCloudSandbox({
+    const createResult = await cloudSandboxProvider.createCloudSandbox({
       appId,
       appPath,
       installCommand,
@@ -876,8 +1004,8 @@ async function executeAppInCloud({
     previewUrl = createResult.previewUrl;
     previewAuthToken = createResult.previewAuthToken;
 
-    const files = await buildCloudSandboxFileMap(appPath);
-    const uploadResult = await uploadCloudSandboxFiles({
+    const files = await cloudSandboxProvider.buildCloudSandboxFileMap(appPath);
+    const uploadResult = await cloudSandboxProvider.uploadCloudSandboxFiles({
       sandboxId,
       files,
       replaceAll: true,
@@ -887,7 +1015,7 @@ async function executeAppInCloud({
   } catch (error) {
     if (sandboxId) {
       try {
-        await destroyCloudSandbox(sandboxId);
+        await cloudSandboxProvider.destroyCloudSandbox(sandboxId);
       } catch (cleanupError) {
         logger.warn(
           `Failed to clean up cloud sandbox ${sandboxId} after startup error for app ${appId}:`,
@@ -911,7 +1039,8 @@ async function executeAppInCloud({
     process: null,
     processId: currentProcessId,
     mode: "cloud",
-    rendererSender: event.sender,
+    eventSink,
+    rendererSender: event?.sender,
     cloudSandboxId: sandboxId,
     cloudPreviewUrl: resolvedPreviewUrl,
     cloudPreviewAuthToken: resolvedPreviewAuthToken,
@@ -919,7 +1048,7 @@ async function executeAppInCloud({
     lastViewedAt: Date.now(),
     originalUrl: resolvedPreviewUrl,
   });
-  registerRunningCloudSandbox({
+  cloudSandboxProvider.registerRunningCloudSandbox({
     appId,
     appPath,
     sandboxId,
@@ -928,13 +1057,14 @@ async function executeAppInCloud({
   await ensureProxyForRunningApp({
     appId,
     event,
+    eventSink,
     originalUrl: resolvedPreviewUrl,
     mode: "cloud",
   });
 
   startCloudSandboxLogStream({
     appId,
-    event,
+    eventSink,
     sandboxId,
     cloudLogAbortController,
   });
@@ -942,13 +1072,14 @@ async function executeAppInCloud({
 
 export function startCloudSandboxLogStream(input: {
   appId: number;
-  event: Electron.IpcMainInvokeEvent;
+  eventSink: RunningAppEventSink;
   sandboxId: string;
   cloudLogAbortController: AbortController;
 }) {
   void (async () => {
     try {
-      for await (const message of streamCloudSandboxLogs(
+      const cloudSandboxProvider = await getCloudSandboxProvider();
+      for await (const message of cloudSandboxProvider.streamCloudSandboxLogs(
         input.sandboxId,
         input.cloudLogAbortController.signal,
       )) {
@@ -965,7 +1096,7 @@ export function startCloudSandboxLogStream(input: {
           appId: input.appId,
         });
 
-        safeSend(input.event.sender, "app:output", {
+        sendRuntimeEvent(input.eventSink, "app:output", {
           type: "stdout",
           message,
           appId: input.appId,
@@ -989,7 +1120,7 @@ export function startCloudSandboxLogStream(input: {
         appId: input.appId,
       });
 
-      safeSend(input.event.sender, "app:output", {
+      sendRuntimeEvent(input.eventSink, "app:output", {
         type: "stderr",
         message,
         appId: input.appId,
@@ -1046,8 +1177,11 @@ async function stopDockerContainersOnPort(port: number): Promise<void> {
   }
 }
 
-export async function cleanUpPort(port: number) {
-  const settings = readSettings();
+export async function cleanUpPort(
+  port: number,
+  readSettingsForRuntime: AppRuntimeSettingsReader = defaultReadSettingsForRuntime,
+) {
+  const settings = await readSettingsForRuntime();
   if (settings.runtimeMode2 === "docker") {
     await stopDockerContainersOnPort(port);
   } else {

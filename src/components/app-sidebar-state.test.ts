@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  getSidebarPanelForRailItem,
   getRouteSidebarPanel,
   getSelectedSidebarPanel,
+  getTouchSidebarActivationIntent,
   isSidebarItemActive,
   shouldShowSelectedAppChatList,
 } from "@/components/app-sidebar-state";
@@ -74,5 +76,17 @@ describe("app sidebar state", () => {
         pathname: "/chat",
       }),
     ).toBe(true);
+  });
+
+  it("maps touch rail activation to explicit panels instead of hover state", () => {
+    expect(getSidebarPanelForRailItem("Apps")).toBe("Apps");
+    expect(getSidebarPanelForRailItem("Settings")).toBe("Settings");
+    expect(getSidebarPanelForRailItem("Library")).toBe("Library");
+    expect(getSidebarPanelForRailItem("Hub")).toBeNull();
+
+    expect(getTouchSidebarActivationIntent("Apps")).toBe("open-panel");
+    expect(getTouchSidebarActivationIntent("Settings")).toBe("open-panel");
+    expect(getTouchSidebarActivationIntent("Library")).toBe("open-panel");
+    expect(getTouchSidebarActivationIntent("Hub")).toBe("close-panel");
   });
 });

@@ -6,7 +6,7 @@ import {
 } from "@/atoms/integrationAtoms";
 import { previewModeAtom, selectedAppIdAtom } from "@/atoms/appAtoms";
 import { selectedChatIdAtom } from "@/atoms/chatAtoms";
-import { integrationClient } from "@/ipc/types/integration";
+import { ipc } from "@/ipc/types";
 import { useLoadApp } from "@/hooks/useLoadApp";
 import { getCompletedIntegrationProvider } from "@/components/chat/dyadAddIntegrationUtils";
 import { showError } from "@/lib/toast";
@@ -50,7 +50,7 @@ export function useIntegrationContinue() {
     ) {
       return;
     }
-    // Queue the continuation BEFORE the IPC call. integrationClient.respond
+    // Queue the continuation BEFORE the IPC call. ipc.integration.respond
     // unblocks the backend's integrationResolver.wait promise, which lets the
     // local-agent stream finish; useIntegrationContinuation only fires on the
     // streaming -> not-streaming transition, so if the stream ends before this
@@ -66,7 +66,7 @@ export function useIntegrationContinue() {
     // everything succeeded. On error, roll back the queued continuation,
     // surface a toast, and leave state intact.
     try {
-      await integrationClient.respond({
+      await ipc.integration.respond({
         requestId: pendingIntegration.requestId,
         provider,
         completed: true,

@@ -23,8 +23,10 @@ import { LanguageSchema } from "@/lib/schemas";
 import { useShortcut } from "@/hooks/useShortcut";
 import { useIsMac } from "@/hooks/useChatModeToggle";
 import { ReleaseNotesDialog } from "@/components/ReleaseNotesDialog";
+import { isLocalWebRuntime } from "@/lib/runtime_client";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const isLocalWeb = isLocalWebRuntime();
   const { refreshAppIframe } = useRunApp();
   // Subscribe to app output events once at the root level to avoid duplicates
   useAppOutputSubscription();
@@ -85,7 +87,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       };
     }
 
-    return () => {};
+    document.documentElement.style.zoom = `${zoomFactor}`;
+
+    return () => {
+      document.documentElement.style.zoom = "";
+    };
   }, [settings?.zoomLevel]);
 
   // Sync i18n language with persisted user setting
@@ -127,11 +133,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <ThemeProvider>
         <DeepLinkProvider>
           <SidebarProvider defaultOpen={false}>
-            <TitleBar />
+            {!isLocalWeb && <TitleBar />}
             <AppSidebar />
             <div
               id="layout-main-content-container"
-              className="flex h-screenish w-full overflow-x-hidden mt-[var(--layout-title-bar-offset)] border-l border-border bg-background"
+              className={
+                isLocalWeb
+                  ? "flex h-screen w-full overflow-x-hidden border-l border-border bg-background"
+                  : "flex h-screenish w-full overflow-x-hidden mt-[var(--layout-title-bar-offset)] border-l border-border bg-background"
+              }
             >
               {children}
             </div>

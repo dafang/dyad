@@ -1,0 +1,44 @@
+{
+  "run_id": "local_web_portal_migration_mq85vvyo",
+  "workflow_id": "local_web_portal_migration",
+  "state": "failed",
+  "created_at": "2026-06-10T14:26:06.097Z",
+  "updated_at": "2026-06-10T14:26:06.285Z",
+  "run_dir": ".dynamic-workflow/runs/local_web_portal_migration_mq85vvyo",
+  "steps": {
+    "collect_context": {
+      "step_id": "collect_context",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Collection commands completed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq85vvyo/steps/collect_context.json"
+    },
+    "implement_foundation": {
+      "step_id": "implement_foundation",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Executed implement_foundation through current host boundary.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq85vvyo/steps/implement_foundation.json"
+    },
+    "verify_targeted": {
+      "step_id": "verify_targeted",
+      "state": "failed",
+      "attempts": 1,
+      "summary": "Verification command failed: npm test -- src/ipc/contracts/core.test.ts",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq85vvyo/steps/verify_targeted.json",
+      "failure": "Verification command failed: npm test -- src/ipc/contracts/core.test.ts"
+    },
+    "review_results": {
+      "step_id": "review_results",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency verify_targeted."
+    },
+    "summarize_run": {
+      "step_id": "summarize_run",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency verify_targeted."
+    }
+  }
+}

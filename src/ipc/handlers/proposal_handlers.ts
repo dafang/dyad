@@ -1,4 +1,3 @@
-import { type IpcMainInvokeEvent } from "electron";
 import type {
   CodeProposal,
   ProposalResult,
@@ -30,14 +29,14 @@ import {
 import { extractCodebase } from "../../utils/codebase";
 import { getDyadAppPath } from "../../paths/paths";
 import { withLock } from "../utils/lock_utils";
-import { createLoggedHandler } from "./safe_handle";
 import { ApproveProposalResult } from "@/ipc/types";
 import { validateChatContext } from "../utils/context_paths_utils";
 import { readSettings } from "@/main/settings";
 import { resolveChatModeForTurn } from "./chat_mode_resolution";
+import type { IpcInvokeEventLike } from "../utils/ipc_event";
+import { createLoggedHandler } from "./safe_handle";
 
 const logger = log.scope("proposal_handlers");
-const handle = createLoggedHandler(logger);
 // Cache for codebase token counts
 interface CodebaseTokenCache {
   chatId: number;
@@ -122,8 +121,8 @@ async function getCodebaseTokenCount(
   return tokenCount;
 }
 
-const getProposalHandler = async (
-  _event: IpcMainInvokeEvent,
+export const getProposalHandler = async (
+  _event: IpcInvokeEventLike | undefined,
   { chatId }: { chatId: number },
 ): Promise<ProposalResult | null> => {
   return withLock("get-proposal:" + chatId, async () => {
@@ -334,8 +333,8 @@ const getProposalHandler = async (
 };
 
 // Handler to approve a proposal (process actions and update message)
-const approveProposalHandler = async (
-  _event: IpcMainInvokeEvent,
+export const approveProposalHandler = async (
+  _event: IpcInvokeEventLike | undefined,
   { chatId, messageId }: { chatId: number; messageId: number },
 ): Promise<ApproveProposalResult> => {
   const settings = readSettings();
@@ -400,8 +399,8 @@ const approveProposalHandler = async (
 };
 
 // Handler to reject a proposal (just update message state)
-const rejectProposalHandler = async (
-  _event: IpcMainInvokeEvent,
+export const rejectProposalHandler = async (
+  _event: IpcInvokeEventLike | undefined,
   { chatId, messageId }: { chatId: number; messageId: number },
 ): Promise<void> => {
   logger.log(
@@ -435,6 +434,7 @@ const rejectProposalHandler = async (
 
 // Function to register proposal-related handlers
 export function registerProposalHandlers() {
+  const handle = createLoggedHandler(logger);
   handle("get-proposal", getProposalHandler);
   handle("approve-proposal", approveProposalHandler);
   handle("reject-proposal", rejectProposalHandler);

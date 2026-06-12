@@ -3,7 +3,6 @@
  * Orchestrates the compaction of long conversations to stay within context limits.
  */
 
-import { IpcMainInvokeEvent } from "electron";
 import { streamText, ModelMessage } from "ai";
 import log from "electron-log";
 import { eq } from "drizzle-orm";
@@ -32,6 +31,7 @@ import {
   DYAD_INTERNAL_REQUEST_ID_HEADER,
 } from "@/ipc/utils/provider_options";
 import { escapeXmlContent } from "../../../../shared/xmlEscape";
+import type { IpcInvokeEventLike } from "@/ipc/utils/ipc_event";
 
 const logger = log.scope("compaction_handler");
 
@@ -122,7 +122,7 @@ export async function checkAndMarkForCompaction(
  * 6. Update chat record
  */
 export async function performCompaction(
-  event: IpcMainInvokeEvent,
+  event: IpcInvokeEventLike,
   chatId: number,
   appPath: string,
   dyadRequestId: string,

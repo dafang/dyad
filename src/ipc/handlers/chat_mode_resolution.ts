@@ -13,6 +13,7 @@ import { readSettings } from "@/main/settings";
 import { PROVIDER_TO_ENV_VAR } from "@/ipc/shared/language_model_constants";
 import { getEnvVar } from "@/ipc/utils/read_env";
 import { getFreeAgentQuotaStatus } from "./free_agent_quota_handlers";
+import { isLocalWebRuntimeContext } from "@/runtime/local_web_runtime_context";
 
 export { normalizeStoredChatMode };
 
@@ -28,9 +29,12 @@ export async function resolveChatModeForTurn({
   const modeForTurn = requestedChatMode ?? storedChatMode;
   const normalizedChatMode = normalizeStoredChatMode(modeForTurn);
   const envVars = getChatModeEnvVars();
+  const localAgentQuotaRequired = !isLocalWebRuntimeContext();
+  const localAgentProviderRestrictionRequired = !isLocalWebRuntimeContext();
   const freeAgentQuotaAvailable = await getFreeAgentQuotaAvailableIfNeeded(
     settings,
     normalizedChatMode,
+    localAgentQuotaRequired,
   );
 
   return {
@@ -39,6 +43,8 @@ export async function resolveChatModeForTurn({
       settings,
       envVars,
       freeAgentQuotaAvailable,
+      localAgentQuotaRequired,
+      localAgentProviderRestrictionRequired,
     }),
     settings,
   };
@@ -57,15 +63,22 @@ export async function getInitialChatModeForNewChat(
   }
 
   const envVars = getChatModeEnvVars();
+  const localAgentQuotaRequired = !isLocalWebRuntimeContext();
+  const localAgentProviderRestrictionRequired = !isLocalWebRuntimeContext();
   const freeAgentQuotaAvailable = await getFreeAgentQuotaAvailableIfNeeded(
     settings,
     null,
+    localAgentQuotaRequired,
   );
 
   return getEffectiveDefaultChatMode(
     settings,
     envVars,
     freeAgentQuotaAvailable,
+    {
+      localAgentQuotaRequired,
+      localAgentProviderRestrictionRequired,
+    },
   );
 }
 
@@ -83,7 +96,12 @@ function getChatModeEnvVars(): Record<string, string | undefined> {
 async function getFreeAgentQuotaAvailableIfNeeded(
   settings: UserSettings,
   chatMode: ChatMode | null,
+  localAgentQuotaRequired = true,
 ): Promise<boolean | undefined> {
+  if (!localAgentQuotaRequired) {
+    return undefined;
+  }
+
   if (isDyadProEnabled(settings)) {
     return undefined;
   }

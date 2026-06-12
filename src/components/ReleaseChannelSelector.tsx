@@ -11,6 +11,10 @@ import { toast } from "sonner";
 import { ipc } from "@/ipc/types";
 import type { ReleaseChannel } from "@/lib/schemas";
 import { useTranslation } from "react-i18next";
+import {
+  getWebHostUnsupportedMessage,
+  webHostCapabilities,
+} from "@/lib/web_host_capabilities";
 
 export function ReleaseChannelSelector() {
   const { settings, updateSettings } = useSettings();
@@ -29,7 +33,13 @@ export function ReleaseChannelSelector() {
         action: {
           label: "Download Stable",
           onClick: () => {
-            ipc.system.openExternalUrl("https://dyad.sh/download");
+            if (webHostCapabilities.isLocalWeb) {
+              void webHostCapabilities.openExternalUrl(
+                "https://dyad.sh/download",
+              );
+              return;
+            }
+            void ipc.system.openExternalUrl("https://dyad.sh/download");
           },
         },
       });
@@ -39,8 +49,15 @@ export function ReleaseChannelSelector() {
           "You will need to restart Dyad for your settings to take effect.",
         action: {
           label: "Restart Dyad",
-          onClick: () => {
-            ipc.system.restartDyad();
+          onClick: async () => {
+            if (webHostCapabilities.isLocalWeb) {
+              const result = await webHostCapabilities.restartApp();
+              toast("Restart from terminal", {
+                description: getWebHostUnsupportedMessage(result),
+              });
+              return;
+            }
+            await ipc.system.restartDyad();
           },
         },
       });

@@ -1,0 +1,261 @@
+{
+  "baseUrl": "http://127.0.0.1:50835",
+  "userDataPath": "/var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-phase9-vGt6RK",
+  "rpc": [
+    {
+      "channel": "get-user-settings",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "selectedModel": {
+          "name": "auto",
+          "provider": "auto"
+        },
+        "providerSettings": {},
+        "telemetryConsent": "unset",
+        "telemetryUserId": "03449f8d-cb9c-420a-b19d-c0d02393650c",
+        "hasRunBefore": false,
+        "experiments": {},
+        "enableProLazyEditsMode": true,
+        "enableProSmartFilesContextMode": true,
+        "selectedTemplateId": "react",
+        "selectedThemeId": "default",
+        "enableAutoFixProblems": false,
+        "enableAppBlueprint": true,
+        "autoExpandPreviewPanel": true,
+        "enablePnpmMinimumReleaseAgeWarning": false,
+        "enableNativeGit": true,
+        "enableSandboxScriptExecution": true,
+        "enableAutoUpdate": true,
+        "releaseChannel": "stable",
+        "isRunning": false,
+        "enableContextCompaction": true,
+        "previewIdleTimeoutPolicy": "default",
+        "selectedChatMode": "build"
+      }
+    },
+    {
+      "channel": "set-user-settings",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "selectedModel": {
+          "name": "auto",
+          "provider": "auto"
+        },
+        "providerSettings": {},
+        "telemetryConsent": "unset",
+        "telemetryUserId": "03449f8d-cb9c-420a-b19d-c0d02393650c",
+        "hasRunBefore": false,
+        "experiments": {},
+        "enableProLazyEditsMode": true,
+        "enableProSmartFilesContextMode": true,
+        "selectedTemplateId": "react",
+        "selectedThemeId": "default",
+        "zoomLevel": "110",
+        "enableAutoFixProblems": false,
+        "enableAppBlueprint": true,
+        "autoExpandPreviewPanel": true,
+        "enablePnpmMinimumReleaseAgeWarning": false,
+        "enableNativeGit": true,
+        "enableSandboxScriptExecution": true,
+        "enableAutoUpdate": true,
+        "releaseChannel": "stable",
+        "isRunning": false,
+        "enableContextCompaction": true,
+        "previewIdleTimeoutPolicy": "default",
+        "selectedChatMode": "build"
+      }
+    },
+    {
+      "channel": "get-language-model-providers",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "arrayLength": 12
+      }
+    },
+    {
+      "channel": "get-language-models",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "arrayLength": 3
+      }
+    },
+    {
+      "channel": "local-models:list-ollama",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "models": {
+          "arrayLength": 0
+        }
+      }
+    },
+    {
+      "channel": "vercel:save-token",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "channel": "vercel:list-projects",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "arrayLength": 0
+      }
+    },
+    {
+      "channel": "supabase:list-organizations",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "arrayLength": 0
+      }
+    },
+    {
+      "channel": "neon:list-projects",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "projects": {
+          "arrayLength": 0
+        }
+      }
+    },
+    {
+      "channel": "github:list-repos",
+      "status": 401,
+      "ok": false,
+      "body": {
+        "ok": false,
+        "error": "Not authenticated with GitHub.",
+        "kind": "auth"
+      }
+    },
+    {
+      "channel": "github:start-flow",
+      "status": 409,
+      "ok": false,
+      "body": {
+        "ok": false,
+        "error": "GitHub device flow is not available in Local Web mode yet.",
+        "kind": "precondition"
+      }
+    },
+    {
+      "channel": "mcp:create-server",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "id": 0,
+        "name": "Phase 9 MCP",
+        "transport": "http",
+        "command": null,
+        "args": null,
+        "envJson": null,
+        "headersJson": null,
+        "url": "https://example.com/mcp",
+        "enabled": true,
+        "oauthEnabled": false,
+        "oauthConnected": false,
+        "oauthCallbackPort": null,
+        "createdAt": "2026-06-11T06:58:43.622Z",
+        "updatedAt": "2026-06-11T06:58:43.622Z"
+      }
+    },
+    {
+      "channel": "mcp:create-server",
+      "status": 400,
+      "ok": false,
+      "body": {
+        "ok": false,
+        "error": "Invalid JSON for \"envJson\": Expected property name or '}' in JSON at position 1 (line 1 column 2)",
+        "kind": "validation"
+      }
+    },
+    {
+      "channel": "mcp:start-oauth",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "success": false,
+        "error": "MCP OAuth is not connected in Local Web mode.",
+        "errorKind": "other"
+      }
+    },
+    {
+      "channel": "mcp:probe-connection",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "status": "error",
+        "error": "MCP connection probing is not available in Local Web mode yet."
+      }
+    },
+    {
+      "channel": "get-latest-security-review",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "findings": {
+          "arrayLength": 0
+        },
+        "timestamp": "2026-06-11T06:58:43.624Z",
+        "chatId": 0
+      }
+    },
+    {
+      "channel": "analyze-component",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "isDynamic": false,
+        "hasStaticText": false,
+        "hasImage": false
+      }
+    },
+    {
+      "channel": "is-capacitor",
+      "status": 200,
+      "ok": true,
+      "body": false
+    },
+    {
+      "channel": "generate-image",
+      "status": 409,
+      "ok": false,
+      "body": {
+        "ok": false,
+        "error": "Image generation is not available in Local Web mode yet.",
+        "kind": "precondition"
+      }
+    },
+    {
+      "channel": "pro:transcribe-audio",
+      "status": 409,
+      "ok": false,
+      "body": {
+        "ok": false,
+        "error": "Audio transcription is not available in Local Web mode yet.",
+        "kind": "precondition"
+      }
+    },
+    {
+      "channel": "open-external-url",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "channel": "open-external-url",
+      "status": 400,
+      "ok": false,
+      "body": {
+        "ok": false,
+        "error": "External URL must be http(s)",
+        "kind": "validation"
+      }
+    }
+  ]
+}

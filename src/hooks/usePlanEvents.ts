@@ -12,8 +12,6 @@ import {
 import { previewModeAtom } from "@/atoms/appAtoms";
 import { selectedChatIdAtom } from "@/atoms/chatAtoms";
 import {
-  planEventClient,
-  planClient,
   type PlanUpdatePayload,
   type PlanExitPayload,
   type PlanQuestionnairePayload,
@@ -48,7 +46,7 @@ export function usePlanEvents() {
 
   useEffect(() => {
     // Handle plan updates
-    const unsubscribeUpdate = planEventClient.onUpdate(
+    const unsubscribeUpdate = ipc.events.plan.onUpdate(
       (payload: PlanUpdatePayload) => {
         // Update plan state
         setPlanState((prev) => {
@@ -70,7 +68,7 @@ export function usePlanEvents() {
     );
 
     // Handle plan exit (transition to implementation)
-    const unsubscribeExit = planEventClient.onExit(
+    const unsubscribeExit = ipc.events.plan.onExit(
       async (payload: PlanExitPayload) => {
         // Mark this chat's plan as accepted
         setPlanState((prev) => {
@@ -124,7 +122,7 @@ export function usePlanEvents() {
         // Always persist the plan to .dyad/plans/
         let planSlug: string;
         try {
-          planSlug = await planClient.createPlan({
+          planSlug = await ipc.plan.createPlan({
             appId: payload.appId,
             chatId: payload.chatId,
             title: planData.title,
@@ -191,7 +189,7 @@ export function usePlanEvents() {
 
     // Handle questionnaire events - set pending questionnaire for in-app display
 
-    const unsubscribeQuestionnaire = planEventClient.onQuestionnaire(
+    const unsubscribeQuestionnaire = ipc.events.plan.onQuestionnaire(
       (payload: PlanQuestionnairePayload) => {
         setPendingQuestionnaire((prev) => {
           const next = new Map(prev);

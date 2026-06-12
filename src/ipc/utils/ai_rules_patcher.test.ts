@@ -4,8 +4,11 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  NEXT_APP_ROUTER_RULES_END,
+  NEXT_APP_ROUTER_RULES_START,
   NITRO_RULES_END,
   NITRO_RULES_START,
+  appendNextAppRouterRules,
   appendNitroRules,
   restoreAiRules,
 } from "./ai_rules_patcher";
@@ -121,5 +124,42 @@ describe("ai_rules_patcher", () => {
     await restoreAiRules(appPath, null);
 
     await expect(readFile()).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  it("appends Next.js App Router client/server boundary rules", async () => {
+    await appendNextAppRouterRules(appPath);
+    const contents = await readFile();
+
+    expect(contents).toContain(NEXT_APP_ROUTER_RULES_START);
+    expect(contents).toContain("Next.js App Router Server/Client Boundaries");
+    expect(contents).toContain('"use client"');
+    expect(contents).toContain("onSubmit");
+    expect(contents).toContain("Event handlers cannot be passed");
+    expect(contents).toContain(NEXT_APP_ROUTER_RULES_END);
+  });
+
+  it("preserves existing content above the Next.js App Router markers", async () => {
+    const original = "# My Next App\n\nUse the existing design system.\n";
+    await fs.writeFile(path.join(appPath, "AI_RULES.md"), original, "utf8");
+
+    const result = await appendNextAppRouterRules(appPath);
+
+    expect(result.wasAppended).toBe(true);
+    expect(result.backup).toBe(original);
+
+    const contents = await readFile();
+    expect(contents.startsWith(original)).toBe(true);
+    expect(contents).toContain(NEXT_APP_ROUTER_RULES_START);
+  });
+
+  it("does not duplicate Next.js App Router rules", async () => {
+    await appendNextAppRouterRules(appPath);
+    const afterFirst = await readFile();
+
+    const second = await appendNextAppRouterRules(appPath);
+    const afterSecond = await readFile();
+
+    expect(second.wasAppended).toBe(false);
+    expect(afterSecond).toBe(afterFirst);
   });
 });

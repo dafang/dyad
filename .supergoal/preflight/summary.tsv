@@ -1,0 +1,12 @@
+RUN	1	npm run fmt:check
+DONE	1	0	1s	npm run fmt:check
+RUN	2	npm run lint
+DONE	2	0	1s	npm run lint
+RUN	3	npm run ts
+DONE	3	0	2s	npm run ts
+RUN	4	npm run build:web
+DONE	4	0	12s	npm run build:web
+RUN	5	npm test -- src/components/app-sidebar-state.test.ts src/components/preview_panel/PreviewPanel.test.tsx src/components/preview_panel/previewBrowserUrl.test.ts src/components/preview_panel/previewUrl.test.ts src/components/chat/ChatTabs.test.ts src/components/chat/DyadAppBlueprintCard.test.ts src/components/chat/DyadAppBlueprintCard.approve.test.ts
+DONE	5	0	2s	npm test -- src/components/app-sidebar-state.test.ts src/components/preview_panel/PreviewPanel.test.tsx src/components/preview_panel/previewBrowserUrl.test.ts src/components/preview_panel/previewUrl.test.ts src/components/chat/ChatTabs.test.ts src/components/chat/DyadAppBlueprintCard.test.ts src/components/chat/DyadAppBlueprintCard.approve.test.ts
+RUN	6	PLAYWRIGHT_HTML_OPEN=never npm run e2e -- e2e-tests/web_portal.spec.ts
+DONE	6	0	36s	PLAYWRIGHT_HTML_OPEN=never npm run e2e -- e2e-tests/web_portal.spec.ts

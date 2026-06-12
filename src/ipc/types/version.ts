@@ -45,6 +45,8 @@ export const CheckoutVersionParamsSchema = z.object({
   versionId: z.string(),
 });
 
+export type CheckoutVersionParams = z.infer<typeof CheckoutVersionParamsSchema>;
+
 // =============================================================================
 // Version Contracts
 // =============================================================================

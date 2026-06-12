@@ -1,14 +1,19 @@
-import { ipcMain, IpcMainInvokeEvent } from "electron";
 import log from "electron-log";
+import type { IpcMainInvokeEvent } from "electron";
 import { DyadError } from "@/errors/dyad_error";
 import { sendTelemetryException } from "../utils/telemetry";
 import { IS_TEST_BUILD } from "../utils/test_utils";
+import { getElectronModule } from "../utils/electron_module";
 
 export function createLoggedHandler(logger: log.LogFunctions) {
   return (
     channel: string,
     fn: (event: IpcMainInvokeEvent, ...args: any[]) => Promise<any>,
   ) => {
+    const ipcMain = getElectronModule<typeof import("electron")>()?.ipcMain;
+    if (!ipcMain) {
+      throw new Error("Electron ipcMain is not available");
+    }
     ipcMain.handle(
       channel,
       async (event: IpcMainInvokeEvent, ...args: any[]) => {

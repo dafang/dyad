@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import type { ChatMode } from "./schemas";
 import type { ChatModeFallbackReason } from "./chatMode";
+import { isLocalWebRuntime } from "./runtime_client";
 
 export function getChatModeDisplayName(mode: ChatMode, isPro: boolean): string {
   switch (mode) {
@@ -9,7 +10,7 @@ export function getChatModeDisplayName(mode: ChatMode, isPro: boolean): string {
     case "ask":
       return "Ask";
     case "local-agent":
-      return isPro ? "Agent" : "Basic Agent";
+      return isPro || isLocalWebRuntime() ? "Agent" : "Basic Agent";
     case "plan":
       return "Plan";
   }

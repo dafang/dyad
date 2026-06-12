@@ -1,0 +1,5 @@
+- supergoal: active planning skill for this request.
+- agent-browser: available for real desktop/mobile viewport browser validation.
+- dogfood: available if deeper exploratory app testing is needed.
+- browser-bridge/chrome-cdp: available but not necessary for initial plan.
+- web search: available, but current task is repo-local brownfield UI/runtime work.

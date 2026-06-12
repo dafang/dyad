@@ -12,17 +12,18 @@ export function AutoFixProblemsSwitch({
 }) {
   const { settings, updateSettings } = useSettings();
   const { t } = useTranslation("settings");
+  const isEnabled = !!settings?.enableAutoFixProblems;
   return (
     <div className="flex items-center space-x-2">
       <Switch
         id="auto-fix-problems"
         aria-label="Auto-fix problems"
-        checked={settings?.enableAutoFixProblems}
+        checked={isEnabled}
         onCheckedChange={() => {
           updateSettings({
-            enableAutoFixProblems: !settings?.enableAutoFixProblems,
+            enableAutoFixProblems: !isEnabled,
           });
-          if (!settings?.enableAutoFixProblems && showToast) {
+          if (!isEnabled && showToast) {
             showInfo("You can disable Auto-fix problems in the Settings page.");
           }
         }}

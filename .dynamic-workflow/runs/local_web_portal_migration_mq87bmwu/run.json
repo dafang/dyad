@@ -1,0 +1,122 @@
+{
+  "run_id": "local_web_portal_migration_mq87bmwu",
+  "workflow_id": "local_web_portal_migration",
+  "state": "completed",
+  "created_at": "2026-06-10T15:06:20.480Z",
+  "updated_at": "2026-06-10T15:08:25.928Z",
+  "run_dir": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu",
+  "steps": {
+    "collect_scope": {
+      "step_id": "collect_scope",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Collection commands completed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/collect_scope.json"
+    },
+    "collect_rules": {
+      "step_id": "collect_rules",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Collection commands completed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/collect_rules.json"
+    },
+    "collect_code_context": {
+      "step_id": "collect_code_context",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Collection commands completed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/collect_code_context.json"
+    },
+    "collect_previous_failure": {
+      "step_id": "collect_previous_failure",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Collection commands completed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/collect_previous_failure.json"
+    },
+    "prepare_dependencies": {
+      "step_id": "prepare_dependencies",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Verification commands passed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/prepare_dependencies.json"
+    },
+    "repair_loop__round_1__execute": {
+      "step_id": "repair_loop__round_1__execute",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Paseo agent f79cdc5c-41e7-44e3-b96e-79cbbef4a335 completed repair_loop__round_1__execute.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_1__execute.json"
+    },
+    "repair_loop__round_1__collect_tests": {
+      "step_id": "repair_loop__round_1__collect_tests",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Collection commands completed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_1__collect_tests.json"
+    },
+    "repair_loop__round_1__review": {
+      "step_id": "repair_loop__round_1__review",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Executed repair_loop__round_1__review through current host boundary.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_1__review.json"
+    },
+    "repair_loop__round_2__execute": {
+      "step_id": "repair_loop__round_2__execute",
+      "state": "skipped",
+      "attempts": 0,
+      "summary": "Skipped because run_if was false: repair_loop__round_1__review.blocking_count",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_2__execute.json"
+    },
+    "repair_loop__round_2__collect_tests": {
+      "step_id": "repair_loop__round_2__collect_tests",
+      "state": "skipped",
+      "attempts": 0,
+      "summary": "Skipped because run_if was false: repair_loop__round_1__review.blocking_count",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_2__collect_tests.json"
+    },
+    "repair_loop__round_2__review": {
+      "step_id": "repair_loop__round_2__review",
+      "state": "skipped",
+      "attempts": 0,
+      "summary": "Skipped because run_if was false: repair_loop__round_1__review.blocking_count",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_2__review.json"
+    },
+    "repair_loop__round_3__execute": {
+      "step_id": "repair_loop__round_3__execute",
+      "state": "skipped",
+      "attempts": 0,
+      "summary": "Skipped because run_if was false: repair_loop__round_2__review.blocking_count",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_3__execute.json"
+    },
+    "repair_loop__round_3__collect_tests": {
+      "step_id": "repair_loop__round_3__collect_tests",
+      "state": "skipped",
+      "attempts": 0,
+      "summary": "Skipped because run_if was false: repair_loop__round_2__review.blocking_count",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_3__collect_tests.json"
+    },
+    "repair_loop__round_3__review": {
+      "step_id": "repair_loop__round_3__review",
+      "state": "skipped",
+      "attempts": 0,
+      "summary": "Skipped because run_if was false: repair_loop__round_2__review.blocking_count",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_3__review.json"
+    },
+    "final_verify": {
+      "step_id": "final_verify",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Verification commands passed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/final_verify.json"
+    },
+    "summarize_run": {
+      "step_id": "summarize_run",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Executed summarize_run through current host boundary.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/summarize_run.json"
+    }
+  }
+}

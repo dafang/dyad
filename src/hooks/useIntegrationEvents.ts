@@ -5,10 +5,8 @@ import { useAtomValue } from "jotai";
 import { useSettings } from "./useSettings";
 import { pendingIntegrationAtom } from "@/atoms/integrationAtoms";
 import { selectedAppIdAtom } from "@/atoms/appAtoms";
-import {
-  integrationEventClient,
-  type IntegrationPromptPayload,
-} from "@/ipc/types/integration";
+import type { IntegrationPromptPayload } from "@/ipc/types/integration";
+import { ipc } from "@/ipc/types";
 import { showUserInputNotification } from "@/lib/userInputNotification";
 
 /**
@@ -28,7 +26,7 @@ export function useIntegrationEvents() {
   settingsRef.current = settings;
 
   useEffect(() => {
-    const unsubscribe = integrationEventClient.onPrompt(
+    const unsubscribe = ipc.events.integration.onPrompt(
       (payload: IntegrationPromptPayload) => {
         setPendingIntegration((prev) => {
           const next = new Map(prev);

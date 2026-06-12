@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useSidebar } from "@/components/ui/sidebar"; // import useSidebar hook
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import type { ComponentType } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -32,10 +32,12 @@ import { AppList } from "./AppList";
 import { HelpDialog } from "./HelpDialog"; // Import the new dialog
 import { SettingsList } from "./SettingsList";
 import { LibraryList } from "./LibraryList";
+import { isLocalWebRuntime } from "@/lib/runtime_client";
 import {
   type AppSidebarHoverState,
   type AppSidebarItemTitle,
   getSelectedSidebarPanel,
+  getTouchSidebarActivationIntent,
   isSidebarItemActive,
   shouldShowSelectedAppChatList,
 } from "./app-sidebar-state";
@@ -84,7 +86,7 @@ function AppSidebarRailButton({
   isExpanded: boolean;
   isActive?: boolean;
   to?: AppSidebarItemTo;
-  onClick?: () => void;
+  onClick?: (event: MouseEvent<HTMLElement>) => void;
   onMouseEnter?: () => void;
 }) {
   const className = cn(
@@ -122,6 +124,7 @@ function AppSidebarRailButton({
         to={to}
         aria-label={label}
         className={className}
+        onClick={onClick}
         onMouseEnter={onMouseEnter}
       >
         {content}
@@ -143,10 +146,12 @@ function AppSidebarRailButton({
 }
 
 export function AppSidebar() {
-  const { state, toggleSidebar } = useSidebar(); // retrieve current sidebar state
+  const isLocalWeb = isLocalWebRuntime();
+  const { state, setOpen, toggleSidebar } = useSidebar(); // retrieve current sidebar state
   const [hoverState, setHoverState] =
     useState<AppSidebarHoverState>("no-hover");
   const expandedByHover = useRef(false);
+  const [isTouchShell, setIsTouchShell] = useState(false);
   const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
   const [isDropdownOpen] = useAtom(dropdownOpenAtom);
   const selectedAppId = useAtomValue(selectedAppIdAtom);
@@ -155,6 +160,25 @@ export function AppSidebar() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia(
+      "(hover: none), (pointer: coarse), (max-width: 640px)",
+    );
+    const updateTouchShell = () => setIsTouchShell(mediaQuery.matches);
+
+    updateTouchShell();
+    mediaQuery.addEventListener("change", updateTouchShell);
+    return () => mediaQuery.removeEventListener("change", updateTouchShell);
+  }, []);
+
+  useEffect(() => {
+    if (isTouchShell) {
+      expandedByHover.current = false;
+      if (hoverState !== "no-hover") {
+        setHoverState("no-hover");
+      }
+      return;
+    }
+
     if (hoverState.startsWith("start-hover") && state === "collapsed") {
       expandedByHover.current = true;
       toggleSidebar();
@@ -169,7 +193,14 @@ export function AppSidebar() {
       expandedByHover.current = false;
       setHoverState("no-hover");
     }
-  }, [hoverState, toggleSidebar, state, setHoverState, isDropdownOpen]);
+  }, [
+    hoverState,
+    toggleSidebar,
+    state,
+    setHoverState,
+    isDropdownOpen,
+    isTouchShell,
+  ]);
 
   const routerState = useRouterState();
   const selectedItem = getSelectedSidebarPanel({
@@ -194,13 +225,22 @@ export function AppSidebar() {
       collapsible="icon"
       className="shadow-lg"
       onMouseLeave={() => {
+        if (isTouchShell) {
+          return;
+        }
         if (!isDropdownOpen) {
           setHoverState("clear-hover");
         }
       }}
     >
       <SidebarContent className="overflow-hidden">
-        <div className="flex mt-[calc(var(--layout-title-bar-offset)+0.25rem)]">
+        <div
+          className={
+            isLocalWeb
+              ? "flex mt-1 pb-[env(safe-area-inset-bottom)]"
+              : "flex mt-[calc(var(--layout-title-bar-offset)+0.25rem)] pb-[env(safe-area-inset-bottom)]"
+          }
+        >
           {/* Left Column: Icon rail */}
           <div
             className={`px-1 transition-[width] duration-200 ease-linear ${
@@ -218,11 +258,20 @@ export function AppSidebar() {
             />
             <AppIcons
               onHoverChange={setHoverState}
+              onTouchActivate={(title) => {
+                if (!isTouchShell) {
+                  return;
+                }
+                setHoverState("no-hover");
+                setOpen(
+                  getTouchSidebarActivationIntent(title) === "open-panel",
+                );
+              }}
               isExpanded={state === "expanded"}
             />
           </div>
           {/* Right Column: Contextual sub-list (only visible when expanded) */}
-          <div className="relative h-[calc(100vh-112px)] w-[224px] overflow-hidden border-l border-sidebar-border">
+          <div className="relative h-[calc(100dvh_-_112px_-_env(safe-area-inset-bottom))] w-[224px] overflow-hidden border-l border-sidebar-border max-sm:w-[calc(100vw_-_4rem_-_0.75rem)]">
             <AnimatePresence initial={false}>
               {selectedItem === "Apps" && !showSelectedAppChats && (
                 <motion.div
@@ -266,7 +315,12 @@ export function AppSidebar() {
               icon={HelpCircle}
               label="Help"
               isExpanded={state === "expanded"}
-              onClick={() => setIsHelpDialogOpen(true)}
+              onClick={() => {
+                if (isTouchShell) {
+                  setOpen(false);
+                }
+                setIsHelpDialogOpen(true);
+              }}
             />
             <HelpDialog
               isOpen={isHelpDialogOpen}
@@ -281,9 +335,11 @@ export function AppSidebar() {
 
 function AppIcons({
   onHoverChange,
+  onTouchActivate,
   isExpanded,
 }: {
   onHoverChange: (state: AppSidebarHoverState) => void;
+  onTouchActivate: (title: AppSidebarItemTitle) => void;
   isExpanded: boolean;
 }) {
   const routerState = useRouterState();
@@ -322,6 +378,7 @@ function AppIcons({
                   to={item.to}
                   isActive={isActive}
                   isExpanded={isExpanded}
+                  onClick={() => onTouchActivate(item.title)}
                   onMouseEnter={() => onHoverChange(hoverForTitle(item.title))}
                 />
               </SidebarMenuItem>

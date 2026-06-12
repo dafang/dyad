@@ -1,6 +1,7 @@
 // startProxy.js – helper to launch proxy.js as a worker
 
 import { Worker } from "worker_threads";
+import fs from "node:fs";
 import path from "path";
 import log from "electron-log";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
@@ -28,18 +29,15 @@ export async function startProxy(
   const { port, onStarted, onError, fixedHeaders } = opts;
   logger.info("Starting proxy on port", port);
 
-  const worker = new Worker(
-    path.resolve(__dirname, "..", "..", "worker", "proxy_server.js"),
-    {
-      workerData: {
-        targetOrigin,
-        port,
-        fallbackPortStart: PROXY_FALLBACK_PORT_START,
-        maxPortAttempts: PROXY_FALLBACK_MAX_ATTEMPTS,
-        fixedHeaders,
-      },
+  const worker = new Worker(resolveProxyWorkerPath(), {
+    workerData: {
+      targetOrigin,
+      port,
+      fallbackPortStart: PROXY_FALLBACK_PORT_START,
+      maxPortAttempts: PROXY_FALLBACK_MAX_ATTEMPTS,
+      fixedHeaders,
     },
-  );
+  });
 
   worker.on("message", (m) => {
     logger.info("[proxy]", m);
@@ -60,4 +58,19 @@ export async function startProxy(
   worker.on("exit", (c) => logger.info("[proxy] exit", c));
 
   return worker; // let the caller keep a handle if desired
+}
+
+function resolveProxyWorkerPath(): string {
+  const candidates = [
+    path.resolve(__dirname, "..", "..", "worker", "proxy_server.js"),
+    path.resolve(process.cwd(), "worker", "proxy_server.js"),
+  ];
+  const workerPath = candidates.find((candidate) => fs.existsSync(candidate));
+  if (!workerPath) {
+    throw new DyadError(
+      "Preview proxy worker script is missing from the application build.",
+      DyadErrorKind.Internal,
+    );
+  }
+  return workerPath;
 }

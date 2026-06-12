@@ -30,6 +30,7 @@ import { useAtomValue } from "jotai";
 import { chatMessagesByIdAtom } from "@/atoms/chatAtoms";
 import { Hammer, Bot, MessageCircle, Lightbulb } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { isLocalWebRuntime } from "@/lib/runtime_client";
 
 export function ChatModeSelector() {
   const { updateSettings } = useSettings();
@@ -49,6 +50,7 @@ export function ChatModeSelector() {
   const fallbackToastKeyRef = useRef<string | null>(null);
 
   const isProEnabled = settings ? isDyadProEnabled(settings) : false;
+  const isLocalWeb = isLocalWebRuntime();
   const { messagesRemaining, messagesLimit, isQuotaExceeded } =
     useFreeAgentQuota();
   const { servers } = useMcp();
@@ -192,19 +194,28 @@ export function ChatModeSelector() {
             </div>
           </SelectItem>
           {!isProEnabled && (
-            <SelectItem value="local-agent" disabled={isQuotaExceeded}>
+            <SelectItem
+              value="local-agent"
+              disabled={!isLocalWeb && isQuotaExceeded}
+            >
               <div className="flex flex-col items-start">
                 <div className="flex items-center gap-1.5">
                   <Bot size={14} className="text-muted-foreground" />
-                  <span className="font-medium">Basic Agent</span>
-                  <span className="text-xs text-muted-foreground">
-                    {`(${isQuotaExceeded ? "0" : messagesRemaining}/${messagesLimit} remaining for today)`}
+                  <span className="font-medium">
+                    {isLocalWeb ? "Agent" : "Basic Agent"}
                   </span>
+                  {!isLocalWeb && (
+                    <span className="text-xs text-muted-foreground">
+                      {`(${isQuotaExceeded ? "0" : messagesRemaining}/${messagesLimit} remaining for today)`}
+                    </span>
+                  )}
                 </div>
                 <span className="text-xs text-muted-foreground ml-[22px]">
-                  {isQuotaExceeded
-                    ? "Daily limit reached"
-                    : "Try our AI agent for free"}
+                  {isLocalWeb
+                    ? "Use your local provider settings"
+                    : isQuotaExceeded
+                      ? "Daily limit reached"
+                      : "Try our AI agent for free"}
                 </span>
               </div>
             </SelectItem>

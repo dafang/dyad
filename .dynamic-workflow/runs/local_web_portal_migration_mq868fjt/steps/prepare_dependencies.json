@@ -1,0 +1,52 @@
+{
+  "step_id": "prepare_dependencies",
+  "status": "failed",
+  "summary": "Verification command failed: test -x node_modules/.bin/cross-env || npm install",
+  "output": {
+    "status": "failed",
+    "step_id": "prepare_dependencies",
+    "checks": [
+      {
+        "id": "ensure_node_modules",
+        "command": "test -x node_modules/.bin/cross-env || npm install",
+        "exit_code": null,
+        "signal": "SIGTERM",
+        "timed_out": true,
+        "elapsed_ms": 600004,
+        "stdout": "",
+        "stderr": "ad\nnpm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@8.1.0: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@8.1.0: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is\nnpm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead\nnpm warn deprecated boolean@3.2.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.\nnpm warn deprecated tar@6.2.1: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me\nnpm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nnpm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.\n",
+        "stdout_bytes": 0,
+        "stderr_bytes": 2926,
+        "stdout_truncated": false,
+        "stderr_truncated": true,
+        "acceptable": false,
+        "soft_failed": false,
+        "failure_category": "timeout",
+        "repair_hint": "Narrow the command scope or set a justified timeout_seconds."
+      }
+    ]
+  },
+  "verify": {
+    "ok": false,
+    "checks": [
+      {
+        "id": "ensure_node_modules",
+        "command": "test -x node_modules/.bin/cross-env || npm install",
+        "exit_code": null,
+        "signal": "SIGTERM",
+        "timed_out": true,
+        "elapsed_ms": 600004,
+        "stdout": "",
+        "stderr": "ad\nnpm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@8.1.0: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@8.1.0: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is\nnpm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead\nnpm warn deprecated boolean@3.2.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.\nnpm warn deprecated tar@6.2.1: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me\nnpm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nnpm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.\n",
+        "stdout_bytes": 0,
+        "stderr_bytes": 2926,
+        "stdout_truncated": false,
+        "stderr_truncated": true,
+        "acceptable": false,
+        "soft_failed": false,
+        "failure_category": "timeout",
+        "repair_hint": "Narrow the command scope or set a justified timeout_seconds."
+      }
+    ]
+  }
+}

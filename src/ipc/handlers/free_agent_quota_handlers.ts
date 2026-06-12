@@ -4,10 +4,10 @@ import { eq } from "drizzle-orm";
 import { createTypedHandler } from "./base";
 import { freeAgentQuotaContracts } from "../types/free_agent_quota";
 import log from "electron-log";
-import { ipcMain } from "electron";
 import { IS_TEST_BUILD } from "../utils/test_utils";
 import { FREE_AGENT_QUOTA_LIMIT } from "@/lib/free_agent_quota_limit";
 import fetch from "node-fetch";
+import { getElectronModule } from "../utils/electron_module";
 
 const logger = log.scope("free_agent_quota_handlers");
 
@@ -81,6 +81,10 @@ export function registerFreeAgentQuotaHandlers() {
 
   // Test-only handler to simulate time passing for quota tests
   if (IS_TEST_BUILD) {
+    const ipcMain = getElectronModule<typeof import("electron")>()?.ipcMain;
+    if (!ipcMain) {
+      throw new Error("Electron ipcMain is not available");
+    }
     ipcMain.handle(
       "test:simulateQuotaTimeElapsed",
       async (_event, hoursAgo: number) => {

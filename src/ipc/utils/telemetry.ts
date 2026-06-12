@@ -1,4 +1,3 @@
-import { BrowserWindow } from "electron";
 import log from "electron-log";
 import {
   DyadError,
@@ -6,6 +5,7 @@ import {
 } from "@/errors/dyad_error";
 import { isGenericFetchFailedError } from "@/lib/posthogTelemetry";
 import { TelemetryEventPayload } from "@/ipc/types";
+import { getElectronModule } from "./electron_module";
 
 const logger = log.scope("telemetry");
 const FILTERED_EXCEPTION_MESSAGES = new Set([
@@ -21,6 +21,10 @@ export function sendTelemetryEvent(
   properties?: Record<string, unknown>,
 ): void {
   try {
+    const BrowserWindow = getElectronBrowserWindow();
+    if (!BrowserWindow) {
+      return;
+    }
     const windows = BrowserWindow.getAllWindows();
     if (windows.length > 0) {
       windows[0].webContents.send("telemetry:event", {
@@ -30,6 +34,21 @@ export function sendTelemetryEvent(
     }
   } catch (error) {
     logger.warn("Error sending telemetry event:", error);
+  }
+}
+
+function getElectronBrowserWindow():
+  | typeof import("electron").BrowserWindow
+  | null {
+  try {
+    if (!process.versions.electron) {
+      return null;
+    }
+    return (
+      getElectronModule<typeof import("electron")>()?.BrowserWindow ?? null
+    );
+  } catch {
+    return null;
   }
 }
 

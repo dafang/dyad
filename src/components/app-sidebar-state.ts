@@ -9,6 +9,8 @@ export type AppSidebarPanel = "Apps" | "Settings" | "Library";
 
 export type AppSidebarItemTitle = AppSidebarPanel | "Hub";
 
+export type TouchSidebarActivationIntent = "open-panel" | "close-panel";
+
 export function getRouteSidebarPanel(pathname: string): AppSidebarPanel | null {
   if (
     pathname === "/" ||
@@ -83,6 +85,21 @@ export function isSidebarItemActive({
     return pathname.startsWith("/library");
   }
   return pathname.startsWith("/hub");
+}
+
+export function getSidebarPanelForRailItem(
+  title: AppSidebarItemTitle,
+): AppSidebarPanel | null {
+  if (title === "Apps" || title === "Settings" || title === "Library") {
+    return title;
+  }
+  return null;
+}
+
+export function getTouchSidebarActivationIntent(
+  title: AppSidebarItemTitle,
+): TouchSidebarActivationIntent {
+  return getSidebarPanelForRailItem(title) ? "open-panel" : "close-panel";
 }
 
 export function shouldShowSelectedAppChatList({

@@ -4,7 +4,7 @@ import {
   pendingQuestionnaireAtom,
   questionnaireSubmittedChatIdsAtom,
 } from "@/atoms/planAtoms";
-import { planClient } from "@/ipc/types/plan";
+import { ipc } from "@/ipc/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -80,7 +80,7 @@ export function QuestionnaireInput() {
 
   const handleDismiss = () => {
     if (!questionnaire) return;
-    planClient.respondToQuestionnaire({
+    ipc.plan.respondToQuestionnaire({
       requestId: questionnaire.requestId,
       answers: null,
     });
@@ -92,7 +92,7 @@ export function QuestionnaireInput() {
     if (!questionnaire) return;
     const timeout = setTimeout(
       () => {
-        planClient.respondToQuestionnaire({
+        ipc.plan.respondToQuestionnaire({
           requestId: questionnaire.requestId,
           answers: null,
         });
@@ -192,7 +192,7 @@ export function QuestionnaireInput() {
       answers[q.id] = getFinalResponse(q.id);
     }
 
-    planClient.respondToQuestionnaire({
+    ipc.plan.respondToQuestionnaire({
       requestId: questionnaire.requestId,
       answers,
     });

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ipc } from "@/ipc/types";
 import { queryKeys } from "@/lib/queryKeys";
+import { toLocalWebPublicUrl } from "@/lib/local_web_transport";
 
 /**
  * Fetches thumbnails for the given app ids and exposes them as a
@@ -21,7 +22,10 @@ export function useAppThumbnails(appIds: number[]): Map<number, string | null> {
   return useMemo(() => {
     const map = new Map<number, string | null>();
     for (const t of data?.thumbnails ?? []) {
-      map.set(t.appId, t.thumbnailUrl);
+      map.set(
+        t.appId,
+        t.thumbnailUrl ? toLocalWebPublicUrl(t.thumbnailUrl) : null,
+      );
     }
     return map;
   }, [data]);

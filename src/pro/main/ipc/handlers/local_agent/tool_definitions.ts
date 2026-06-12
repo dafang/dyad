@@ -3,9 +3,9 @@
  * Each tool includes a zod schema, description, and execute function
  */
 
-import { IpcMainInvokeEvent } from "electron";
 import crypto from "node:crypto";
 import { readSettings, writeSettings } from "@/main/settings";
+import type { IpcInvokeEventLike } from "@/ipc/utils/ipc_event";
 import { writeFileTool } from "./tools/write_file";
 import { deleteFileTool } from "./tools/delete_file";
 import { renameFileTool } from "./tools/rename_file";
@@ -132,6 +132,7 @@ function getAgentToolConsentSettings(
 
 interface PendingConsentEntry {
   chatId: number;
+  toolName: AgentToolName;
   resolve: (d: "accept-once" | "accept-always" | "decline") => void;
 }
 
@@ -140,9 +141,10 @@ const pendingConsentResolvers = new Map<string, PendingConsentEntry>();
 export function waitForAgentToolConsent(
   requestId: string,
   chatId: number,
+  toolName: AgentToolName,
 ): Promise<"accept-once" | "accept-always" | "decline"> {
   return new Promise((resolve) => {
-    pendingConsentResolvers.set(requestId, { chatId, resolve });
+    pendingConsentResolvers.set(requestId, { chatId, toolName, resolve });
   });
 }
 
@@ -151,9 +153,22 @@ export function resolveAgentToolConsent(
   decision: "accept-once" | "accept-always" | "decline",
 ) {
   const entry = pendingConsentResolvers.get(requestId);
-  if (entry) {
-    pendingConsentResolvers.delete(requestId);
-    entry.resolve(decision);
+  if (!entry) {
+    return;
+  }
+
+  const entriesToResolve =
+    decision === "accept-always"
+      ? Array.from(pendingConsentResolvers).filter(
+          ([, pending]) =>
+            pending.chatId === entry.chatId &&
+            pending.toolName === entry.toolName,
+        )
+      : ([[requestId, entry]] as Array<[string, PendingConsentEntry]>);
+
+  for (const [pendingRequestId, pending] of entriesToResolve) {
+    pendingConsentResolvers.delete(pendingRequestId);
+    pending.resolve(decision);
   }
 }
 
@@ -215,7 +230,7 @@ export function getAllAgentToolConsents(): Record<
 }
 
 export async function requireAgentToolConsent(
-  event: IpcMainInvokeEvent,
+  event: IpcInvokeEventLike,
   params: {
     chatId: number;
     toolName: AgentToolName;
@@ -240,7 +255,11 @@ export async function requireAgentToolConsent(
     ...params,
   });
 
-  const response = await waitForAgentToolConsent(requestId, params.chatId);
+  const response = await waitForAgentToolConsent(
+    requestId,
+    params.chatId,
+    params.toolName,
+  );
 
   if (response === "accept-always") {
     setAgentToolConsent(params.toolName, "always");
@@ -435,6 +454,18 @@ export function shouldIncludeTool(
   }
   // Skip plan-mode-only tools when NOT in plan mode.
   if (!options.planModeOnly && PLAN_MODE_ONLY_TOOLS.has(tool.name)) {
+    return false;
+  }
+  // When the app is still in the blueprint flow, do not expose normal
+  // implementation tools. The execution guard below remains as a safety net,
+  // but hiding the tools prevents the model from first attempting writes that
+  // are guaranteed to fail before the blueprint is approved.
+  if (
+    options.enableAppBlueprint === true &&
+    tool.modifiesState &&
+    !APP_BLUEPRINT_TOOLS.has(tool.name) &&
+    !PLANNING_SPECIFIC_TOOLS.has(tool.name)
+  ) {
     return false;
   }
   // Skip Pro-only tools in basic agent mode.

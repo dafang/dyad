@@ -7,7 +7,6 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import log from "electron-log";
 import defaultApproveBuildsText from "@/data/default-approve-builds.txt?raw";
-import { gitAdd, gitCommit } from "@/ipc/utils/git_utils";
 import { PNPM_MINIMUM_RELEASE_AGE_WARNING_PREFIX } from "@/shared/packageManagerWarnings";
 import { IS_TEST_BUILD } from "@/ipc/utils/test_utils";
 import { isVersionAtLeast } from "@/shared/version_utils";
@@ -586,6 +585,7 @@ export async function commitPnpmAllowBuildsConfigIfChanged(
   }
 
   try {
+    const { gitAdd, gitCommit } = await import("@/ipc/utils/git_utils");
     await gitAdd({ path: appPath, filepath: "pnpm-workspace.yaml" });
     await gitCommit({
       path: appPath,

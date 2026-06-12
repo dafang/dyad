@@ -10,6 +10,7 @@ import {
 import type { ChatMode } from "@/lib/schemas";
 import { isDyadProEnabled, getEffectiveDefaultChatMode } from "@/lib/schemas";
 import { useTranslation } from "react-i18next";
+import { isLocalWebRuntime } from "@/lib/runtime_client";
 
 export function DefaultChatModeSelector() {
   const { settings, updateSettings, envVars } = useSettings();
@@ -21,15 +22,21 @@ export function DefaultChatModeSelector() {
   }
 
   const isProEnabled = isDyadProEnabled(settings);
+  const isLocalWeb = isLocalWebRuntime();
   // Wait for quota status to load before determining effective default
   const freeAgentQuotaAvailable = !isQuotaLoading && !isQuotaExceeded;
   const effectiveDefault = getEffectiveDefaultChatMode(
     settings,
     envVars,
     freeAgentQuotaAvailable,
+    {
+      localAgentQuotaRequired: !isLocalWeb,
+      localAgentProviderRestrictionRequired: !isLocalWeb,
+    },
   );
   // Show Basic Agent option if user is Pro OR if they have free quota available
-  const showBasicAgentOption = isProEnabled || freeAgentQuotaAvailable;
+  const showBasicAgentOption =
+    isProEnabled || isLocalWeb || freeAgentQuotaAvailable;
 
   const handleDefaultChatModeChange = (value: ChatMode) => {
     updateSettings({ defaultChatMode: value });
@@ -40,7 +47,7 @@ export function DefaultChatModeSelector() {
       case "build":
         return "Build";
       case "local-agent":
-        return isProEnabled ? "Agent" : "Basic Agent";
+        return isProEnabled || isLocalWeb ? "Agent" : "Basic Agent";
       case "ask":
         return "Ask";
       case "plan":
@@ -71,12 +78,14 @@ export function DefaultChatModeSelector() {
               <SelectItem value="local-agent">
                 <div className="flex flex-col items-start">
                   <span className="font-medium">
-                    {isProEnabled ? "Agent" : "Basic Agent"}
+                    {isProEnabled || isLocalWeb ? "Agent" : "Basic Agent"}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {isProEnabled
                       ? "Better at bigger tasks"
-                      : "Free tier (10 messages/day)"}
+                      : isLocalWeb
+                        ? "Use your local provider settings"
+                        : "Free tier (10 messages/day)"}
                   </span>
                 </div>
               </SelectItem>

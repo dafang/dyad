@@ -1,0 +1,1044 @@
+{
+  "generatedAt": "2026-06-12T12:39:01.600Z",
+  "server": {
+    "pageUrl": "http://127.0.0.1:55841",
+    "apiUrl": "http://127.0.0.1:55842",
+    "userDataPath": "/var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-vI1yx3/user-data",
+    "tokenSource": "DYAD_LOCAL_WEB_TOKEN env",
+    "mode": "local"
+  },
+  "created": {
+    "appId": 1,
+    "appName": "Mobile Audit 1781267948881",
+    "chatId": 2,
+    "resolvedPath": "/var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-vI1yx3/user-data/dyad-apps/Mobile Audit 1781267948881"
+  },
+  "routes": [
+    {
+      "viewport": "desktop",
+      "route": "home",
+      "url": "http://127.0.0.1:55841/",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-desktop-home.png",
+      "metrics": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "documentScrollWidth": 1440,
+        "documentScrollHeight": 900,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "DIV",
+          "text": "",
+          "ariaLabel": null
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nAlready have Dyad Pro? Add your key\nBuild a new app\nImport App\n\n\n\n\nAsk Dyad to build an inf\nAgent\nModel: Auto\nMedium\nPro\nMusic Discovery App\nTODO list app\nNewsletter Creator\nMore ideas\nAccess leading AI models with one plan\nGet Dyad Pro\nShare anonymous data?\n\nWe use anonymous telemetry data to improve the product. No personal data is collected.\nLearn more\n\nAccept and Continue\nReject\nLater\nFeatured Apps\nSee more\nM\n\nMobile Audit 1781267948881"
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": false
+        },
+        "preview-mode-button": {
+          "present": false
+        },
+        "preview-refresh-button": {
+          "present": false
+        },
+        "preview-restart-button": {
+          "present": false
+        },
+        "preview-open-browser-button": {
+          "present": false
+        },
+        "chat-input-container": {
+          "present": false
+        },
+        "messages-list": {
+          "present": false
+        },
+        "apps-grid": {
+          "present": false
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "desktop",
+      "route": "apps",
+      "url": "http://127.0.0.1:55841/apps",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-desktop-apps.png",
+      "metrics": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "documentScrollWidth": 1440,
+        "documentScrollHeight": 900,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "BODY",
+          "text": "Toggle MenuAppsSettingsLibraryHubHelpGo BackAppsSelectAppsCollectionsMMobile Aud",
+          "ariaLabel": null
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nGo Back\nApps\nSelect\nApps\nCollections\nM\n\nMobile Audit 1781267948881"
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": false
+        },
+        "preview-mode-button": {
+          "present": false
+        },
+        "preview-refresh-button": {
+          "present": false
+        },
+        "preview-restart-button": {
+          "present": false
+        },
+        "preview-open-browser-button": {
+          "present": false
+        },
+        "chat-input-container": {
+          "present": false
+        },
+        "messages-list": {
+          "present": false
+        },
+        "apps-grid": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 169,
+            "y": 240,
+            "width": 1152,
+            "height": 207
+          }
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "desktop",
+      "route": "chat",
+      "url": "http://127.0.0.1:55841/chat?id=2&appId=1",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-desktop-chat.png",
+      "metrics": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "documentScrollWidth": 1440,
+        "documentScrollHeight": 900,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "DIV",
+          "text": "",
+          "ariaLabel": null
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nNew Chat\nVersion 1\nNo messages yet\n\nGet notified about chat events.\n\nEnable\n\n\n\n\nAsk Dyad to build...\nAsk\nModel: Auto\nMedium\nPro\nPreview\n/\nPreparing preview\n·\nDone in 2.9s using pnpm v11.6.0\n20:39:30\nINFO\nConnecting to app...\n20:39:36\nINFO\n✓ Lockfile passes supply-chain policies (verified 1h ago)\n\n20:39:36\nINFO\nLockfile is up to date, resolution step is skipped\n\n20:39:36\nINFO\nProgress: resolved 1, reused 0, downloaded 0, added 0\n\n20:39:36\nINFO\nPackages: "
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 707,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "preview-mode-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 755,
+            "y": 8,
+            "width": 91,
+            "height": 32
+          }
+        },
+        "preview-refresh-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1217,
+            "y": 13,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "preview-restart-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1296,
+            "y": 12,
+            "width": 24,
+            "height": 24
+          }
+        },
+        "preview-open-browser-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1239,
+            "y": 13,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "chat-input-container": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 806,
+            "width": 694,
+            "height": 94
+          }
+        },
+        "messages-list": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 48,
+            "width": 694,
+            "height": 694
+          }
+        },
+        "apps-grid": {
+          "present": false
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "desktop",
+      "route": "preview",
+      "url": "http://127.0.0.1:55841/chat?id=2&appId=1",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-desktop-preview.png",
+      "metrics": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "documentScrollWidth": 1440,
+        "documentScrollHeight": 900,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "BUTTON",
+          "text": "",
+          "ariaLabel": "Preview"
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nNew Chat\nVersion 1\nNo messages yet\n\nGet notified about chat events.\n\nEnable\n\n\n\n\nAsk Dyad to build...\nAsk\nModel: Auto\nMedium\nPro\n/\nSystem Messages\n[DEBUG] [dyad-screenshot] Screenshot captured successfully\nPreview\nCode"
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1359,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "preview-mode-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1407,
+            "y": 9,
+            "width": 28,
+            "height": 28
+          }
+        },
+        "preview-refresh-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1658,
+            "y": 12,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "preview-restart-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1695,
+            "y": 11,
+            "width": 24,
+            "height": 24
+          }
+        },
+        "preview-open-browser-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1680,
+            "y": 12,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "chat-input-container": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 806,
+            "width": 1346,
+            "height": 94
+          }
+        },
+        "messages-list": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 48,
+            "width": 1346,
+            "height": 694
+          }
+        },
+        "apps-grid": {
+          "present": false
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "desktop",
+      "route": "settings",
+      "url": "http://127.0.0.1:55841/settings",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-desktop-settings.png",
+      "metrics": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "documentScrollWidth": 1440,
+        "documentScrollHeight": 900,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "BODY",
+          "text": "Toggle MenuAppsSettingsLibraryHubHelpGo BackSettingsGeneral SettingsThemeSystemL",
+          "ariaLabel": null
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nGo Back\nSettings\nGeneral Settings\nTheme\nSystem\nLight\nDark\nLanguage\n\nChoose your preferred display language.\n\nen\nZoom level\n\nAdjusts the zoom level to make content easier to read.\n\n100\nAuto-update app\nThis will automatically update the app when new versions are available.\nRelease channel\nstable\n\nControls which update channel the app uses.\n\nRuntime Mode\nhost\nSelect the runtime to use for running the app.\nNode.js Path Configuration\nBrowse for Node.js\nSyste"
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": false
+        },
+        "preview-mode-button": {
+          "present": false
+        },
+        "preview-refresh-button": {
+          "present": false
+        },
+        "preview-restart-button": {
+          "present": false
+        },
+        "preview-open-browser-button": {
+          "present": false
+        },
+        "chat-input-container": {
+          "present": false
+        },
+        "messages-list": {
+          "present": false
+        },
+        "apps-grid": {
+          "present": false
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "desktop",
+      "route": "library",
+      "url": "http://127.0.0.1:55841/library",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-desktop-library.png",
+      "metrics": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "documentScrollWidth": 1440,
+        "documentScrollHeight": 900,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "BODY",
+          "text": "Toggle MenuAppsSettingsLibraryHubHelpLibraryNewAllThemesPromptsMediaNo items in ",
+          "ariaLabel": null
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nLibrary\nNew\nAll\nThemes\nPrompts\nMedia\nNo items in your library yet."
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": false
+        },
+        "preview-mode-button": {
+          "present": false
+        },
+        "preview-refresh-button": {
+          "present": false
+        },
+        "preview-restart-button": {
+          "present": false
+        },
+        "preview-open-browser-button": {
+          "present": false
+        },
+        "chat-input-container": {
+          "present": false
+        },
+        "messages-list": {
+          "present": false
+        },
+        "apps-grid": {
+          "present": false
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "mobile",
+      "route": "home",
+      "url": "http://127.0.0.1:55841/",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-mobile-home.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "documentScrollHeight": 844,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "DIV",
+          "text": "",
+          "ariaLabel": null
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nAlready have Dyad Pro? Add your key\nBuild a new app\nImport App\n\n\n\n\nAsk Dyad to build an inf\nAgent\nModel: Auto\nMedium\nPro\nTODO list app\nAI Writing Assistant\nPersonal Finance Dashboard\nMore ideas\nUp to 3x cheaper\nby using Smart Context\nGet Dyad Pro\nShare anonymous data?\n\nWe use anonymous telemetry data to improve the product. No personal data is collected.\nLearn more\n\nAccept and Continue\nReject\nLater\nFeatured Apps\nSee more\n\nMobile Audit 1781267948881"
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": false
+        },
+        "preview-mode-button": {
+          "present": false
+        },
+        "preview-refresh-button": {
+          "present": false
+        },
+        "preview-restart-button": {
+          "present": false
+        },
+        "preview-open-browser-button": {
+          "present": false
+        },
+        "chat-input-container": {
+          "present": false
+        },
+        "messages-list": {
+          "present": false
+        },
+        "apps-grid": {
+          "present": false
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "mobile",
+      "route": "apps",
+      "url": "http://127.0.0.1:55841/apps",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-mobile-apps.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "documentScrollHeight": 844,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "BODY",
+          "text": "Toggle MenuAppsSettingsLibraryHubHelpGo BackAppsSelectAppsCollectionsMobile Audi",
+          "ariaLabel": null
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nGo Back\nApps\nSelect\nApps\nCollections\n\nMobile Audit 1781267948881"
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": false
+        },
+        "preview-mode-button": {
+          "present": false
+        },
+        "preview-refresh-button": {
+          "present": false
+        },
+        "preview-restart-button": {
+          "present": false
+        },
+        "preview-open-browser-button": {
+          "present": false
+        },
+        "chat-input-container": {
+          "present": false
+        },
+        "messages-list": {
+          "present": false
+        },
+        "apps-grid": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 81,
+            "y": 240,
+            "width": 277,
+            "height": 208
+          }
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "mobile",
+      "route": "chat",
+      "url": "http://127.0.0.1:55841/chat?id=2&appId=1",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-mobile-chat.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "documentScrollHeight": 844,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "DIV",
+          "text": "",
+          "ariaLabel": null
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nVersion 1\nNo messages yet\n\nGet notified about chat events.\n\nEnable\n\n\n\n\nAsk Dyad to build...\nAsk\nModel: Auto\nMedium\nPro\nPreview\n/\nSystem Messages\n8:40:32 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransiti"
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 192,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "preview-mode-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 230,
+            "y": 8,
+            "width": 91,
+            "height": 32
+          }
+        },
+        "preview-refresh-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 543,
+            "y": 13,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "preview-restart-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 580,
+            "y": 12,
+            "width": 24,
+            "height": 24
+          }
+        },
+        "preview-open-browser-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 565,
+            "y": 13,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "chat-input-container": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 750,
+            "width": 169,
+            "height": 94
+          }
+        },
+        "messages-list": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 48,
+            "width": 169,
+            "height": 578
+          }
+        },
+        "apps-grid": {
+          "present": false
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "mobile",
+      "route": "preview",
+      "url": "http://127.0.0.1:55841/chat?id=2&appId=1",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-mobile-preview.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "documentScrollHeight": 844,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "BUTTON",
+          "text": "",
+          "ariaLabel": "Preview"
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nVersion 1\nNo messages yet\n\nGet notified about chat events.\n\nEnable\n\n\n\n\nAsk Dyad to build...\nAsk\nModel: Auto\nMedium\nPro\n/\nSystem Messages\n8:40:42 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.\nPreview\nCode"
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 297,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "preview-mode-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 345,
+            "y": 9,
+            "width": 28,
+            "height": 28
+          }
+        },
+        "preview-refresh-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 596,
+            "y": 12,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "preview-restart-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 633,
+            "y": 11,
+            "width": 24,
+            "height": 24
+          }
+        },
+        "preview-open-browser-button": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 618,
+            "y": 12,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "chat-input-container": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 750,
+            "width": 284,
+            "height": 94
+          }
+        },
+        "messages-list": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 48,
+            "width": 284,
+            "height": 597
+          }
+        },
+        "apps-grid": {
+          "present": false
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "mobile",
+      "route": "settings",
+      "url": "http://127.0.0.1:55841/settings",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-mobile-settings.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "documentScrollHeight": 844,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "BODY",
+          "text": "Toggle MenuAppsSettingsLibraryHubHelpGo BackSettingsGeneral SettingsThemeSystemL",
+          "ariaLabel": null
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nGo Back\nSettings\nGeneral Settings\nTheme\nSystem\nLight\nDark\nLanguage\n\nChoose your preferred display language.\n\nen\nZoom level\n\nAdjusts the zoom level to make content easier to read.\n\n100\nAuto-update app\nThis will automatically update the app when new versions are available.\nRelease channel\nstable\n\nControls which update channel the app uses.\n\nRuntime Mode\nhost\nSelect the runtime to use for running the app.\nNode.js Path Configuration\nBrowse for Node.js\nSyste"
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": false
+        },
+        "preview-mode-button": {
+          "present": false
+        },
+        "preview-refresh-button": {
+          "present": false
+        },
+        "preview-restart-button": {
+          "present": false
+        },
+        "preview-open-browser-button": {
+          "present": false
+        },
+        "chat-input-container": {
+          "present": false
+        },
+        "messages-list": {
+          "present": false
+        },
+        "apps-grid": {
+          "present": false
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    },
+    {
+      "viewport": "mobile",
+      "route": "library",
+      "url": "http://127.0.0.1:55841/library",
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase1-mobile-library.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "documentScrollHeight": 844,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "blank": false,
+        "activeElement": {
+          "tag": "BODY",
+          "text": "Toggle MenuAppsSettingsLibraryHubHelpLibraryNewAllThemesPromptsMediaNo items in ",
+          "ariaLabel": null
+        },
+        "visibleText": "Toggle Menu\nApps\nSettings\nLibrary\nHub\nHelp\nLibrary\nNew\nAll\nThemes\nPrompts\nMedia\nNo items in your library yet."
+      },
+      "controls": {
+        "toggle-preview-panel-button": {
+          "present": false
+        },
+        "preview-mode-button": {
+          "present": false
+        },
+        "preview-refresh-button": {
+          "present": false
+        },
+        "preview-restart-button": {
+          "present": false
+        },
+        "preview-open-browser-button": {
+          "present": false
+        },
+        "chat-input-container": {
+          "present": false
+        },
+        "messages-list": {
+          "present": false
+        },
+        "apps-grid": {
+          "present": false
+        }
+      },
+      "errors": {
+        "console": [],
+        "network": [],
+        "backend": []
+      }
+    }
+  ],
+  "issues": [
+    {
+      "area": "chat",
+      "viewport": "mobile",
+      "route": "chat",
+      "type": "control-outside-viewport",
+      "owners": [
+        "src/pages/chat.tsx",
+        "src/components/ChatPanel.tsx",
+        "src/components/chat/ChatInput.tsx",
+        "src/components/chat/MessagesList.tsx",
+        "src/components/chat/ChatHeader.tsx"
+      ],
+      "detail": "preview-refresh-button rect={\"x\":543,\"y\":13,\"width\":22,\"height\":22} viewport=390x844"
+    },
+    {
+      "area": "chat",
+      "viewport": "mobile",
+      "route": "chat",
+      "type": "control-outside-viewport",
+      "owners": [
+        "src/pages/chat.tsx",
+        "src/components/ChatPanel.tsx",
+        "src/components/chat/ChatInput.tsx",
+        "src/components/chat/MessagesList.tsx",
+        "src/components/chat/ChatHeader.tsx"
+      ],
+      "detail": "preview-restart-button rect={\"x\":580,\"y\":12,\"width\":24,\"height\":24} viewport=390x844"
+    },
+    {
+      "area": "chat",
+      "viewport": "mobile",
+      "route": "chat",
+      "type": "control-outside-viewport",
+      "owners": [
+        "src/pages/chat.tsx",
+        "src/components/ChatPanel.tsx",
+        "src/components/chat/ChatInput.tsx",
+        "src/components/chat/MessagesList.tsx",
+        "src/components/chat/ChatHeader.tsx"
+      ],
+      "detail": "preview-open-browser-button rect={\"x\":565,\"y\":13,\"width\":22,\"height\":22} viewport=390x844"
+    },
+    {
+      "area": "chat",
+      "viewport": "mobile",
+      "route": "chat",
+      "type": "narrow-chat-pane",
+      "owners": [
+        "src/pages/chat.tsx",
+        "src/components/ChatPanel.tsx",
+        "src/components/chat/ChatInput.tsx",
+        "src/components/chat/MessagesList.tsx",
+        "src/components/chat/ChatHeader.tsx"
+      ],
+      "detail": "chat input width 169px at 390px viewport; desktop split-pane remains active"
+    },
+    {
+      "area": "preview",
+      "viewport": "mobile",
+      "route": "preview",
+      "type": "control-outside-viewport",
+      "owners": [
+        "src/pages/chat.tsx",
+        "src/components/preview_panel/PreviewPanel.tsx",
+        "src/components/preview_panel/PreviewIframe.tsx",
+        "src/components/preview_panel/PreviewToolbar.tsx"
+      ],
+      "detail": "preview-refresh-button rect={\"x\":596,\"y\":12,\"width\":22,\"height\":22} viewport=390x844"
+    },
+    {
+      "area": "preview",
+      "viewport": "mobile",
+      "route": "preview",
+      "type": "control-outside-viewport",
+      "owners": [
+        "src/pages/chat.tsx",
+        "src/components/preview_panel/PreviewPanel.tsx",
+        "src/components/preview_panel/PreviewIframe.tsx",
+        "src/components/preview_panel/PreviewToolbar.tsx"
+      ],
+      "detail": "preview-restart-button rect={\"x\":633,\"y\":11,\"width\":24,\"height\":24} viewport=390x844"
+    },
+    {
+      "area": "preview",
+      "viewport": "mobile",
+      "route": "preview",
+      "type": "control-outside-viewport",
+      "owners": [
+        "src/pages/chat.tsx",
+        "src/components/preview_panel/PreviewPanel.tsx",
+        "src/components/preview_panel/PreviewIframe.tsx",
+        "src/components/preview_panel/PreviewToolbar.tsx"
+      ],
+      "detail": "preview-open-browser-button rect={\"x\":618,\"y\":12,\"width\":22,\"height\":22} viewport=390x844"
+    },
+    {
+      "area": "preview",
+      "viewport": "mobile",
+      "route": "preview",
+      "type": "cropped-preview-pane",
+      "owners": [
+        "src/pages/chat.tsx",
+        "src/components/preview_panel/PreviewPanel.tsx",
+        "src/components/preview_panel/PreviewIframe.tsx",
+        "src/components/preview_panel/PreviewToolbar.tsx"
+      ],
+      "detail": "preview toolbar actions extend to x=640px in 390px viewport; preview content is visibly cropped"
+    }
+  ],
+  "localWebOutputTail": [
+    "20:40:31.979 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:31.979 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'openai',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:31.979 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'anthropic',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:31.979 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'google',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:31.979 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'vertex',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:31.979 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'openrouter',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:31.979 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'xai',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:31.979 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'auto',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: false\n}\n",
+    "20:40:31.979 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'azure',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: false\n}\n",
+    "20:40:31.979 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'bedrock',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: false\n}\n",
+    "20:40:31.979 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'minimax',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: false\n}\n",
+    "20:40:32.071 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "20:40:32.116 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "20:40:32.250 (app_runtime_service)           › App 1 (PID: 3743) stderr: 8:40:32 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.\n8:40:32 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.\n\n",
+    "20:40:32.661 (tsc)                           › TSC worker completed successfully for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-vI1yx3/user-data/dyad-apps/Mobile Audit 1781267948881\n",
+    "20:40:32.663 (tsc)                           › TSC worker exited with code 1 for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-vI1yx3/user-data/dyad-apps/Mobile Audit 1781267948881\n",
+    "20:40:42.083 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.083 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.085 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.086 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.091 (proposal_handlers)             › IPC: get-proposal called for chatId: 2\n",
+    "20:40:42.092 (process_manager)               › Updated lastViewedAt for app 1\n",
+    "20:40:42.105 (utils/codebase)                › extractCodebase: time taken 13\n20:40:42.105 (token_count_handlers)          › Extracted codebase information from /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-vI1yx3/user-data/dyad-apps/Mobile Audit 1781267948881, tokens: 6289\n20:40:42.106 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n20:40:42.106 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.106 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.106 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'auto',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: false\n}\n",
+    "20:40:42.126 (process_manager)               › Updated lastViewedAt for app 1\n",
+    "20:40:42.145 (tsc)                           › Starting TSC worker for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-vI1yx3/user-data/dyad-apps/Mobile Audit 1781267948881\n",
+    "20:40:42.147 (tsc)                           › Sending input to TSC worker for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-vI1yx3/user-data/dyad-apps/Mobile Audit 1781267948881\n",
+    "20:40:42.217 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.217 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.218 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.218 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.218 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.218 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.218 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.218 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.218 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.218 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.219 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.219 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.219 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.219 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.219 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.219 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.219 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.219 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n20:40:42.219 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.220 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n20:40:42.220 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.220 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:42.221 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.221 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.221 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.221 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.221 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.221 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.221 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.222 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.222 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.222 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:42.222 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'openai',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:42.222 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'anthropic',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:42.222 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'google',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:42.222 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'vertex',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:42.222 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'openrouter',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:42.222 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'xai',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: true\n}\n",
+    "20:40:42.222 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'auto',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: false\n}\n",
+    "20:40:42.223 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'azure',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: false\n}\n",
+    "20:40:42.223 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'bedrock',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: false\n}\n",
+    "20:40:42.223 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'minimax',\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  hasProviderModels: false\n}\n",
+    "20:40:42.319 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "20:40:42.356 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "20:40:42.439 (app_runtime_service)           › App 1 (PID: 3743) stderr: 8:40:42 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.\n\n",
+    "20:40:42.439 (app_runtime_service)           › App 1 (PID: 3743) stderr: 8:40:42 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.\n\n",
+    "20:40:42.890 (tsc)                           › TSC worker completed successfully for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-vI1yx3/user-data/dyad-apps/Mobile Audit 1781267948881\n",
+    "20:40:42.893 (tsc)                           › TSC worker exited with code 1 for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-vI1yx3/user-data/dyad-apps/Mobile Audit 1781267948881\n",
+    "20:40:52.207 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "20:40:52.472 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:40:52.472 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:40:52.477 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n20:40:52.477 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n",
+    "20:41:02.721 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  expiresAt: '2026-06-12T12:42:07.182Z'\n}\n",
+    "20:41:02.722 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T11:42:07.182Z',\n  providerCount: 6\n}\n"
+  ]
+}

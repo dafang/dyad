@@ -1,0 +1,19 @@
+node scripts/audit-web-parity.mjs
+npm run ts
+npm run fmt:check -- docs/web_parity_inventory.md scripts/audit-web-parity.mjs
+npm run build:web
+npm test -- src/lib/web_host_capabilities.test.ts src/lib/local_web_transport.test.ts
+npm run fmt:check
+npm test -- src/server/local_web_rpc_registry.test.ts src/server/local_event_stream.test.ts
+PLAYWRIGHT_HTML_OPEN=never npm run e2e -- e2e-tests/web_portal.spec.ts
+npm run lint
+npm test -- src/ipc/contracts/core.test.ts src/server/local_rpc_server.test.ts src/server/local_server.test.ts src/server/local_event_stream.test.ts src/lib/local_web_transport.test.ts
+npm run build
+npm test -- src/ipc/contracts/core.test.ts src/server/local_rpc_server.test.ts src/server/local_backend_host.test.ts
+npm test -- src/main/settings.test.ts src/db.test.ts src/server/local_server.test.ts src/server/local_web_runtime.test.ts
+npm test -- src/lib/local_web_transport.test.ts src/lib/runtime_client.test.ts
+npm test -- src/server/local_web_rpc_registry.test.ts src/lib/runtime_client.test.ts src/ipc/services/local_web_core_service.test.ts
+npm test -- src/server/local_web_rpc_registry.test.ts src/ipc/handlers/app_collection_handlers.test.ts src/ipc/services/local_web_mutation_service.test.ts
+npm test -- src/server/local_event_stream.test.ts src/hooks/useRunApp.test.tsx src/hooks/useTerminalSession.test.tsx
+npm test -- src/ipc/contracts/core.test.ts src/server/local_event_stream.test.ts src/hooks/usePlanImplementation.test.tsx src/pro/main/ipc/handlers/local_agent/local_agent_handler.test.ts
+npm test -- src/ipc/handlers/mcp_handlers.test.ts src/ipc/handlers/git_branch_handlers.test.ts src/ipc/services/app_runtime_service.test.ts src/server/local_web_integration_registry.test.ts

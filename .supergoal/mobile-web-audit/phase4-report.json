@@ -1,0 +1,564 @@
+{
+  "generatedAt": "2026-06-12T13:35:05.571Z",
+  "server": {
+    "pageUrl": "http://127.0.0.1:49481",
+    "apiUrl": "http://127.0.0.1:49482",
+    "userDataPath": "/var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data"
+  },
+  "created": {
+    "appId": 1,
+    "appName": "Mobile Preview 1781271312787",
+    "chatId": 2,
+    "resolvedPath": "/var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data/dyad-apps/Mobile Preview 1781271312787"
+  },
+  "mobile": {
+    "chat": {
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase4-mobile-chat.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "backToChat": {
+          "present": false
+        },
+        "previewToolbar": {
+          "present": false
+        },
+        "modeOverflow": {
+          "present": false
+        },
+        "deviceMode": {
+          "present": false
+        },
+        "refresh": {
+          "present": false
+        },
+        "openBrowser": {
+          "present": false
+        },
+        "restart": {
+          "present": false
+        },
+        "moreOptions": {
+          "present": false
+        },
+        "iframe": {
+          "present": false
+        },
+        "chatInput": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 750,
+            "width": 341,
+            "height": 94
+          }
+        },
+        "previewPanel": {
+          "present": false
+        },
+        "chatPanel": {
+          "present": false
+        }
+      }
+    },
+    "preview": {
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase4-mobile-preview.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "backToChat": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 57,
+            "y": 4,
+            "width": 73,
+            "height": 32
+          }
+        },
+        "previewToolbar": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 57,
+            "y": 83,
+            "width": 91,
+            "height": 32
+          }
+        },
+        "modeOverflow": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 210,
+            "y": 85,
+            "width": 28,
+            "height": 28
+          }
+        },
+        "deviceMode": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 251,
+            "y": 123,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "refresh": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 333,
+            "y": 123,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "openBrowser": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 355,
+            "y": 123,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "restart": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 246,
+            "y": 87,
+            "width": 24,
+            "height": 24
+          }
+        },
+        "moreOptions": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 358,
+            "y": 87,
+            "width": 24,
+            "height": 24
+          }
+        },
+        "iframe": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 158,
+            "width": 341,
+            "height": 637
+          }
+        },
+        "chatInput": {
+          "present": false
+        },
+        "previewPanel": {
+          "present": false
+        },
+        "chatPanel": {
+          "present": false
+        }
+      },
+      "iframe": {
+        "src": "http://127.0.0.1:49482/api/preview/1/",
+        "bodyText": "Welcome to Your Blank AppStart building your amazing project here!Made with Dyad",
+        "hasBodyText": true,
+        "addressPath": "/",
+        "usesLocalWebProxy": true
+      }
+    },
+    "controls": {
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase4-mobile-preview-controls.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "backToChat": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 57,
+            "y": 4,
+            "width": 73,
+            "height": 32
+          }
+        },
+        "previewToolbar": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 57,
+            "y": 83,
+            "width": 91,
+            "height": 32
+          }
+        },
+        "modeOverflow": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 210,
+            "y": 85,
+            "width": 28,
+            "height": 28
+          }
+        },
+        "deviceMode": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 251,
+            "y": 123,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "refresh": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 333,
+            "y": 123,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "openBrowser": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 355,
+            "y": 123,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "restart": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 246,
+            "y": 87,
+            "width": 24,
+            "height": 24
+          }
+        },
+        "moreOptions": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 358,
+            "y": 87,
+            "width": 24,
+            "height": 24
+          }
+        },
+        "iframe": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 158,
+            "width": 341,
+            "height": 637
+          }
+        },
+        "chatInput": {
+          "present": false
+        },
+        "previewPanel": {
+          "present": false
+        },
+        "chatPanel": {
+          "present": false
+        }
+      },
+      "devicePopoverVisible": true,
+      "overflowVisible": true,
+      "moreOptionsVisible": true
+    },
+    "backToChat": {
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase4-mobile-back-chat.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "backToChat": {
+          "present": false
+        },
+        "previewToolbar": {
+          "present": false
+        },
+        "modeOverflow": {
+          "present": false
+        },
+        "deviceMode": {
+          "present": false
+        },
+        "refresh": {
+          "present": false
+        },
+        "openBrowser": {
+          "present": false
+        },
+        "restart": {
+          "present": false
+        },
+        "moreOptions": {
+          "present": false
+        },
+        "iframe": {
+          "present": false
+        },
+        "chatInput": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 750,
+            "width": 341,
+            "height": 94
+          }
+        },
+        "previewPanel": {
+          "present": false
+        },
+        "chatPanel": {
+          "present": false
+        }
+      }
+    }
+  },
+  "desktop": {
+    "preview": {
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase4-desktop-preview-split-pane.png",
+      "metrics": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflow": false,
+        "backToChat": {
+          "present": false
+        },
+        "previewToolbar": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 755,
+            "y": 8,
+            "width": 91,
+            "height": 32
+          }
+        },
+        "modeOverflow": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 907,
+            "y": 10,
+            "width": 28,
+            "height": 28
+          }
+        },
+        "deviceMode": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1028,
+            "y": 13,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "refresh": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1217,
+            "y": 13,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "openBrowser": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1239,
+            "y": 13,
+            "width": 22,
+            "height": 22
+          }
+        },
+        "restart": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1296,
+            "y": 12,
+            "width": 24,
+            "height": 24
+          }
+        },
+        "moreOptions": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 1408,
+            "y": 12,
+            "width": 24,
+            "height": 24
+          }
+        },
+        "iframe": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 747,
+            "y": 49,
+            "width": 694,
+            "height": 802
+          }
+        },
+        "chatInput": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 806,
+            "width": 694,
+            "height": 94
+          }
+        },
+        "previewPanel": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 747,
+            "y": 0,
+            "width": 694,
+            "height": 900
+          }
+        },
+        "chatPanel": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 0,
+            "width": 694,
+            "height": 900
+          }
+        }
+      },
+      "iframe": {
+        "src": "http://127.0.0.1:49482/api/preview/1/",
+        "bodyText": "Welcome to Your Blank AppStart building your amazing project here!Made with Dyad",
+        "hasBodyText": true,
+        "addressPath": "/",
+        "usesLocalWebProxy": true
+      }
+    }
+  },
+  "localWebOutputTail": [
+    "21:35:13.930 (tsc)                           › TSC worker failed for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data/dyad-apps/Mobile Preview 1781271312787: Failed to load TypeScript from /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data/dyad-apps/Mobile Preview 1781271312787 because of Error: Cannot find module 'typescript'\nRequire stack:\n- /Users/wyattfang/work/github/dyad/.vite/build/tsc_worker.js\n",
+    "21:35:13.931 (local_web_core_service)        › Skipping problem check for app 1: Failed to load TypeScript from /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data/dyad-apps/Mobile Preview 1781271312787 because of Error: Cannot find module 'typescript'\nRequire stack:\n- /Users/wyattfang/work/github/dyad/.vite/build/tsc_worker.js\n",
+    "21:35:13.931 (tsc)                           › TSC worker exited with code 1 for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data/dyad-apps/Mobile Preview 1781271312787\n",
+    "21:35:27.308 (app_runtime_service)           › App 1 (PID: 47621) stdout: ✓ Lockfile passes supply-chain policies (verified 2h ago)\n\n",
+    "21:35:27.311 (app_runtime_service)           › App 1 (PID: 47621) stdout: Lockfile is up to date, resolution step is skipped\n\n",
+    "21:35:27.321 (app_runtime_service)           › App 1 (PID: 47621) stdout: Progress: resolved 1, reused 0, downloaded 0, added 0\n\n",
+    "21:35:27.341 (app_runtime_service)           › App 1 (PID: 47621) stdout: Packages: +377\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n",
+    "21:35:28.324 (app_runtime_service)           › App 1 (PID: 47621) stdout: Progress: resolved 377, reused 377, downloaded 0, added 283\n\n",
+    "21:35:29.130 (app_runtime_service)           › App 1 (PID: 47621) stdout: Progress: resolved 377, reused 377, downloaded 0, added 377, done\n\n",
+    "21:35:29.274 (app_runtime_service)           › App 1 (PID: 47621) stdout: .../node_modules/@swc/core postinstall$ node postinstall.js\n\n",
+    "21:35:30.663 (app_runtime_service)           › App 1 (PID: 47621) stdout: .../node_modules/@swc/core postinstall: Done\n\n",
+    "21:35:30.723 (app_runtime_service)           › App 1 (PID: 47621) stdout: \ndependencies:\n+ @hookform/resolvers 3.10.0\n+ @radix-ui/react-accordion 1.2.4\n+ @radix-ui/react-alert-dialog 1.1.7\n+ @radix-ui/react-aspect-ratio 1.1.3\n+ @radix-ui/react-avatar 1.1.4\n+ @radix-ui/react-checkbox 1.1.5\n+ @radix-ui/react-collapsible 1.1.4\n+ @radix-ui/react-context-menu 2.2.7\n+ @radix-ui/react-dialog 1.1.7\n+ @radix-ui/react-dropdown-menu 2.1.7\n+ @radix-ui/react-hover-card 1.1.7\n+ @radix-ui/react-label 2.1.3\n+ @radix-ui/react-menubar 1.1.7\n+ @radix-ui/react-navigation-menu 1.2.6\n+ @radix-ui/react-popover 1.1.7\n+ @radix-ui/react-progress 1.1.3\n+ @radix-ui/react-radio-group 1.2.4\n+ @radix-ui/react-scroll-area 1.2.4\n+ @radix-ui/react-select 2.1.7\n+ @radix-ui/react-separator 1.1.3\n+ @radix-ui/react-slider 1.2.4\n+ @radix-ui/react-slot 1.2.0\n+ @radix-ui/react-switch 1.1.4\n+ @radix-ui/react-tabs 1.1.4\n+ @radix-ui/react-toast 1.2.7\n+ @radix-ui/react-toggle 1.1.3\n+ @radix-ui/react-toggle-group 1.1.3\n+ @radix-ui/react-tooltip 1.2.0\n+ @tanstack/react-query 5.74.4\n+ class-variance-authority 0.7.1\n+ clsx 2.1.1\n+ cmdk 1.1.1\n+ date-fns 3.6.0\n+ embla-carousel-react 8.6.0\n+ input-otp 1.4.2\n+ lucide-react 0.462.0\n+ next-themes 0.3.0\n+ react 19.2.3\n+ react-day-picker 9.13.0\n+ react-dom 19.2.3\n+ react-hook-form 7.55.0\n+ react-resizable-panels 2.1.7\n+ react-router-dom 6.30.4\n+ recharts 2.15.2\n+ sonner 1.7.4\n+ tailwind-merge 2.6.0\n+ tailwindcss-animate 1.0.7\n+ vaul 0.9.9\n+ zod 3.25.76\n\ndevDependencies:\n+ @dyad-sh/react-vite-component-tagger 0.9.0\n+ @eslint/js 9.24.0\n+ @tailwindcss/typography 0.5.16\n+ @types/node 22.14.1\n+ @types/react 19.2.8\n+ @types/react-dom 19.2.3\n+ @vitejs/plugin-react-swc 4.3.0\n+ autoprefixer 10.4.21\n+ eslint 9.24.0\n+ eslint-plugin-react-hooks 5.2.0\n+ eslint-plugin-react-refresh 0.4.19\n+ globals 15.15.0\n+ postcss 8.5.3\n+ tailwindcss 3.4.17\n+ typescript 5.8.3\n+ typescript-eslint 8.30.1\n+ vite 8.0.10\n\n\n",
+    "21:35:30.802 (app_runtime_service)           › App 1 (PID: 47621) stdout: Done in 3.6s using pnpm v11.6.0\n\n",
+    "21:35:31.112 (app_runtime_service)           › App 1 (PID: 47621) stderr: $ vite --port 32101\n\n",
+    "21:35:32.595 (app_runtime_service)           › App 1 (PID: 47621) stderr: [vite:react-swc] We recommend switching to `@vitejs/plugin-react` for improved performance as no swc plugins are used. More information at https://vite.dev/rolldown\n\n",
+    "21:35:32.614 (app_runtime_service)           › App 1 (PID: 47621) stdout: \n  VITE v8.0.10  ready in 954 ms\n\n\n",
+    "21:35:32.615 (app_runtime_service)           › App 1 (PID: 47621) stdout:   ➜  Local:   http://localhost:32101/\n  ➜  Network: http://10.137.1.4:32101/\n\n",
+    "21:35:32.615 (start_proxy_server)            › Starting proxy on port 42101\n",
+    "21:35:32.637 (start_proxy_server)            › [proxy] [proxy-worker] fixed upstream origin: http://localhost:32101\n",
+    "21:35:32.637 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image.js loaded from: /Users/wyattfang/work/github/dyad/node_modules/html-to-image/dist/html-to-image.js\n",
+    "21:35:32.637 (start_proxy_server)            › [proxy] [proxy-worker] stacktrace.js loaded.\n",
+    "21:35:32.638 (start_proxy_server)            › [proxy] [proxy-worker] dyad-shim.js loaded.\n",
+    "21:35:32.638 (start_proxy_server)            › [proxy] [proxy-worker] dyad-component-selector-client.js loaded.\n",
+    "21:35:32.638 (start_proxy_server)            › [proxy] [proxy-worker] dyad-screenshot-client.js loaded.\n",
+    "21:35:32.638 (start_proxy_server)            › [proxy] [proxy-worker] dyad-visual-editor-client.js loaded.\n",
+    "21:35:32.638 (start_proxy_server)            › [proxy] [proxy-worker] dyad_logs.js loaded.\n",
+    "21:35:32.638 (start_proxy_server)            › [proxy] [proxy-worker] dyad-sw.js loaded.\n",
+    "21:35:32.638 (start_proxy_server)            › [proxy] [proxy-worker] dyad-sw-register.js loaded.\n",
+    "21:35:32.645 (start_proxy_server)            › [proxy] proxy-server-start url=http://localhost:42101\n",
+    "21:35:32.818 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "21:35:32.907 (app_runtime_service)           › App 1 (PID: 47621) stderr: Browserslist: browsers data (caniuse-lite) is 14 months old. Please run:\n  npx update-browserslist-db@latest\n  Why you should do it regularly: https://github.com/browserslist/update-db#readme\n\n",
+    "21:35:33.127 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "21:35:33.277 (app_runtime_service)           › App 1 (PID: 47621) stderr: 9:35:33 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.\n\n",
+    "21:35:33.277 (app_runtime_service)           › App 1 (PID: 47621) stderr: 9:35:33 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.\n\n",
+    "21:35:34.073 (process_manager)               › Updated lastViewedAt for app 1\n",
+    "21:35:34.801 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.801 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:35:34.803 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.803 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:35:34.807 (proposal_handlers)             › IPC: get-proposal called for chatId: 2\n",
+    "21:35:34.817 (utils/codebase)                › extractCodebase: time taken 8\n",
+    "21:35:34.817 (token_count_handlers)          › Extracted codebase information from /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data/dyad-apps/Mobile Preview 1781271312787, tokens: 6289\n",
+    "21:35:34.818 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.818 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:35:34.818 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.818 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'auto',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: false\n}\n",
+    "21:35:34.859 (tsc)                           › Starting TSC worker for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data/dyad-apps/Mobile Preview 1781271312787\n",
+    "21:35:34.859 (tsc)                           › Sending input to TSC worker for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data/dyad-apps/Mobile Preview 1781271312787\n",
+    "21:35:34.863 (process_manager)               › Updated lastViewedAt for app 1\n",
+    "21:35:34.961 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.962 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:35:34.962 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.963 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:35:34.963 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:35:34.963 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:35:34.963 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:35:34.964 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:35:34.964 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:35:34.964 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.964 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:35:34.964 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:35:34.965 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:35:34.965 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:35:34.965 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:35:34.965 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:35:34.965 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:35:34.965 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:35:34.966 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:35:34.966 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:35:34.966 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:35:34.966 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:35:34.967 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.967 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.968 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.968 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.968 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.968 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:35:34.968 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:35:34.968 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.968 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.969 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:35:34.969 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'openai',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n21:35:34.969 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'anthropic',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:35:34.969 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'google',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:35:34.969 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'vertex',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:35:34.969 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'openrouter',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:35:34.970 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'xai',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:35:34.970 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'auto',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: false\n}\n",
+    "21:35:34.970 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'azure',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: false\n}\n",
+    "21:35:34.970 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'bedrock',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: false\n}\n",
+    "21:35:34.970 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'minimax',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: false\n}\n",
+    "21:35:35.056 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "21:35:35.098 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "21:35:35.196 (app_runtime_service)           › App 1 (PID: 47621) stderr: 9:35:35 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.\n\n",
+    "21:35:35.197 (app_runtime_service)           › App 1 (PID: 47621) stderr: 9:35:35 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.\n\n",
+    "21:35:36.507 (tsc)                           › TSC worker completed successfully for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data/dyad-apps/Mobile Preview 1781271312787\n",
+    "21:35:36.510 (tsc)                           › TSC worker exited with code 1 for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-pVVFTF/user-data/dyad-apps/Mobile Preview 1781271312787\n",
+    "21:35:44.781 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n"
+  ]
+}

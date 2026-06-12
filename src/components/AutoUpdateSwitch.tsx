@@ -4,6 +4,10 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { ipc } from "@/ipc/types";
 import { useTranslation } from "react-i18next";
+import {
+  getWebHostUnsupportedMessage,
+  webHostCapabilities,
+} from "@/lib/web_host_capabilities";
 
 export function AutoUpdateSwitch() {
   const { settings, updateSettings } = useSettings();
@@ -26,8 +30,15 @@ export function AutoUpdateSwitch() {
               "You will need to restart Dyad for your settings to take effect.",
             action: {
               label: "Restart Dyad",
-              onClick: () => {
-                ipc.system.restartDyad();
+              onClick: async () => {
+                if (webHostCapabilities.isLocalWeb) {
+                  const result = await webHostCapabilities.restartApp();
+                  toast("Restart from terminal", {
+                    description: getWebHostUnsupportedMessage(result),
+                  });
+                  return;
+                }
+                await ipc.system.restartDyad();
               },
             },
           });

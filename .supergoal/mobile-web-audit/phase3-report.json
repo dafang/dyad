@@ -1,0 +1,1849 @@
+{
+  "generatedAt": "2026-06-12T13:17:47.679Z",
+  "provider": {
+    "source": "codex",
+    "baseUrlHost": "sub2global.bzy.ai",
+    "model": "gpt-5.5",
+    "key": "present"
+  },
+  "server": {
+    "pageUrl": "http://127.0.0.1:54171",
+    "apiUrl": "http://127.0.0.1:54172",
+    "userDataPath": "/var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-tKSHoc/user-data"
+  },
+  "created": {
+    "appId": 1,
+    "appName": "Mobile Chat 1781270274751",
+    "chatId": 2,
+    "resolvedPath": "/var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-tKSHoc/user-data/dyad-apps/Mobile Chat 1781270274751"
+  },
+  "mobile": {
+    "before": {
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase3-mobile-chat-before.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "messagesList": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 48,
+            "width": 341,
+            "height": 636
+          }
+        },
+        "chatInput": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 750,
+            "width": 341,
+            "height": 94
+          }
+        },
+        "editor": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 58,
+            "y": 751,
+            "width": 239,
+            "height": 44
+          }
+        },
+        "sendButton": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 341,
+            "y": 757,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "cancelButton": {
+          "present": false
+        },
+        "previewToggle": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 354,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "terminalToggle": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 314,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "previewPanel": {
+          "present": false
+        },
+        "chatPanel": {
+          "present": false
+        }
+      }
+    },
+    "afterType": {
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "messagesList": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 48,
+            "width": 341,
+            "height": 547
+          }
+        },
+        "chatInput": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 662,
+            "width": 341,
+            "height": 183
+          }
+        },
+        "editor": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 58,
+            "y": 663,
+            "width": 239,
+            "height": 133
+          }
+        },
+        "sendButton": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 341,
+            "y": 757,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "cancelButton": {
+          "present": false
+        },
+        "previewToggle": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 354,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "terminalToggle": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 314,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "previewPanel": {
+          "present": false
+        },
+        "chatPanel": {
+          "present": false
+        }
+      }
+    },
+    "during": {
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase3-mobile-chat-during.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "messagesList": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 48,
+            "width": 341,
+            "height": 628
+          }
+        },
+        "chatInput": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 750,
+            "width": 341,
+            "height": 94
+          }
+        },
+        "editor": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 58,
+            "y": 751,
+            "width": 239,
+            "height": 44
+          }
+        },
+        "sendButton": {
+          "present": false
+        },
+        "cancelButton": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 341,
+            "y": 757,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "previewToggle": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 354,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "terminalToggle": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 314,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "previewPanel": {
+          "present": false
+        },
+        "chatPanel": {
+          "present": false
+        }
+      },
+      "chunkEvents": [
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "effectiveChatMode": "ask"
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "messages": [
+              {
+                "id": 1,
+                "chatId": 2,
+                "role": "user",
+                "content": "This is a UI test. Reply with exactly this token and no other words: MOBILE_CHAT_OK_1781270285406",
+                "approvalState": null,
+                "sourceCommitHash": null,
+                "commitHash": null,
+                "requestId": null,
+                "maxTokensUsed": null,
+                "model": null,
+                "aiMessagesJson": null,
+                "usingFreeAgentModeQuota": null,
+                "isCompactionSummary": null,
+                "createdAt": "2026-06-12T13:18:05.000Z"
+              },
+              {
+                "id": 2,
+                "chatId": 2,
+                "role": "assistant",
+                "content": "",
+                "approvalState": null,
+                "sourceCommitHash": "17244227d049d2319f4e08e0be6fe036f8e2d39a",
+                "commitHash": null,
+                "requestId": null,
+                "maxTokensUsed": null,
+                "model": "gpt-5.5",
+                "aiMessagesJson": null,
+                "usingFreeAgentModeQuota": null,
+                "isCompactionSummary": null,
+                "createdAt": "2026-06-12T13:18:05.000Z"
+              }
+            ]
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "messages": [
+              {
+                "id": 1,
+                "chatId": 2,
+                "role": "user",
+                "content": "This is a UI test. Reply with exactly this token and no other words: MOBILE_CHAT_OK_1781270285406",
+                "approvalState": null,
+                "sourceCommitHash": null,
+                "commitHash": null,
+                "requestId": null,
+                "maxTokensUsed": null,
+                "model": null,
+                "aiMessagesJson": {
+                  "messages": [
+                    {
+                      "role": "user",
+                      "content": "This is a UI test. Reply with exactly this token and no other words: MOBILE_CHAT_OK_1781270285406",
+                      "providerOptions": {
+                        "dyad-engine": {
+                          "sourceCommitHash": null,
+                          "commitHash": null
+                        }
+                      }
+                    }
+                  ],
+                  "sdkVersion": "ai@v6"
+                },
+                "usingFreeAgentModeQuota": null,
+                "isCompactionSummary": null,
+                "createdAt": "2026-06-12T13:18:05.000Z"
+              },
+              {
+                "id": 2,
+                "chatId": 2,
+                "role": "assistant",
+                "content": "",
+                "approvalState": null,
+                "sourceCommitHash": "17244227d049d2319f4e08e0be6fe036f8e2d39a",
+                "commitHash": null,
+                "requestId": null,
+                "maxTokensUsed": null,
+                "model": "gpt-5.5",
+                "aiMessagesJson": null,
+                "usingFreeAgentModeQuota": null,
+                "isCompactionSummary": null,
+                "createdAt": "2026-06-12T13:18:05.000Z"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "after": {
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase3-mobile-chat-after.png",
+      "metrics": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflow": false,
+        "messagesList": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 48,
+            "width": 341,
+            "height": 628
+          }
+        },
+        "chatInput": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 750,
+            "width": 341,
+            "height": 94
+          }
+        },
+        "editor": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 58,
+            "y": 751,
+            "width": 239,
+            "height": 44
+          }
+        },
+        "sendButton": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 341,
+            "y": 757,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "cancelButton": {
+          "present": false
+        },
+        "previewToggle": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 354,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "terminalToggle": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 314,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "previewPanel": {
+          "present": false
+        },
+        "chatPanel": {
+          "present": false
+        }
+      },
+      "finalState": {
+        "ok": true,
+        "assistantText": "<think>**Evaluating user request**\n\nI need to be precise with the user's instructions. They mentioned something about setting a chat summary, which the developer says should only happen early and exactly once. But the user only asked for a token without any other words. Should I make a tool call for the summary? It seems like it might violate some rules if I don't do it the right way. I probably need to use the tool for this.</think>\nMOBILE_CHAT_OK_1781270285406",
+        "visibleHasToken": true,
+        "streaming": false
+      },
+      "chunkEvents": [
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "effectiveChatMode": "ask"
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "messages": [
+              {
+                "id": 1,
+                "chatId": 2,
+                "role": "user",
+                "content": "This is a UI test. Reply with exactly this token and no other words: MOBILE_CHAT_OK_1781270285406",
+                "approvalState": null,
+                "sourceCommitHash": null,
+                "commitHash": null,
+                "requestId": null,
+                "maxTokensUsed": null,
+                "model": null,
+                "aiMessagesJson": null,
+                "usingFreeAgentModeQuota": null,
+                "isCompactionSummary": null,
+                "createdAt": "2026-06-12T13:18:05.000Z"
+              },
+              {
+                "id": 2,
+                "chatId": 2,
+                "role": "assistant",
+                "content": "",
+                "approvalState": null,
+                "sourceCommitHash": "17244227d049d2319f4e08e0be6fe036f8e2d39a",
+                "commitHash": null,
+                "requestId": null,
+                "maxTokensUsed": null,
+                "model": "gpt-5.5",
+                "aiMessagesJson": null,
+                "usingFreeAgentModeQuota": null,
+                "isCompactionSummary": null,
+                "createdAt": "2026-06-12T13:18:05.000Z"
+              }
+            ]
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "messages": [
+              {
+                "id": 1,
+                "chatId": 2,
+                "role": "user",
+                "content": "This is a UI test. Reply with exactly this token and no other words: MOBILE_CHAT_OK_1781270285406",
+                "approvalState": null,
+                "sourceCommitHash": null,
+                "commitHash": null,
+                "requestId": null,
+                "maxTokensUsed": null,
+                "model": null,
+                "aiMessagesJson": {
+                  "messages": [
+                    {
+                      "role": "user",
+                      "content": "This is a UI test. Reply with exactly this token and no other words: MOBILE_CHAT_OK_1781270285406",
+                      "providerOptions": {
+                        "dyad-engine": {
+                          "sourceCommitHash": null,
+                          "commitHash": null
+                        }
+                      }
+                    }
+                  ],
+                  "sdkVersion": "ai@v6"
+                },
+                "usingFreeAgentModeQuota": null,
+                "isCompactionSummary": null,
+                "createdAt": "2026-06-12T13:18:05.000Z"
+              },
+              {
+                "id": 2,
+                "chatId": 2,
+                "role": "assistant",
+                "content": "",
+                "approvalState": null,
+                "sourceCommitHash": "17244227d049d2319f4e08e0be6fe036f8e2d39a",
+                "commitHash": null,
+                "requestId": null,
+                "maxTokensUsed": null,
+                "model": "gpt-5.5",
+                "aiMessagesJson": null,
+                "usingFreeAgentModeQuota": null,
+                "isCompactionSummary": null,
+                "createdAt": "2026-06-12T13:18:05.000Z"
+              }
+            ]
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 0,
+              "content": "<think>"
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 7,
+              "content": "**Evaluating user request**\n\nI",
+              "prefixHash": 2405867799
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 37,
+              "content": " need",
+              "prefixHash": 3065501184
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 42,
+              "content": " to",
+              "prefixHash": 3010160394
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 45,
+              "content": " be",
+              "prefixHash": 3087798769
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 48,
+              "content": " precise",
+              "prefixHash": 1449336054
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 56,
+              "content": " with",
+              "prefixHash": 3853481645
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 61,
+              "content": " the",
+              "prefixHash": 2715086159
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 65,
+              "content": " user's",
+              "prefixHash": 839253398
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 72,
+              "content": " instructions",
+              "prefixHash": 1494450515
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 85,
+              "content": ".",
+              "prefixHash": 277639064
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 86,
+              "content": " They",
+              "prefixHash": 572154550
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 91,
+              "content": " mentioned",
+              "prefixHash": 3259585622
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 101,
+              "content": " something",
+              "prefixHash": 3343512429
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 111,
+              "content": " about",
+              "prefixHash": 2923420389
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 117,
+              "content": " setting",
+              "prefixHash": 1568142984
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 125,
+              "content": " a",
+              "prefixHash": 2422244286
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 127,
+              "content": " chat",
+              "prefixHash": 714106751
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 132,
+              "content": " summary",
+              "prefixHash": 2992123809
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 140,
+              "content": ",",
+              "prefixHash": 1538377069
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 141,
+              "content": " which",
+              "prefixHash": 3521803041
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 147,
+              "content": " the",
+              "prefixHash": 3254269020
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 151,
+              "content": " developer",
+              "prefixHash": 2978130949
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 161,
+              "content": " says",
+              "prefixHash": 3043389843
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 166,
+              "content": " should",
+              "prefixHash": 4039045451
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 173,
+              "content": " only",
+              "prefixHash": 3302323586
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 178,
+              "content": " happen",
+              "prefixHash": 790498582
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 185,
+              "content": " early",
+              "prefixHash": 3928913812
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 191,
+              "content": " and",
+              "prefixHash": 1947526007
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 195,
+              "content": " exactly",
+              "prefixHash": 1917369084
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 203,
+              "content": " once",
+              "prefixHash": 3146716098
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 208,
+              "content": ".",
+              "prefixHash": 1703973413
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 209,
+              "content": " But",
+              "prefixHash": 396547819
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 213,
+              "content": " the",
+              "prefixHash": 1238027816
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 217,
+              "content": " user",
+              "prefixHash": 2974152305
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 222,
+              "content": " only",
+              "prefixHash": 590472416
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 227,
+              "content": " asked",
+              "prefixHash": 2855860596
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 233,
+              "content": " for",
+              "prefixHash": 1841428396
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 237,
+              "content": " a",
+              "prefixHash": 3892180119
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 239,
+              "content": " token",
+              "prefixHash": 3746394710
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 245,
+              "content": " without",
+              "prefixHash": 4069596557
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 253,
+              "content": " any",
+              "prefixHash": 23174145
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 257,
+              "content": " other",
+              "prefixHash": 3503335831
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 263,
+              "content": " words",
+              "prefixHash": 2115867699
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 269,
+              "content": ".",
+              "prefixHash": 822304014
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 270,
+              "content": " Should",
+              "prefixHash": 1366228704
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 277,
+              "content": " I",
+              "prefixHash": 2781885673
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 279,
+              "content": " make",
+              "prefixHash": 1521555200
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 284,
+              "content": " a",
+              "prefixHash": 1515299618
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 286,
+              "content": " tool",
+              "prefixHash": 893841379
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 291,
+              "content": " call",
+              "prefixHash": 95772955
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 296,
+              "content": " for",
+              "prefixHash": 1610717241
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 300,
+              "content": " the",
+              "prefixHash": 992494786
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 304,
+              "content": " summary",
+              "prefixHash": 1802574619
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 312,
+              "content": "?",
+              "prefixHash": 4181101911
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 313,
+              "content": " It",
+              "prefixHash": 537409544
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 316,
+              "content": " seems",
+              "prefixHash": 2713856757
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 322,
+              "content": " like",
+              "prefixHash": 1808829176
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 327,
+              "content": " it",
+              "prefixHash": 1977612595
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 330,
+              "content": " might",
+              "prefixHash": 640017870
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 336,
+              "content": " violate",
+              "prefixHash": 2055082033
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 344,
+              "content": " some",
+              "prefixHash": 1304158493
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 349,
+              "content": " rules",
+              "prefixHash": 884853769
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 355,
+              "content": " if",
+              "prefixHash": 3835853140
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 358,
+              "content": " I",
+              "prefixHash": 2078959067
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 360,
+              "content": " don't",
+              "prefixHash": 538657842
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 366,
+              "content": " do",
+              "prefixHash": 3319540516
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 369,
+              "content": " it",
+              "prefixHash": 1610845199
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 372,
+              "content": " the",
+              "prefixHash": 1374666994
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 376,
+              "content": " right",
+              "prefixHash": 1423480619
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 382,
+              "content": " way",
+              "prefixHash": 1901057419
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 386,
+              "content": ".",
+              "prefixHash": 2566185764
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 387,
+              "content": " I",
+              "prefixHash": 3079751562
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 389,
+              "content": " probably",
+              "prefixHash": 3774961251
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 398,
+              "content": " need",
+              "prefixHash": 4009181626
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 403,
+              "content": " to",
+              "prefixHash": 812912432
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 406,
+              "content": " use",
+              "prefixHash": 3561456523
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 410,
+              "content": " the",
+              "prefixHash": 3960711272
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 414,
+              "content": " tool",
+              "prefixHash": 2767183921
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 419,
+              "content": " for",
+              "prefixHash": 177960841
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 423,
+              "content": " this",
+              "prefixHash": 1394420658
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 428,
+              "content": ".",
+              "prefixHash": 3090284596
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 429,
+              "content": "</think>\n",
+              "prefixHash": 3195143834
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 438,
+              "content": "M",
+              "prefixHash": 834226925
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 439,
+              "content": "OBILE",
+              "prefixHash": 1759684800
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 444,
+              "content": "_CHAT",
+              "prefixHash": 3842904333
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 449,
+              "content": "_OK",
+              "prefixHash": 148378092
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 452,
+              "content": "_",
+              "prefixHash": 2209018135
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 453,
+              "content": "178",
+              "prefixHash": 4178121640
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 456,
+              "content": "127",
+              "prefixHash": 1395658102
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 459,
+              "content": "028",
+              "prefixHash": 3432044354
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 462,
+              "content": "540",
+              "prefixHash": 3097128440
+            }
+          }
+        },
+        {
+          "event": "chat:response:chunk",
+          "data": {
+            "chatId": 2,
+            "streamingMessageId": 2,
+            "streamingPatch": {
+              "offset": 465,
+              "content": "6",
+              "prefixHash": 1722192201
+            }
+          }
+        }
+      ],
+      "streamEndEvents": [
+        {
+          "event": "chat:stream:end",
+          "data": {
+            "chatId": 2
+          }
+        }
+      ]
+    }
+  },
+  "desktop": {
+    "splitPane": {
+      "screenshot": "/Users/wyattfang/work/github/dyad/.supergoal/mobile-web-audit/phase3-desktop-chat-split-pane.png",
+      "metrics": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflow": false,
+        "messagesList": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 48,
+            "width": 694,
+            "height": 686
+          }
+        },
+        "chatInput": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 806,
+            "width": 694,
+            "height": 94
+          }
+        },
+        "editor": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 58,
+            "y": 807,
+            "width": 592,
+            "height": 44
+          }
+        },
+        "sendButton": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 694,
+            "y": 813,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "cancelButton": {
+          "present": false
+        },
+        "previewToggle": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 707,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "terminalToggle": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 667,
+            "y": 6,
+            "width": 36,
+            "height": 36
+          }
+        },
+        "previewPanel": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 747,
+            "y": 0,
+            "width": 694,
+            "height": 900
+          }
+        },
+        "chatPanel": {
+          "present": true,
+          "visible": true,
+          "rect": {
+            "x": 49,
+            "y": 0,
+            "width": 694,
+            "height": 900
+          }
+        }
+      }
+    }
+  },
+  "localWebOutputTail": [
+    "21:18:17.318 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.318 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:18:17.320 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.320 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:18:17.323 (proposal_handlers)             › IPC: get-proposal called for chatId: 2\n",
+    "21:18:17.324 (proposal_handlers)             › Using cached codebase token count for chatId: 2\n",
+    "21:18:17.324 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.324 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:18:17.325 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.325 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'openai',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:18:17.325 (proposal_handlers)             › Token usage: 6431/100000 (6.431000000000001%)\n",
+    "21:18:17.335 (utils/codebase)                › extractCodebase: time taken 9\n",
+    "21:18:17.335 (token_count_handlers)          › Extracted codebase information from /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-tKSHoc/user-data/dyad-apps/Mobile Chat 1781270274751, tokens: 6289\n",
+    "21:18:17.335 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.335 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:18:17.336 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.336 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'openai',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:18:17.376 (tsc)                           › Starting TSC worker for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-tKSHoc/user-data/dyad-apps/Mobile Chat 1781270274751\n",
+    "21:18:17.376 (tsc)                           › Sending input to TSC worker for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-tKSHoc/user-data/dyad-apps/Mobile Chat 1781270274751\n",
+    "21:18:17.398 (tsc)                           › TSC worker failed for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-tKSHoc/user-data/dyad-apps/Mobile Chat 1781270274751: Failed to load TypeScript from /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-tKSHoc/user-data/dyad-apps/Mobile Chat 1781270274751 because of Error: Cannot find module 'typescript'\nRequire stack:\n- /Users/wyattfang/work/github/dyad/.vite/build/tsc_worker.js\n",
+    "21:18:17.398 (local_web_core_service)        › Skipping problem check for app 1: Failed to load TypeScript from /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-tKSHoc/user-data/dyad-apps/Mobile Chat 1781270274751 because of Error: Cannot find module 'typescript'\nRequire stack:\n- /Users/wyattfang/work/github/dyad/.vite/build/tsc_worker.js\n",
+    "21:18:17.398 (tsc)                           › TSC worker exited with code 1 for app /var/folders/4f/1vy4dbc93_33p_4brpw2dr080000gn/T/dyad-mobile-web-audit-tKSHoc/user-data/dyad-apps/Mobile Chat 1781270274751\n",
+    "21:18:17.482 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.482 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:18:17.483 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:18:17.483 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:18:17.483 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:18:17.484 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:18:17.484 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:18:17.484 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:18:17.484 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:18:17.484 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:18:17.484 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n21:18:17.484 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.484 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:18:17.484 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:18:17.485 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:18:17.485 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:18:17.485 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:18:17.485 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n21:18:17.485 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:18:17.485 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:18:17.485 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:18:17.486 (language_model_helpers)        › Loaded builtin catalog for provider list {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  providerCount: 6\n}\n",
+    "21:18:17.487 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.487 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.487 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.487 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.487 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.487 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.487 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.487 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.487 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.488 (remote_language_model_catalog) › Returning cached language model catalog {\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  expiresAt: '2026-06-12T13:42:19.473Z'\n}\n",
+    "21:18:17.488 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'openai',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:18:17.488 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'anthropic',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:18:17.488 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'google',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:18:17.488 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'vertex',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n21:18:17.488 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'openrouter',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:18:17.488 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'xai',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: true\n}\n",
+    "21:18:17.489 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'auto',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: false\n}\n",
+    "21:18:17.489 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'azure',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: false\n}\n",
+    "21:18:17.489 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'bedrock',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: false\n}\n",
+    "21:18:17.489 (language_model_helpers)        › Loading cloud models from builtin catalog {\n  providerId: 'minimax',\n  source: 'remote',\n  version: '2026-06-12T12:42:19.473Z',\n  hasProviderModels: false\n}\n",
+    "21:18:20.145 (app_runtime_service)           › App 1 (PID: 72860) stdout: ✓ Lockfile passes supply-chain policies (verified 2h ago)\n\n",
+    "21:18:20.147 (app_runtime_service)           › App 1 (PID: 72860) stdout: Lockfile is up to date, resolution step is skipped\n\n",
+    "21:18:20.157 (app_runtime_service)           › App 1 (PID: 72860) stdout: Progress: resolved 1, reused 0, downloaded 0, added 0\n\n",
+    "21:18:20.186 (app_runtime_service)           › App 1 (PID: 72860) stdout: Packages: +377\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n",
+    "21:18:21.159 (app_runtime_service)           › App 1 (PID: 72860) stdout: Progress: resolved 377, reused 377, downloaded 0, added 185\n\n",
+    "21:18:21.976 (app_runtime_service)           › App 1 (PID: 72860) stdout: Progress: resolved 377, reused 377, downloaded 0, added 377, done\n\n",
+    "21:18:22.116 (app_runtime_service)           › App 1 (PID: 72860) stdout: .../node_modules/@swc/core postinstall$ node postinstall.js\n\n",
+    "21:18:22.779 (app_runtime_service)           › App 1 (PID: 72860) stdout: .../node_modules/@swc/core postinstall: Done\n\n",
+    "21:18:22.822 (app_runtime_service)           › App 1 (PID: 72860) stdout: \ndependencies:\n+ @hookform/resolvers 3.10.0\n+ @radix-ui/react-accordion 1.2.4\n+ @radix-ui/react-alert-dialog 1.1.7\n+ @radix-ui/react-aspect-ratio 1.1.3\n+ @radix-ui/react-avatar 1.1.4\n+ @radix-ui/react-checkbox 1.1.5\n+ @radix-ui/react-collapsible 1.1.4\n+ @radix-ui/react-context-menu 2.2.7\n+ @radix-ui/react-dialog 1.1.7\n+ @radix-ui/react-dropdown-menu 2.1.7\n+ @radix-ui/react-hover-card 1.1.7\n+ @radix-ui/react-label 2.1.3\n+ @radix-ui/react-menubar 1.1.7\n+ @radix-ui/react-navigation-menu 1.2.6\n+ @radix-ui/react-popover 1.1.7\n+ @radix-ui/react-progress 1.1.3\n+ @radix-ui/react-radio-group 1.2.4\n+ @radix-ui/react-scroll-area 1.2.4\n+ @radix-ui/react-select 2.1.7\n+ @radix-ui/react-separator 1.1.3\n+ @radix-ui/react-slider 1.2.4\n+ @radix-ui/react-slot 1.2.0\n+ @radix-ui/react-switch 1.1.4\n+ @radix-ui/react-tabs 1.1.4\n+ @radix-ui/react-toast 1.2.7\n+ @radix-ui/react-toggle 1.1.3\n+ @radix-ui/react-toggle-group 1.1.3\n+ @radix-ui/react-tooltip 1.2.0\n+ @tanstack/react-query 5.74.4\n+ class-variance-authority 0.7.1\n+ clsx 2.1.1\n+ cmdk 1.1.1\n+ date-fns 3.6.0\n+ embla-carousel-react 8.6.0\n+ input-otp 1.4.2\n+ lucide-react 0.462.0\n+ next-themes 0.3.0\n+ react 19.2.3\n+ react-day-picker 9.13.0\n+ react-dom 19.2.3\n+ react-hook-form 7.55.0\n+ react-resizable-panels 2.1.7\n+ react-router-dom 6.30.4\n+ recharts 2.15.2\n+ sonner 1.7.4\n+ tailwind-merge 2.6.0\n+ tailwindcss-animate 1.0.7\n+ vaul 0.9.9\n+ zod 3.25.76\n\ndevDependencies:\n+ @dyad-sh/react-vite-component-tagger 0.9.0\n+ @eslint/js 9.24.0\n+ @tailwindcss/typography 0.5.16\n+ @types/node 22.14.1\n+ @types/react 19.2.8\n+ @types/react-dom 19.2.3\n+ @vitejs/plugin-react-swc 4.3.0\n+ autoprefixer 10.4.21\n+ eslint 9.24.0\n+ eslint-plugin-react-hooks 5.2.0\n+ eslint-plugin-react-refresh 0.4.19\n+ globals 15.15.0\n+ postcss 8.5.3\n+ tailwindcss 3.4.17\n+ typescript 5.8.3\n+ typescript-eslint 8.30.1\n+ vite 8.0.10\n\n\n",
+    "21:18:22.849 (app_runtime_service)           › App 1 (PID: 72860) stdout: Done in 2.9s using pnpm v11.6.0\n\n",
+    "21:18:23.096 (app_runtime_service)           › App 1 (PID: 72860) stderr: $ vite --port 32101\n\n",
+    "21:18:24.440 (app_runtime_service)           › App 1 (PID: 72860) stderr: [vite:react-swc] We recommend switching to `@vitejs/plugin-react` for improved performance as no swc plugins are used. More information at https://vite.dev/rolldown\n\n",
+    "21:18:24.455 (app_runtime_service)           › App 1 (PID: 72860) stdout: \n  VITE v8.0.10  ready in 881 ms\n\n\n",
+    "21:18:24.455 (app_runtime_service)           › App 1 (PID: 72860) stdout:   ➜  Local:   http://localhost:32101/\n  ➜  Network: http://10.137.1.4:32101/\n\n",
+    "21:18:24.455 (start_proxy_server)            › Starting proxy on port 42101\n",
+    "21:18:24.470 (start_proxy_server)            › [proxy] [proxy-worker] fixed upstream origin: http://localhost:32101\n",
+    "21:18:24.471 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image.js loaded from: /Users/wyattfang/work/github/dyad/node_modules/html-to-image/dist/html-to-image.js\n",
+    "21:18:24.471 (start_proxy_server)            › [proxy] [proxy-worker] stacktrace.js loaded.\n",
+    "21:18:24.471 (start_proxy_server)            › [proxy] [proxy-worker] dyad-shim.js loaded.\n",
+    "21:18:24.471 (start_proxy_server)            › [proxy] [proxy-worker] dyad-component-selector-client.js loaded.\n",
+    "21:18:24.471 (start_proxy_server)            › [proxy] [proxy-worker] dyad-screenshot-client.js loaded.\n",
+    "21:18:24.471 (start_proxy_server)            › [proxy] [proxy-worker] dyad-visual-editor-client.js loaded.\n",
+    "21:18:24.471 (start_proxy_server)            › [proxy] [proxy-worker] dyad_logs.js loaded.\n",
+    "21:18:24.471 (start_proxy_server)            › [proxy] [proxy-worker] dyad-sw.js loaded.\n",
+    "21:18:24.471 (start_proxy_server)            › [proxy] [proxy-worker] dyad-sw-register.js loaded.\n",
+    "21:18:24.476 (start_proxy_server)            › [proxy] proxy-server-start url=http://localhost:42101\n",
+    "21:18:24.613 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "21:18:24.656 (start_proxy_server)            › [proxy] [proxy-worker] html-to-image script injected into HTML.\n",
+    "21:18:24.685 (app_runtime_service)           › App 1 (PID: 72860) stderr: Browserslist: browsers data (caniuse-lite) is 14 months old. Please run:\n  npx update-browserslist-db@latest\n  Why you should do it regularly: https://github.com/browserslist/update-db#readme\n\n",
+    "21:18:25.004 (app_runtime_service)           › App 1 (PID: 72860) stderr: 9:18:25 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.\n\n",
+    "21:18:25.004 (app_runtime_service)           › App 1 (PID: 72860) stderr: 9:18:25 PM [vite] (client) [console.warn] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.\n\n"
+  ]
+}

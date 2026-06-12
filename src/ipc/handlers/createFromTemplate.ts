@@ -1,12 +1,13 @@
 import path from "path";
 import fs from "fs-extra";
-import { app } from "electron";
 import { copyDirectoryRecursive } from "../utils/file_utils";
 import { gitClone, getCurrentCommitHash } from "../utils/git_utils";
 import { readSettings } from "@/main/settings";
 import { getTemplateOrThrow } from "../utils/template_utils";
 import log from "electron-log";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import { getUserDataPath } from "@/paths/paths";
+import { appendNextAppRouterRules } from "../utils/ai_rules_patcher";
 
 const logger = log.scope("createFromTemplate");
 
@@ -37,6 +38,7 @@ export async function createFromTemplate({
   }
   const repoCachePath = await cloneRepo(template.githubUrl);
   await copyRepoToApp(repoCachePath, fullAppPath);
+  await patchTemplateAppRules(fullAppPath);
 }
 
 async function cloneRepo(repoUrl: string): Promise<string> {
@@ -75,7 +77,7 @@ async function cloneRepo(repoUrl: string): Promise<string> {
   logger.info(`Parsed org: ${orgName}, repo: ${repoName} from ${repoUrl}`);
 
   const cachePath = path.join(
-    app.getPath("userData"),
+    getUserDataPath(),
     "templates",
     orgName,
     repoName,
@@ -176,4 +178,31 @@ async function copyRepoToApp(repoCachePath: string, appPath: string) {
     );
     throw err; // Re-throw the error after logging
   }
+}
+
+async function patchTemplateAppRules(appPath: string) {
+  if (await isNextApp(appPath)) {
+    await appendNextAppRouterRules(appPath);
+  }
+}
+
+async function isNextApp(appPath: string): Promise<boolean> {
+  const packageJsonPath = path.join(appPath, "package.json");
+  let packageJson: {
+    dependencies?: Record<string, unknown>;
+    devDependencies?: Record<string, unknown>;
+  };
+  try {
+    packageJson = await fs.readJson(packageJsonPath);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+      return false;
+    }
+    throw err;
+  }
+
+  return (
+    typeof packageJson.dependencies?.next === "string" ||
+    typeof packageJson.devDependencies?.next === "string"
+  );
 }

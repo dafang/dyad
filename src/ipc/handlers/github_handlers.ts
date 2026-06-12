@@ -1,4 +1,4 @@
-import { BrowserWindow, IpcMainInvokeEvent } from "electron";
+import type { BrowserWindow, IpcMainInvokeEvent } from "electron";
 import fetch from "node-fetch"; // Use node-fetch for making HTTP requests in main process
 import { writeSettings, readSettings } from "../../main/settings";
 import {
@@ -40,6 +40,7 @@ import { githubContracts } from "../types/github";
 import type { CloneRepoParams, CloneRepoResult } from "../types/github";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
 import { slugifyAppPath } from "@/shared/slugify";
+import { getElectronModule } from "../utils/electron_module";
 
 const logger = log.scope("github_handlers");
 
@@ -474,7 +475,10 @@ function handleStartGithubFlow(
   }
 
   // Store the window that initiated the request
-  const window = BrowserWindow.fromWebContents(event.sender);
+  const window =
+    getElectronModule<
+      typeof import("electron")
+    >()?.BrowserWindow.fromWebContents(event.sender) ?? null;
   if (!window) {
     logger.error("Could not get BrowserWindow instance.");
     return;

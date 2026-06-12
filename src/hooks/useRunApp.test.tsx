@@ -5,10 +5,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { selectedAppIdAtom } from "@/atoms/appAtoms";
 import {
   currentConsoleEntriesAtom,
+  currentAppUrlAtom,
   currentPreviewAppExitAtom,
   currentPreviewErrorAtom,
   setConsoleEntriesForAppAtom,
 } from "@/atoms/previewRuntimeAtoms";
+import { HttpInvokeAbortError } from "@/ipc/contracts/core";
 import { useAppOutputSubscription, useRunApp } from "@/hooks/useRunApp";
 
 const {
@@ -18,6 +20,7 @@ const {
   appOutputListeners,
   appOutputSubscribeMock,
   clearLogsMock,
+  getRunningAppPreviewMock,
   installPnpmMock,
   openExternalUrlMock,
   respondToAppInputMock,
@@ -36,6 +39,7 @@ const {
   appOutputListeners: new Set<(output: unknown) => void>(),
   appOutputSubscribeMock: vi.fn(),
   clearLogsMock: vi.fn(),
+  getRunningAppPreviewMock: vi.fn(),
   installPnpmMock: vi.fn(),
   openExternalUrlMock: vi.fn(),
   respondToAppInputMock: vi.fn(),
@@ -59,6 +63,7 @@ const {
 vi.mock("@/ipc/types", () => ({
   ipc: {
     app: {
+      getRunningAppPreview: getRunningAppPreviewMock,
       respondToAppInput: respondToAppInputMock,
       restartApp: restartAppMock,
       runApp: runAppMock,
@@ -123,6 +128,13 @@ describe("useAppOutputSubscription", () => {
     appOutputSubscribeMock.mockReset();
     appOutputBatchSubscribeMock.mockReset();
     clearLogsMock.mockReset();
+    getRunningAppPreviewMock.mockReset();
+    getRunningAppPreviewMock.mockResolvedValue({
+      appId: 1,
+      appUrl: "http://localhost:42101",
+      originalUrl: "http://localhost:32101",
+      mode: "host",
+    });
     installPnpmMock.mockReset();
     openExternalUrlMock.mockReset();
     respondToAppInputMock.mockReset();
@@ -470,6 +482,134 @@ describe("useAppOutputSubscription", () => {
 
     expect(result.current.loading).toBe(false);
 
+    unmount();
+  });
+
+  it("restores preview url from running app status when output event was missed", async () => {
+    const { store, Wrapper } = makeWrapper(1);
+    getRunningAppPreviewMock.mockResolvedValueOnce(null).mockResolvedValueOnce({
+      appId: 1,
+      appUrl: "http://localhost:42101",
+      originalUrl: "http://localhost:32101",
+      mode: "host",
+    });
+    runAppMock.mockResolvedValueOnce(undefined);
+
+    const { result, unmount } = renderHook(() => useRunApp(), {
+      wrapper: Wrapper,
+    });
+
+    let runPromise = Promise.resolve();
+    await act(async () => {
+      runPromise = result.current.runApp(1);
+      await Promise.resolve();
+    });
+
+    expect(store.get(currentAppUrlAtom).appUrl).toBeNull();
+    expect(result.current.loading).toBe(true);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(500);
+      await runPromise;
+    });
+
+    expect(getRunningAppPreviewMock).toHaveBeenCalledWith({ appId: 1 });
+    expect(store.get(currentAppUrlAtom)).toEqual({
+      appId: 1,
+      appUrl: "http://localhost:42101",
+      originalUrl: "http://localhost:32101",
+      mode: "host",
+    });
+    expect(result.current.loading).toBe(false);
+
+    unmount();
+  });
+
+  it("does not surface cancelled automatic preview run failures", async () => {
+    const { store, Wrapper } = makeWrapper(1);
+    let rejectRunApp: (error: Error) => void = () => {};
+    runAppMock.mockReturnValueOnce(
+      new Promise<void>((_resolve, reject) => {
+        rejectRunApp = reject;
+      }),
+    );
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    const { result, unmount } = renderHook(() => useRunApp(), {
+      wrapper: Wrapper,
+    });
+
+    let cancelled = false;
+    let runPromise = Promise.resolve();
+    await act(async () => {
+      runPromise = result.current.runApp(1, {
+        isCancelled: () => cancelled,
+        suppressCancelledError: true,
+      });
+      await Promise.resolve();
+    });
+
+    expect(result.current.loading).toBe(true);
+
+    cancelled = true;
+    await act(async () => {
+      rejectRunApp(
+        new HttpInvokeAbortError("run-app", new Error("Failed to fetch")),
+      );
+      await runPromise;
+    });
+
+    expect(store.get(currentPreviewErrorAtom)).toBeUndefined();
+    expect(result.current.loading).toBe(false);
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
+    unmount();
+  });
+
+  it("does not surface cancelled manual preview restart failures", async () => {
+    const { store, Wrapper } = makeWrapper(1);
+    let rejectRestartApp: (error: Error) => void = () => {};
+    restartAppMock.mockReturnValueOnce(
+      new Promise<void>((_resolve, reject) => {
+        rejectRestartApp = reject;
+      }),
+    );
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    const { result, unmount } = renderHook(() => useRunApp(), {
+      wrapper: Wrapper,
+    });
+
+    let cancelled = false;
+    let restartPromise = Promise.resolve();
+    await act(async () => {
+      restartPromise = result.current.restartApp({
+        isCancelled: () => cancelled,
+        suppressCancelledError: true,
+      });
+      await Promise.resolve();
+    });
+
+    expect(result.current.loading).toBe(true);
+
+    cancelled = true;
+    await act(async () => {
+      rejectRestartApp(
+        new HttpInvokeAbortError("restart-app", new Error("Failed to fetch")),
+      );
+      await restartPromise;
+    });
+
+    expect(store.get(currentPreviewErrorAtom)).toBeUndefined();
+    expect(result.current.loading).toBe(false);
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
     unmount();
   });
 

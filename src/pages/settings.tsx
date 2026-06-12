@@ -39,6 +39,10 @@ import { CloudSandboxExperimentSwitch } from "@/components/CloudSandboxExperimen
 import { useSetAtom } from "jotai";
 import { activeSettingsSectionAtom } from "@/atoms/viewAtoms";
 import { SECTION_IDS, SETTING_IDS } from "@/lib/settingsSearchIndex";
+import {
+  getWebHostUnsupportedMessage,
+  webHostCapabilities,
+} from "@/lib/web_host_capabilities";
 
 export default function SettingsPage() {
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
@@ -54,6 +58,11 @@ export default function SettingsPage() {
   const handleResetEverything = async () => {
     setIsResetting(true);
     try {
+      if (webHostCapabilities.isLocalWeb) {
+        const result = await webHostCapabilities.resetAll();
+        showError(getWebHostUnsupportedMessage(result));
+        return;
+      }
       await ipc.system.resetAll();
       showSuccess("Successfully reset everything. Restart the application.");
     } catch (error) {

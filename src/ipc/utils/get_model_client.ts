@@ -170,8 +170,12 @@ export async function getModelClient(
       const envVarName = providerInfo?.envVarName;
 
       const apiKey = getProviderApiKeyForRequest(
-        settings.providerSettings?.[resolvedModel.providerId]?.apiKey?.value ||
-          (envVarName ? getEnvVar(envVarName) : undefined),
+        getProviderApiKeyCandidate({
+          settingsValue:
+            settings.providerSettings?.[resolvedModel.providerId]?.apiKey
+              ?.value,
+          envVarName,
+        }),
         providerInfo?.name ?? resolvedModel.providerId,
       );
 
@@ -304,16 +308,34 @@ function getRegularModelClient(
     providerId === "azure"
       ? undefined
       : getProviderApiKeyForRequest(
-          settings.providerSettings?.[model.provider]?.apiKey?.value ||
-            (providerConfig.envVarName
-              ? getEnvVar(providerConfig.envVarName)
-              : undefined),
+          getProviderApiKeyCandidate({
+            settingsValue:
+              settings.providerSettings?.[model.provider]?.apiKey?.value,
+            envVarName: providerConfig.envVarName,
+          }),
           providerConfig.name ?? providerConfig.id,
         );
   // Create client based on provider ID or type
   switch (providerId) {
     case "openai": {
-      const provider = createOpenAI({ apiKey });
+      const baseURL = getOpenAIBaseURL();
+      logProviderDiagnostic({
+        providerId,
+        modelName: model.name,
+        baseURL,
+        hasApiKey: !!apiKey,
+        apiKeySource:
+          settings.providerSettings?.[model.provider]?.apiKey?.value &&
+          normalizeProviderApiKeyInput(
+            settings.providerSettings[model.provider]?.apiKey?.value,
+          ) !== "__env__"
+            ? "settings"
+            : "env",
+      });
+      const provider = createOpenAI({
+        apiKey,
+        ...(baseURL ? { baseURL } : {}),
+      });
       return {
         modelClient: {
           model: provider.responses(model.name),
@@ -535,7 +557,7 @@ function getRegularModelClient(
         // Assume custom providers are OpenAI compatible for now
         const provider = createOpenAICompatible({
           name: providerConfig.id,
-          baseURL: providerConfig.apiBaseUrl,
+          baseURL: normalizeOpenAICompatibleBaseURL(providerConfig.apiBaseUrl),
           apiKey,
         });
         return {
@@ -554,12 +576,75 @@ function getRegularModelClient(
   }
 }
 
+function getOpenAIBaseURL(): string | undefined {
+  const baseURL = getEnvVar("OPENAI_BASE_URL")?.trim();
+  return baseURL || undefined;
+}
+
+function normalizeOpenAICompatibleBaseURL(baseURL: string): string {
+  const trimmed = baseURL.trim().replace(/\/+$/, "");
+  try {
+    const url = new URL(trimmed);
+    if (url.pathname === "" || url.pathname === "/") {
+      url.pathname = "/v1";
+      return url.toString().replace(/\/+$/, "");
+    }
+  } catch {
+    // Let the provider surface invalid URLs with its normal error path.
+  }
+  return trimmed;
+}
+
+function getProviderApiKeyCandidate({
+  settingsValue,
+  envVarName,
+}: {
+  settingsValue: string | null | undefined;
+  envVarName: string | undefined;
+}): string | undefined {
+  const normalizedSettingsValue = normalizeProviderApiKeyInput(settingsValue);
+  if (normalizedSettingsValue && normalizedSettingsValue !== "__env__") {
+    return normalizedSettingsValue;
+  }
+  return envVarName ? getEnvVar(envVarName) : undefined;
+}
+
+function logProviderDiagnostic({
+  providerId,
+  modelName,
+  baseURL,
+  hasApiKey,
+  apiKeySource,
+}: {
+  providerId: string;
+  modelName: string;
+  baseURL?: string;
+  hasApiKey: boolean;
+  apiKeySource: "settings" | "env";
+}) {
+  logger.info("Using language model provider", {
+    providerId,
+    modelName,
+    baseURLHost: baseURL ? getUrlHost(baseURL) : "default",
+    hasApiKey,
+    apiKeySource,
+  });
+}
+
+function getUrlHost(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return "<invalid>";
+  }
+}
+
 function getProviderApiKeyForRequest(
   value: string | null | undefined,
   providerDisplayName: string,
 ): string | undefined {
   const normalizedValue = normalizeProviderApiKeyInput(value);
-  if (!normalizedValue) {
+  if (!normalizedValue || normalizedValue === "__env__") {
     return undefined;
   }
   const invalidCharacter = findInvalidProviderApiKeyCharacter(normalizedValue);

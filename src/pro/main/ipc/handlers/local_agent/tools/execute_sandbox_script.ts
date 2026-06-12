@@ -78,9 +78,13 @@ function isAttachmentHostCallPath(path: string | undefined): boolean {
 function buildSandboxFailureMessage(params: {
   script: string;
   errorMessage: string;
+  syntaxLike: boolean;
 }): string {
+  const headline = params.syntaxLike
+    ? "This script contains unsupported syntax."
+    : "This script failed while running.";
   return [
-    "This script contains unsupported syntax.",
+    headline,
     "",
     "Script:",
     params.script,
@@ -88,6 +92,18 @@ function buildSandboxFailureMessage(params: {
     "Original error:",
     params.errorMessage,
   ].join("\n");
+}
+
+function isSandboxSyntaxLikeError(
+  error: unknown,
+  errorMessage: string,
+): boolean {
+  if (isDyadError(error)) {
+    return error.kind === DyadErrorKind.Validation;
+  }
+  return /\b(?:Unexpected token|Unexpected identifier|SyntaxError|Unsupported syntax|not supported)\b/i.test(
+    errorMessage,
+  );
 }
 
 function buildScriptXml(params: {
@@ -340,6 +356,7 @@ export const executeSandboxScriptTool: ToolDefinition<ExecuteSandboxScriptArgs> 
           buildSandboxFailureMessage({
             script: args.script,
             errorMessage,
+            syntaxLike: isSandboxSyntaxLikeError(error, errorMessage),
           }),
           isDyadError(error) ? error.kind : DyadErrorKind.Validation,
         );

@@ -1,6 +1,272 @@
 import { z } from "zod";
 
 // =============================================================================
+// Transport Definitions
+// =============================================================================
+
+export interface IpcTransport {
+  invoke(channel: string, input: unknown): Promise<unknown>;
+  on?(
+    channel: string,
+    listener: (payload: unknown) => void,
+    options?: { connect?: boolean },
+  ): () => void;
+  ready?(): Promise<void>;
+  emit?(channel: string, payload: unknown): void;
+  supportsStreamingInvoke?: boolean;
+}
+
+export class HttpInvokeAbortError extends Error {
+  constructor(
+    public readonly channel: string,
+    cause: unknown,
+  ) {
+    super(`HTTP invoke aborted for ${channel}`, { cause });
+    this.name = "HttpInvokeAbortError";
+  }
+}
+
+export interface HttpInvokeTransportOptions {
+  baseUrl: string;
+  token?: string;
+  path?: string;
+  fetch?: typeof fetch;
+  headers?: Record<string, string>;
+  onStreamEvent?: (event: {
+    channel: string;
+    payload: unknown;
+  }) => void | undefined;
+  supportsStreamingInvoke?: boolean;
+}
+
+type HttpInvokeSuccessEnvelope = {
+  ok: true;
+  data: unknown;
+};
+
+type HttpInvokeErrorEnvelope = {
+  ok: false;
+  error?: string;
+  message?: string;
+};
+
+type HttpInvokeEnvelope = HttpInvokeSuccessEnvelope | HttpInvokeErrorEnvelope;
+
+const getIpcRenderer = () => (window as any).electron?.ipcRenderer;
+
+const unsupportedTransportOperation = (
+  operation: "events" | "streams",
+): Error =>
+  new Error(
+    `The configured IPC transport does not support ${operation}. Use the Electron IPC transport or add ${operation} support to this transport.`,
+  );
+
+export function createElectronIpcTransport(): IpcTransport {
+  return {
+    async invoke(channel: string, input: unknown): Promise<unknown> {
+      const ipcRenderer = getIpcRenderer();
+      if (!ipcRenderer) {
+        throw new Error(
+          `[${channel}] IPC renderer not available. Make sure this is called from the renderer process.`,
+        );
+      }
+      return ipcRenderer.invoke(channel, input);
+    },
+    on(channel: string, listener: (payload: unknown) => void): () => void {
+      const ipcRenderer = getIpcRenderer();
+      if (!ipcRenderer) {
+        throw new Error(
+          `[${channel}] IPC renderer not available. Make sure this is called from the renderer process.`,
+        );
+      }
+      return ipcRenderer.on(channel, listener);
+    },
+  };
+}
+
+export function createHttpInvokeTransport(
+  options: HttpInvokeTransportOptions,
+): IpcTransport {
+  const invokePath = options.path ?? "/api/rpc/:channel";
+  const fetchImpl = options.fetch ?? getDefaultFetch();
+
+  return {
+    supportsStreamingInvoke: options.supportsStreamingInvoke,
+    async invoke(channel: string, input: unknown): Promise<unknown> {
+      const url = new URL(
+        invokePath.includes(":channel")
+          ? invokePath.replace(":channel", encodeURIComponent(channel))
+          : invokePath,
+        options.baseUrl,
+      );
+      let response: Response;
+      try {
+        response = await fetchImpl(url.toString(), {
+          method: "POST",
+          headers: {
+            accept: "application/json",
+            "content-type": "application/json",
+            ...(options.token
+              ? { authorization: `Bearer ${options.token}` }
+              : {}),
+            ...options.headers,
+          },
+          body: JSON.stringify(
+            invokePath.includes(":channel") ? input : { channel, input },
+          ),
+        });
+      } catch (error) {
+        if (isFetchAbortError(error)) {
+          throw new HttpInvokeAbortError(channel, error);
+        }
+        throw error;
+      }
+
+      if (isJsonlStreamResponse(response)) {
+        return readJsonlInvokeStream(response, options.onStreamEvent);
+      }
+
+      const text = await response.text();
+      const body = parseHttpInvokeBody(text, channel, response.ok);
+
+      if (!response.ok) {
+        const message =
+          getHttpEnvelopeErrorMessage(body) ??
+          `HTTP invoke failed for ${channel}: ${response.status} ${response.statusText}`;
+        throw new Error(message);
+      }
+
+      if (isHttpInvokeEnvelope(body)) {
+        if (body.ok) {
+          return body.data;
+        }
+        throw new Error(body.error ?? body.message ?? "HTTP invoke failed");
+      }
+
+      return body;
+    },
+  };
+}
+
+function getDefaultFetch(): typeof fetch {
+  return globalThis.fetch.bind(globalThis) as typeof fetch;
+}
+
+function isJsonlStreamResponse(response: Response): boolean {
+  return (
+    response.ok &&
+    response.headers
+      .get("content-type")
+      ?.toLowerCase()
+      .includes("application/x-ndjson") === true
+  );
+}
+
+async function readJsonlInvokeStream(
+  response: Response,
+  onStreamEvent: HttpInvokeTransportOptions["onStreamEvent"],
+): Promise<unknown> {
+  if (!response.body) {
+    throw new Error("HTTP invoke stream response had no body");
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let result: unknown;
+  let sawResult = false;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      for (const line of lines) {
+        if (!line.trim()) {
+          continue;
+        }
+        const item = JSON.parse(line) as
+          | { type: "event"; channel: string; payload: unknown }
+          | { type: "result"; data: unknown }
+          | { type: "error"; error: string }
+          | { type: "ready" };
+        if (item.type === "event") {
+          onStreamEvent?.({ channel: item.channel, payload: item.payload });
+        } else if (item.type === "result") {
+          sawResult = true;
+          result = item.data;
+        } else if (item.type === "error") {
+          throw new Error(item.error);
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  if (!sawResult) {
+    throw new Error("HTTP invoke stream ended without a result");
+  }
+  return result;
+}
+
+function isFetchAbortError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  return (
+    error.name === "AbortError" ||
+    error.message === "Failed to fetch" ||
+    error.message.includes("NetworkError when attempting to fetch resource")
+  );
+}
+
+function getHttpEnvelopeErrorMessage(body: unknown): string | undefined {
+  if (body && typeof body === "object") {
+    const record = body as Record<string, unknown>;
+    if (typeof record.error === "string") {
+      return record.error;
+    }
+    if (typeof record.message === "string") {
+      return record.message;
+    }
+  }
+  return undefined;
+}
+
+function parseHttpInvokeBody(
+  text: string,
+  channel: string,
+  responseOk: boolean,
+): unknown {
+  if (text.length === 0) {
+    return undefined;
+  }
+
+  try {
+    return JSON.parse(text) as unknown;
+  } catch (error) {
+    if (!responseOk) {
+      return undefined;
+    }
+    throw new Error(`HTTP invoke returned invalid JSON for ${channel}`, {
+      cause: error,
+    });
+  }
+}
+
+function isHttpInvokeEnvelope(body: unknown): body is HttpInvokeEnvelope {
+  return (
+    body !== null &&
+    typeof body === "object" &&
+    "ok" in body &&
+    typeof (body as { ok: unknown }).ok === "boolean"
+  );
+}
+
+// =============================================================================
 // Contract Type Definitions
 // =============================================================================
 
@@ -153,20 +419,14 @@ type ClientFromContracts<
  */
 export function createClient<
   T extends Record<string, IpcContract<string, z.ZodType, z.ZodType>>,
->(contracts: T): ClientFromContracts<T> {
-  // Access ipcRenderer from the window.electron exposed by preload
-  const getIpcRenderer = () => (window as any).electron?.ipcRenderer;
-
+>(
+  contracts: T,
+  transport: IpcTransport = createElectronIpcTransport(),
+): ClientFromContracts<T> {
   const client = {} as ClientFromContracts<T>;
   for (const [methodName, contract] of Object.entries(contracts)) {
     (client as any)[methodName] = async (input: unknown) => {
-      const ipcRenderer = getIpcRenderer();
-      if (!ipcRenderer) {
-        throw new Error(
-          `[${contract.channel}] IPC renderer not available. Make sure this is called from the renderer process.`,
-        );
-      }
-      return ipcRenderer.invoke(contract.channel, input);
+      return transport.invoke(contract.channel, input);
     };
   }
   return client;
@@ -203,20 +463,17 @@ type EventClientFromContracts<
  */
 export function createEventClient<
   T extends Record<string, EventContract<string, z.ZodType>>,
->(events: T): EventClientFromContracts<T> {
-  const getIpcRenderer = () => (window as any).electron?.ipcRenderer;
-
+>(
+  events: T,
+  transport: IpcTransport = createElectronIpcTransport(),
+): EventClientFromContracts<T> {
   const client = {} as EventClientFromContracts<T>;
 
   for (const [key, event] of Object.entries(events)) {
     const methodName = `on${key.charAt(0).toUpperCase()}${key.slice(1)}`;
     (client as any)[methodName] = (handler: (payload: unknown) => void) => {
-      const ipcRenderer = getIpcRenderer();
-      if (!ipcRenderer) {
-        console.error(
-          `[${event.channel}] IPC renderer not available. Make sure this is called from the renderer process.`,
-        );
-        return () => {};
+      if (!transport.on) {
+        throw unsupportedTransportOperation("events");
       }
 
       const listener = (data: unknown) => {
@@ -231,7 +488,7 @@ export function createEventClient<
         }
       };
 
-      const unsubscribe = ipcRenderer.on(event.channel, listener);
+      const unsubscribe = transport.on(event.channel, listener);
       return unsubscribe;
     };
   }
@@ -255,7 +512,7 @@ export function createEventClient<
  *   events: { chunk: ..., end: ..., error: ... },
  * });
  * const chatStreamClient = createStreamClient(chatStreamContract);
- * chatStreamClient.start({ chatId: 123, prompt: "Hello" }, { onChunk, onEnd, onError });
+ * void chatStreamClient.start({ chatId: 123, prompt: "Hello" }, { onChunk, onEnd, onError });
  */
 export function createStreamClient<
   TChannel extends string,
@@ -264,9 +521,10 @@ export function createStreamClient<
   TChunk extends z.ZodType,
   TEnd extends z.ZodType,
   TError extends z.ZodType,
->(contract: StreamContract<TChannel, TInput, TKey, TChunk, TEnd, TError>) {
-  const getIpcRenderer = () => (window as any).electron?.ipcRenderer;
-
+>(
+  contract: StreamContract<TChannel, TInput, TKey, TChunk, TEnd, TError>,
+  transport: IpcTransport = createElectronIpcTransport(),
+) {
   type Input = z.infer<TInput>;
   // Use string | number for KeyValue to support common key types while
   // maintaining better type safety than unknown. TypeScript cannot infer
@@ -287,40 +545,57 @@ export function createStreamClient<
   const setupListeners = () => {
     if (listenersSetUp) return;
 
-    const ipcRenderer = getIpcRenderer();
-    if (!ipcRenderer) return;
+    if (!transport.on) {
+      throw unsupportedTransportOperation("streams");
+    }
 
-    ipcRenderer.on(contract.events.chunk.channel, (data: unknown) => {
-      const parsed = contract.events.chunk.payload.safeParse(data);
-      if (parsed.success) {
-        const key = (parsed.data as Record<string, unknown>)[
-          contract.keyField
-        ] as KeyValue;
-        streams.get(key)?.onChunk(parsed.data);
-      }
-    });
+    const eventSubscriptionOptions = transport.supportsStreamingInvoke
+      ? { connect: false }
+      : undefined;
 
-    ipcRenderer.on(contract.events.end.channel, (data: unknown) => {
-      const parsed = contract.events.end.payload.safeParse(data);
-      if (parsed.success) {
-        const key = (parsed.data as Record<string, unknown>)[
-          contract.keyField
-        ] as KeyValue;
-        streams.get(key)?.onEnd(parsed.data);
-        streams.delete(key);
-      }
-    });
+    transport.on(
+      contract.events.chunk.channel,
+      (data: unknown) => {
+        const parsed = contract.events.chunk.payload.safeParse(data);
+        if (parsed.success) {
+          const key = (parsed.data as Record<string, unknown>)[
+            contract.keyField
+          ] as KeyValue;
+          streams.get(key)?.onChunk(parsed.data);
+        }
+      },
+      eventSubscriptionOptions,
+    );
 
-    ipcRenderer.on(contract.events.error.channel, (data: unknown) => {
-      const parsed = contract.events.error.payload.safeParse(data);
-      if (parsed.success) {
-        const key = (parsed.data as Record<string, unknown>)[
-          contract.keyField
-        ] as KeyValue;
-        streams.get(key)?.onError(parsed.data);
-        streams.delete(key);
-      }
-    });
+    transport.on(
+      contract.events.end.channel,
+      (data: unknown) => {
+        const parsed = contract.events.end.payload.safeParse(data);
+        if (parsed.success) {
+          const key = (parsed.data as Record<string, unknown>)[
+            contract.keyField
+          ] as KeyValue;
+          streams.get(key)?.onEnd(parsed.data);
+          streams.delete(key);
+        }
+      },
+      eventSubscriptionOptions,
+    );
+
+    transport.on(
+      contract.events.error.channel,
+      (data: unknown) => {
+        const parsed = contract.events.error.payload.safeParse(data);
+        if (parsed.success) {
+          const key = (parsed.data as Record<string, unknown>)[
+            contract.keyField
+          ] as KeyValue;
+          streams.get(key)?.onError(parsed.data);
+          streams.delete(key);
+        }
+      },
+      eventSubscriptionOptions,
+    );
 
     listenersSetUp = true;
   };
@@ -336,32 +611,29 @@ export function createStreamClient<
         onEnd: (data: z.infer<TEnd>) => void;
         onError: (data: z.infer<TError>) => void;
       },
-    ): void {
-      setupListeners();
-
-      const ipcRenderer = getIpcRenderer();
-      if (!ipcRenderer) {
-        callbacks.onError({
-          [contract.keyField]: (input as Record<string, unknown>)[
-            contract.keyField
-          ],
-          error: "IPC renderer not available",
-        } as any);
-        return;
-      }
-
+    ): Promise<unknown> {
       const key = (input as Record<string, unknown>)[
         contract.keyField
       ] as KeyValue;
       streams.set(key, callbacks);
+      setupListeners();
 
-      ipcRenderer.invoke(contract.channel, input).catch((err: Error) => {
-        callbacks.onError({
-          [contract.keyField]: key,
-          error: err.message,
-        } as any);
-        streams.delete(key);
-      });
+      const waitForTransport = transport.supportsStreamingInvoke
+        ? Promise.resolve()
+        : (transport.ready?.() ?? Promise.resolve());
+
+      return waitForTransport
+        .then(() => transport.invoke(contract.channel, input))
+        .catch((err: Error) => {
+          if (streams.has(key)) {
+            callbacks.onError({
+              [contract.keyField]: key,
+              error: err.message,
+            } as any);
+            streams.delete(key);
+          }
+          return "error";
+        });
     },
 
     /**

@@ -1,8 +1,11 @@
-import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { z } from "zod";
-import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import type { IpcMainInvokeEvent } from "electron";
+import { DyadError } from "@/errors/dyad_error";
 import type { IpcContract } from "../contracts/core";
 import { sendTelemetryException } from "../utils/telemetry";
+import { createTypedBackendRegistry } from "@/server/local_backend_host";
+import { registerElectronBackendHandlers } from "./electron_backend_adapter";
+import { getElectronModule } from "../utils/electron_module";
 
 /**
  * Creates a typed IPC handler from a contract.
@@ -27,45 +30,11 @@ export function createTypedHandler<
     input: z.infer<TInput>,
   ) => Promise<z.infer<TOutput>>,
 ): void {
-  ipcMain.handle(
-    contract.channel,
-    async (event: IpcMainInvokeEvent, rawInput: unknown) => {
-      // Runtime validation of input
-      const parsed = contract.input.safeParse(rawInput);
-      if (!parsed.success) {
-        const errorMessage = parsed.error.issues
-          .map((e) => `${e.path.join(".")}: ${e.message}`)
-          .join("; ");
-        throw new DyadError(
-          `[${contract.channel}] Invalid input: ${errorMessage}`,
-          DyadErrorKind.Validation,
-        );
-      }
-
-      let result: z.infer<TOutput>;
-      try {
-        result = await handler(event, parsed.data);
-      } catch (err) {
-        sendTelemetryException(err, { ipc_channel: contract.channel });
-        throw err;
-      }
-
-      // Validate output in development mode only (catches handler bugs without prod overhead)
-      if (process.env.NODE_ENV === "development") {
-        const outputParsed = contract.output.safeParse(result);
-        if (!outputParsed.success) {
-          const errorMessage = outputParsed.error.issues
-            .map((e) => `${e.path.join(".")}: ${e.message}`)
-            .join("; ");
-          console.error(
-            `[${contract.channel}] Output validation warning: ${errorMessage}`,
-          );
-        }
-      }
-
-      return result;
+  registerSingleElectronTypedHandler(contract, handler, {
+    onHandlerError: (err) => {
+      sendTelemetryException(err, { ipc_channel: contract.channel });
     },
-  );
+  });
 }
 
 /**
@@ -93,49 +62,58 @@ export function createLoggedTypedHandler(logger: {
       input: z.infer<TInput>,
     ) => Promise<z.infer<TOutput>>,
   ): void {
-    ipcMain.handle(
-      contract.channel,
-      async (event: IpcMainInvokeEvent, rawInput: unknown) => {
-        // Runtime validation of input
-        const parsed = contract.input.safeParse(rawInput);
-        if (!parsed.success) {
-          const errorMessage = parsed.error.issues
-            .map((e) => `${e.path.join(".")}: ${e.message}`)
-            .join("; ");
-          const error = new DyadError(
-            `[${contract.channel}] Invalid input: ${errorMessage}`,
-            DyadErrorKind.Validation,
-          );
-          logger.error(`[${contract.channel}] Invalid input`, error);
-          throw error;
-        }
-
-        try {
-          logger.info(`[${contract.channel}] Handling request`);
-          const result = await handler(event, parsed.data);
-
-          // Validate output in development mode only
-          if (process.env.NODE_ENV === "development") {
-            const outputParsed = contract.output.safeParse(result);
-            if (!outputParsed.success) {
-              const errorMessage = outputParsed.error.issues
-                .map((e) => `${e.path.join(".")}: ${e.message}`)
-                .join("; ");
-              console.error(
-                `[${contract.channel}] Output validation warning: ${errorMessage}`,
-              );
-            }
-          }
-
-          return result;
-        } catch (err) {
+    registerSingleElectronTypedHandler(
+      contract,
+      async (event, input) => {
+        logger.info(`[${contract.channel}] Handling request`);
+        return handler(event, input);
+      },
+      {
+        onHandlerError: (err) => {
           logger.error(`[${contract.channel}] Handler error`, err);
           sendTelemetryException(err, { ipc_channel: contract.channel });
-          throw err;
-        }
+        },
+        onValidationError: (err) => {
+          logger.error(`[${contract.channel}] Invalid input`, err);
+        },
       },
     );
   };
+}
+
+function registerSingleElectronTypedHandler<
+  TChannel extends string,
+  TInput extends z.ZodType,
+  TOutput extends z.ZodType,
+>(
+  contract: IpcContract<TChannel, TInput, TOutput>,
+  handler: (
+    event: IpcMainInvokeEvent,
+    input: z.infer<TInput>,
+  ) => Promise<z.infer<TOutput>>,
+  options: {
+    onHandlerError: (error: unknown) => void;
+    onValidationError?: (error: DyadError) => void;
+  },
+): void {
+  const ipcMain = getElectronModule<typeof import("electron")>()?.ipcMain;
+  if (!ipcMain) {
+    throw new Error("Electron ipcMain is not available");
+  }
+  const registry = createTypedBackendRegistry({
+    outputValidation: "development-warn",
+    warn: (message) => {
+      process.stderr.write(`${message}\n`);
+    },
+  });
+  registry.register(contract, ({ native }, input) =>
+    handler(native as IpcMainInvokeEvent, input),
+  );
+  registerElectronBackendHandlers(registry, {
+    ipcMain,
+    onHandlerError: options.onHandlerError,
+    onValidationError: options.onValidationError,
+  });
 }
 
 /**

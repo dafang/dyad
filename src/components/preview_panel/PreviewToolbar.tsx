@@ -240,10 +240,13 @@ export const PreviewToolbar = ({
   }, [compactThreshold]);
 
   return (
-    <div ref={containerRef} className="flex items-center p-2 border-b gap-3">
+    <div
+      ref={containerRef}
+      className="flex flex-wrap items-center gap-2 border-b p-2 sm:flex-nowrap sm:gap-3"
+    >
       <PreviewToolbarModeButtons isCompact={isCompact} />
       {children && (
-        <div className="flex flex-1 items-center space-x-2 min-w-0">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:flex-nowrap">
           {children}
         </div>
       )}

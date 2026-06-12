@@ -1,0 +1,80 @@
+{
+  "step_id": "prepare_dependencies",
+  "status": "succeeded",
+  "summary": "Verification commands passed.",
+  "output": {
+    "status": "succeeded",
+    "step_id": "prepare_dependencies",
+    "checks": [
+      {
+        "id": "verify_test_bins_present",
+        "command": "test -x node_modules/.bin/cross-env && test -x node_modules/.bin/vitest && test -x node_modules/.bin/tsgo",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 3,
+        "stdout": "",
+        "stderr": "",
+        "stdout_bytes": 0,
+        "stderr_bytes": 0,
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      },
+      {
+        "id": "record_external_install_note",
+        "command": "printf '%s\\n' 'Dependency install is intentionally external to the workflow: local_web_portal_migration_mq868fjt timed out while running full npm install, so dependencies were prepared with npm install --ignore-scripts before this run.'",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 3,
+        "stdout": "Dependency install is intentionally external to the workflow: local_web_portal_migration_mq868fjt timed out while running full npm install, so dependencies were prepared with npm install --ignore-scripts before this run.\n",
+        "stderr": "",
+        "stdout_bytes": 221,
+        "stderr_bytes": 0,
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      }
+    ]
+  },
+  "verify": {
+    "ok": true,
+    "checks": [
+      {
+        "id": "verify_test_bins_present",
+        "command": "test -x node_modules/.bin/cross-env && test -x node_modules/.bin/vitest && test -x node_modules/.bin/tsgo",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 3,
+        "stdout": "",
+        "stderr": "",
+        "stdout_bytes": 0,
+        "stderr_bytes": 0,
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      },
+      {
+        "id": "record_external_install_note",
+        "command": "printf '%s\\n' 'Dependency install is intentionally external to the workflow: local_web_portal_migration_mq868fjt timed out while running full npm install, so dependencies were prepared with npm install --ignore-scripts before this run.'",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 3,
+        "stdout": "Dependency install is intentionally external to the workflow: local_web_portal_migration_mq868fjt timed out while running full npm install, so dependencies were prepared with npm install --ignore-scripts before this run.\n",
+        "stderr": "",
+        "stdout_bytes": 221,
+        "stderr_bytes": 0,
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      }
+    ]
+  }
+}

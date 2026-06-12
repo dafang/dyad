@@ -36,6 +36,7 @@ import {
 import { hasDyadProKey, getEffectiveDefaultChatMode } from "@/lib/schemas";
 import { useFreeAgentQuota } from "@/hooks/useFreeAgentQuota";
 import { useInitialChatMode } from "@/hooks/useInitialChatMode";
+import { isLocalWebRuntime } from "@/lib/runtime_client";
 
 // Adding an export for attachments
 export interface HomeSubmitOptions {
@@ -52,6 +53,7 @@ export default function HomePage() {
   const { settings, updateSettings, envVars } = useSettings();
   const { isQuotaExceeded, isLoading: isQuotaLoading } = useFreeAgentQuota();
   const initialChatMode = useInitialChatMode();
+  const isLocalWeb = isLocalWebRuntime();
 
   const setIsPreviewOpen = useSetAtom(isPreviewOpenAtom);
   const { selectChat } = useSelectChat();
@@ -111,12 +113,23 @@ export default function HomePage() {
         settings,
         envVars,
         !isQuotaExceeded,
+        {
+          localAgentQuotaRequired: !isLocalWeb,
+          localAgentProviderRestrictionRequired: !isLocalWeb,
+        },
       );
       if (settings.selectedChatMode !== effectiveDefaultMode) {
         updateSettings({ selectedChatMode: effectiveDefaultMode });
       }
     }
-  }, [settings, updateSettings, isQuotaExceeded, isQuotaLoading, envVars]);
+  }, [
+    settings,
+    updateSettings,
+    isQuotaExceeded,
+    isQuotaLoading,
+    envVars,
+    isLocalWeb,
+  ]);
 
   const handleSubmit = async (options?: HomeSubmitOptions) => {
     const attachments = options?.attachments || [];

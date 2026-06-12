@@ -1,0 +1,112 @@
+{
+  "run_id": "local_web_portal_migration_mq868fjt",
+  "workflow_id": "local_web_portal_migration",
+  "state": "failed",
+  "created_at": "2026-06-10T14:35:51.355Z",
+  "updated_at": "2026-06-10T14:45:51.484Z",
+  "run_dir": ".dynamic-workflow/runs/local_web_portal_migration_mq868fjt",
+  "steps": {
+    "collect_scope": {
+      "step_id": "collect_scope",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Collection commands completed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq868fjt/steps/collect_scope.json"
+    },
+    "collect_rules": {
+      "step_id": "collect_rules",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Collection commands completed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq868fjt/steps/collect_rules.json"
+    },
+    "collect_code_context": {
+      "step_id": "collect_code_context",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Collection commands completed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq868fjt/steps/collect_code_context.json"
+    },
+    "collect_previous_failure": {
+      "step_id": "collect_previous_failure",
+      "state": "succeeded",
+      "attempts": 1,
+      "summary": "Collection commands completed.",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq868fjt/steps/collect_previous_failure.json"
+    },
+    "prepare_dependencies": {
+      "step_id": "prepare_dependencies",
+      "state": "failed",
+      "attempts": 1,
+      "summary": "Verification command failed: test -x node_modules/.bin/cross-env || npm install",
+      "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq868fjt/steps/prepare_dependencies.json",
+      "failure": "Verification command failed: test -x node_modules/.bin/cross-env || npm install"
+    },
+    "round_1_execute": {
+      "step_id": "round_1_execute",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    },
+    "round_1_collect_tests": {
+      "step_id": "round_1_collect_tests",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    },
+    "round_1_review": {
+      "step_id": "round_1_review",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    },
+    "round_2_execute": {
+      "step_id": "round_2_execute",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    },
+    "round_2_collect_tests": {
+      "step_id": "round_2_collect_tests",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    },
+    "round_2_review": {
+      "step_id": "round_2_review",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    },
+    "round_3_execute": {
+      "step_id": "round_3_execute",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    },
+    "round_3_collect_tests": {
+      "step_id": "round_3_collect_tests",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    },
+    "round_3_review": {
+      "step_id": "round_3_review",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    },
+    "final_verify": {
+      "step_id": "final_verify",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    },
+    "summarize_run": {
+      "step_id": "summarize_run",
+      "state": "blocked",
+      "attempts": 0,
+      "failure": "Blocked by failed dependency prepare_dependencies."
+    }
+  }
+}

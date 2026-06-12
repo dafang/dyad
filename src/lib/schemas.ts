@@ -494,8 +494,15 @@ export function getEffectiveDefaultChatMode(
   settings: UserSettings,
   envVars: Record<string, string | undefined>,
   freeAgentQuotaAvailable?: boolean,
+  options: {
+    localAgentQuotaRequired?: boolean;
+    localAgentProviderRestrictionRequired?: boolean;
+  } = {},
 ): ChatMode {
   const isPro = isDyadProEnabled(settings);
+  const localAgentQuotaRequired = options.localAgentQuotaRequired ?? true;
+  const localAgentProviderRestrictionRequired =
+    options.localAgentProviderRestrictionRequired ?? true;
   // We are checking that OpenAI or Anthropic is setup, which are the first two
   // choices for the Auto model selection.
   //
@@ -503,12 +510,15 @@ export function getEffectiveDefaultChatMode(
   // most likely it's a free API key with stringent limits and they'll get
   // a bad experience with local-agent.
   const hasPaidProviderSetup = isOpenAIOrAnthropicSetup(settings, envVars);
+  const canUseNonProLocalAgent =
+    (!localAgentQuotaRequired || freeAgentQuotaAvailable === true) &&
+    (!localAgentProviderRestrictionRequired || hasPaidProviderSetup);
 
   if (settings.defaultChatMode) {
     // "local-agent" requires either Pro OR (available free quota AND provider setup)
     if (settings.defaultChatMode === "local-agent") {
       if (isPro) return "local-agent";
-      if (freeAgentQuotaAvailable && hasPaidProviderSetup) return "local-agent";
+      if (canUseNonProLocalAgent) return "local-agent";
       return "build";
     }
     return settings.defaultChatMode;
@@ -516,7 +526,7 @@ export function getEffectiveDefaultChatMode(
 
   // No explicit default set
   if (isPro) return "local-agent";
-  if (freeAgentQuotaAvailable && hasPaidProviderSetup) return "local-agent";
+  if (canUseNonProLocalAgent) return "local-agent";
   return "build";
 }
 

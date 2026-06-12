@@ -33,16 +33,22 @@ export function getUnavailableChatModeReason({
   mode,
   settings,
   freeAgentQuotaAvailable,
+  localAgentQuotaRequired = true,
 }: {
   mode: ChatMode | null | undefined;
   settings: UserSettings;
   freeAgentQuotaAvailable?: boolean;
+  localAgentQuotaRequired?: boolean;
 }): ChatModeFallbackReason | undefined {
   if (mode !== "local-agent") {
     return undefined;
   }
 
   if (isDyadProEnabled(settings)) {
+    return undefined;
+  }
+
+  if (!localAgentQuotaRequired) {
     return undefined;
   }
 
@@ -58,17 +64,25 @@ export function resolveChatMode({
   settings,
   envVars,
   freeAgentQuotaAvailable,
+  localAgentQuotaRequired = true,
+  localAgentProviderRestrictionRequired = true,
 }: {
   storedChatMode: string | null | undefined;
   settings: UserSettings;
   envVars: Record<string, string | undefined>;
   freeAgentQuotaAvailable?: boolean;
+  localAgentQuotaRequired?: boolean;
+  localAgentProviderRestrictionRequired?: boolean;
 }): ChatModeResolution {
   const chatMode = normalizeStoredChatMode(storedChatMode);
   const effectiveDefault = getEffectiveDefaultChatMode(
     settings,
     envVars,
     freeAgentQuotaAvailable,
+    {
+      localAgentQuotaRequired,
+      localAgentProviderRestrictionRequired,
+    },
   );
 
   if (!chatMode) {
@@ -79,6 +93,7 @@ export function resolveChatMode({
     mode: chatMode,
     settings,
     freeAgentQuotaAvailable,
+    localAgentQuotaRequired,
   });
 
   if (fallbackReason && effectiveDefault !== chatMode) {

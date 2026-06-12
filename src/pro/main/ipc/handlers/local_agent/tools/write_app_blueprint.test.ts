@@ -1,16 +1,18 @@
 import crypto from "node:crypto";
-import type { IpcMainInvokeEvent, WebContents } from "electron";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getAppBlueprintForChat } from "@/ipc/handlers/app_blueprint_handlers";
 import {
   AppBlueprintFieldEditSchema,
   type AppBlueprintVisual,
 } from "@/ipc/types/app_blueprint";
+import type { IpcInvokeEventLike } from "@/ipc/utils/ipc_event";
+import type { WebContentsLike } from "@/ipc/utils/safe_sender";
 import {
   type AgentContext,
   type Todo,
 } from "@/pro/main/ipc/handlers/local_agent/tools/types";
 import { writeAppBlueprintTool } from "@/pro/main/ipc/handlers/local_agent/tools/write_app_blueprint";
+import { extractAppBlueprintDataFromContent } from "@/lib/app_blueprint_data";
 
 vi.mock("electron-log", () => ({
   default: {
@@ -42,10 +44,10 @@ function createAgentContext(chatId: number): AgentContext {
     isDestroyed: () => false,
     isCrashed: () => false,
     send: vi.fn(),
-  } as unknown as WebContents;
+  } as WebContentsLike;
 
   return {
-    event: { sender } as IpcMainInvokeEvent,
+    event: { sender } as IpcInvokeEventLike,
     appId: 1,
     appPath: "/tmp/test-app",
     chatId,
@@ -134,6 +136,21 @@ describe("app blueprint tools", () => {
       },
     );
 
+    expect(ctx.onXmlComplete).toHaveBeenCalledOnce();
+    const finalXml = vi.mocked(ctx.onXmlComplete).mock.calls[0][0];
+    expect(finalXml).toContain('<dyad-app-blueprint app-name="Lumen Notes"');
+    expect(finalXml).toContain('data="{&quot;appName&quot;');
+    expect(extractAppBlueprintDataFromContent(finalXml)).toMatchObject({
+      appName: "Lumen Notes",
+      userPrompt: "Build me a beautiful notes app",
+      attachments: ["docs/spec.md"],
+      visuals: [
+        expect.objectContaining({
+          prompt: "Minimal notes app logo in amber tones",
+        }),
+      ],
+    });
+
     uuidSpy.mockRestore();
   });
 
@@ -162,6 +179,37 @@ describe("app blueprint tools", () => {
     expect(getAppBlueprintForChat(chatId)).toMatchObject({
       templateId: "react",
       themeId: "default",
+    });
+  });
+
+  it("embeds recoverable blueprint data in the final XML", () => {
+    const xml = writeAppBlueprintTool.buildXml?.(
+      {
+        app_name: "Recoverable Plan",
+        user_prompt: "Build a landing page",
+        attachments: ["docs/spec.md"],
+        template_id: "react",
+        theme_id: "default",
+        design_direction: "Modern and concise",
+        primary_color: "#2563EB",
+        visuals: [
+          {
+            type: "logo",
+            description: "Simple product logo",
+            prompt: "Blue geometric logo",
+          },
+        ],
+      },
+      true,
+    );
+
+    expect(extractAppBlueprintDataFromContent(xml ?? "")).toMatchObject({
+      appName: "Recoverable Plan",
+      userPrompt: "Build a landing page",
+      attachments: ["docs/spec.md"],
+      templateId: "react",
+      themeId: "default",
+      visuals: [expect.objectContaining({ type: "logo" })],
     });
   });
 

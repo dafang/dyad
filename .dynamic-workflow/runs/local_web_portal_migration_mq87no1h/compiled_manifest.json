@@ -1,0 +1,1571 @@
+{
+  "manifest_version": "dynamic_workflow/compiled/v2",
+  "workflow_id": "local_web_portal_migration",
+  "nodes": [
+    {
+      "step_id": "collect_scope",
+      "type": "command.collect",
+      "input": {},
+      "depends_on": [],
+      "reverse_dependencies": ["repair_loop__round_1__execute"],
+      "permission_profile": "command_collector",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "collect_scope",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Collect CodeStable scope",
+      "produces": {
+        "checks": {
+          "select": "$.output.collection.checks",
+          "schema": "command_collection/v1"
+        }
+      },
+      "collect": {
+        "commands": [
+          {
+            "run": "sed -n '1,280p' .codestable/compound/2026-06-10-explore-web-portal-migration.md",
+            "id": "codestable_explore",
+            "timeout_seconds": 10
+          },
+          {
+            "run": "sed -n '1,220p' .codestable/compound/2026-06-10-decision-local-web-portal-first.md",
+            "id": "codestable_decision",
+            "timeout_seconds": 10
+          }
+        ]
+      }
+    },
+    {
+      "step_id": "collect_rules",
+      "type": "command.collect",
+      "input": {},
+      "depends_on": [],
+      "reverse_dependencies": ["repair_loop__round_1__execute"],
+      "permission_profile": "command_collector",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "collect_rules",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Collect repo rules",
+      "produces": {
+        "checks": {
+          "select": "$.output.collection.checks",
+          "schema": "command_collection/v1"
+        }
+      },
+      "collect": {
+        "commands": [
+          {
+            "run": "sed -n '1,260p' CONTRIBUTING.md",
+            "id": "contributing",
+            "timeout_seconds": 10
+          },
+          {
+            "run": "sed -n '1,260p' rules/electron-ipc.md",
+            "id": "electron_ipc_rule",
+            "timeout_seconds": 10
+          },
+          {
+            "run": "sed -n '1,220p' rules/dyad-errors.md",
+            "id": "dyad_errors_rule",
+            "timeout_seconds": 10
+          },
+          {
+            "run": "sed -n '1,260p' rules/local-agent-tools.md",
+            "id": "local_agent_tools_rule",
+            "timeout_seconds": 10
+          },
+          {
+            "run": "sed -n '1,180p' rules/typescript-strict-mode.md",
+            "id": "typescript_strict_rule",
+            "timeout_seconds": 10
+          }
+        ]
+      }
+    },
+    {
+      "step_id": "collect_code_context",
+      "type": "command.collect",
+      "input": {},
+      "depends_on": [],
+      "reverse_dependencies": ["repair_loop__round_1__execute"],
+      "permission_profile": "command_collector",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "collect_code_context",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Collect IPC code context",
+      "produces": {
+        "checks": {
+          "select": "$.output.collection.checks",
+          "schema": "command_collection/v1"
+        }
+      },
+      "collect": {
+        "commands": [
+          {
+            "run": "sed -n '1,460p' src/ipc/contracts/core.ts",
+            "id": "ipc_contract_core",
+            "timeout_seconds": 10
+          },
+          {
+            "run": "rg -n \"createClient\\(|createStreamClient\\(|createEventClient\\(\" src/ipc/types src/ipc/contracts/core.ts",
+            "id": "ipc_clients",
+            "timeout_seconds": 10
+          },
+          {
+            "run": "rg -n \"HttpTransport|LocalRuntimeProvider|RuntimeProvider|api/rpc|localhost HTTP|local server\" src package.json .codestable/compound",
+            "id": "server_runtime_prior_art",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 10
+          }
+        ]
+      }
+    },
+    {
+      "step_id": "collect_previous_failure",
+      "type": "command.collect",
+      "input": {},
+      "depends_on": [],
+      "reverse_dependencies": [
+        "prepare_dependencies",
+        "repair_loop__round_1__execute"
+      ],
+      "permission_profile": "command_collector",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "collect_previous_failure",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Collect previous workflow failure",
+      "produces": {
+        "checks": {
+          "select": "$.output.collection.checks",
+          "schema": "command_collection/v1"
+        }
+      },
+      "collect": {
+        "commands": [
+          {
+            "run": "sed -n '1,220p' .dynamic-workflow/runs/local_web_portal_migration_mq85vvyo/steps/verify_targeted.json",
+            "id": "previous_test_dependency_failure",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 10
+          },
+          {
+            "run": "sed -n '1,260p' .dynamic-workflow/runs/local_web_portal_migration_mq868fjt/steps/prepare_dependencies.json",
+            "id": "previous_install_timeout_failure",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 10
+          },
+          {
+            "run": "sed -n '1,180p' .dynamic-workflow/runs/local_web_portal_migration_mq86y0kw/steps/prepare_dependencies.json",
+            "id": "interrupted_old_plan_run",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 10
+          },
+          {
+            "run": "test -x node_modules/.bin/cross-env && test -x node_modules/.bin/vitest && test -x node_modules/.bin/tsgo && echo test-deps-present || echo test-deps-missing",
+            "id": "dependency_probe",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 10
+          }
+        ]
+      }
+    },
+    {
+      "step_id": "prepare_dependencies",
+      "type": "command.verify",
+      "input": {},
+      "depends_on": ["collect_previous_failure"],
+      "reverse_dependencies": ["repair_loop__round_1__execute"],
+      "permission_profile": "command_verifier",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "prepare_dependencies",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Verify local verification dependencies",
+      "produces": {
+        "checks": {
+          "select": "$.verify.checks",
+          "schema": "command_checks/v1"
+        }
+      },
+      "verify": {
+        "commands": [
+          {
+            "run": "test -x node_modules/.bin/cross-env && test -x node_modules/.bin/vitest && test -x node_modules/.bin/tsgo",
+            "id": "verify_test_bins_present",
+            "timeout_seconds": 10
+          },
+          {
+            "run": "printf '%s\\n' 'Dependency install is intentionally external to the workflow: local_web_portal_migration_mq868fjt timed out while running full npm install, so dependencies were prepared with npm install --ignore-scripts before this run.'",
+            "id": "record_external_install_note",
+            "timeout_seconds": 10
+          }
+        ]
+      }
+    },
+    {
+      "step_id": "repair_loop__round_1__execute",
+      "type": "agent.execute",
+      "input": {
+        "agent_backend": "paseo",
+        "provider": "codex/gpt-5.5",
+        "mode": "full-access",
+        "cwd": "/Users/wyattfang/work/github/dyad",
+        "wait_timeout": "45m",
+        "title": "DW local web portal migration loop",
+        "resource_scope": "workspace",
+        "prompt": "Implement or repair the Dyad Web + Local Server foundation slice until review reports zero blockers.\n\nRequired end-state:\n1. src/ipc/contracts/core.ts uses an injectable transport abstraction while preserving default Electron IPC behavior and source compatibility for existing src/ipc/types/* clients.\n2. An HTTP invoke transport exists for browser-to-local-server calls. Event/stream operations may throw explicit unsupported errors unless implemented safely.\n3. A local RPC server skeleton exists, likely under src/server/local_rpc_server.ts, registering contract handlers over POST /api/rpc/:channel and validating input/output through the existing Zod contracts.\n4. The local RPC server enforces localhost security basics: loopback binding assumptions, bearer token requirement, and strict Origin/CORS checks.\n5. RuntimeProvider and LocalRuntimeProvider skeletons exist for a small local capability surface such as workspace path resolution/bounds checks and bounded command execution.\n6. Focused unit tests exist for transport behavior, RPC auth/origin/validation behavior, and LocalRuntimeProvider guardrails.\n\nIteration behavior:\n- If previous_findings are present, fix those first.\n- Keep the slice infrastructure-only; do not migrate all 40+ IPC handlers and do not convert the desktop app to HTTP.\n- Do not implement Vercel Sandbox/cloud provider in this slice.\n- Use existing dependencies where possible.\n- Follow CONTRIBUTING.md plus rules/electron-ipc.md, rules/dyad-errors.md, rules/local-agent-tools.md, and rules/typescript-strict-mode.md.\n- Use apply_patch for edits.\n",
+        "control_origin": "repair_loop",
+        "loop_round": 1,
+        "stop_condition": "no_review_blockers"
+      },
+      "depends_on": [
+        "collect_code_context",
+        "collect_previous_failure",
+        "collect_rules",
+        "collect_scope",
+        "prepare_dependencies"
+      ],
+      "reverse_dependencies": ["repair_loop__round_1__collect_tests"],
+      "permission_profile": "executor_writer",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "repair_loop__round_1__execute",
+          "scope": "workspace",
+          "mode": "write"
+        }
+      ],
+      "title": "Execute or repair migration slice",
+      "consumes": [
+        {
+          "from": "collect_scope",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "scope_evidence",
+          "required": true,
+          "max_bytes": 50000
+        },
+        {
+          "from": "collect_rules",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "rule_evidence",
+          "required": true,
+          "max_bytes": 40000
+        },
+        {
+          "from": "collect_code_context",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "code_evidence",
+          "required": true,
+          "max_bytes": 50000
+        },
+        {
+          "from": "collect_previous_failure",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "previous_failure_evidence",
+          "required": true,
+          "max_bytes": 30000
+        }
+      ],
+      "produces": {
+        "artifact_summary": {
+          "select": "$.output.artifacts",
+          "schema": "agent_artifacts/v1"
+        }
+      },
+      "control_origin": "repair_loop"
+    },
+    {
+      "step_id": "repair_loop__round_1__collect_tests",
+      "type": "command.collect",
+      "input": {
+        "control_origin": "repair_loop",
+        "loop_round": 1,
+        "stop_condition": "no_review_blockers"
+      },
+      "depends_on": ["repair_loop__round_1__execute"],
+      "reverse_dependencies": ["repair_loop__round_1__review"],
+      "permission_profile": "command_collector",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "repair_loop__round_1__collect_tests",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Collect targeted verification",
+      "produces": {
+        "checks": {
+          "select": "$.output.collection.checks",
+          "schema": "command_collection/v1"
+        }
+      },
+      "collect": {
+        "commands": [
+          {
+            "id": "test_contract_core",
+            "run": "npm test -- src/ipc/contracts/core.test.ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 180
+          },
+          {
+            "id": "test_local_rpc_server",
+            "run": "npm test -- src/server/local_rpc_server.test.ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 180
+          },
+          {
+            "id": "test_local_runtime_provider",
+            "run": "npm test -- src/runtime/local_runtime_provider.test.ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 180
+          },
+          {
+            "id": "typecheck_probe",
+            "run": "npm run ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 420
+          },
+          {
+            "id": "git_diff",
+            "run": "git diff -- src/ipc/contracts/core.ts src/ipc/contracts/core.test.ts src/server src/runtime package.json package-lock.json",
+            "timeout_seconds": 10
+          }
+        ]
+      },
+      "control_origin": "repair_loop"
+    },
+    {
+      "step_id": "repair_loop__round_1__review",
+      "type": "agent.review",
+      "input": {
+        "agent_backend": "paseo",
+        "provider": "codex/gpt-5.5",
+        "mode": "full-access",
+        "cwd": "/Users/wyattfang/work/github/dyad",
+        "wait_timeout": "30m",
+        "title": "DW local web portal migration review",
+        "prompt": "Review the current migration slice for correctness, security, scope control, and verification quality.\n\nReturn blocking_count > 0 for any issue that should force another loop round. Treat missing target tests, failing targeted tests, type failures, broken Electron IPC compatibility, weak localhost token/origin protections, or missing RuntimeProvider guardrails as blockers.\n",
+        "output_schema": {
+          "type": "object",
+          "required": ["ok", "findings", "blocking_count"],
+          "properties": {
+            "ok": {
+              "type": "boolean"
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "blocking_count": {
+              "type": "integer"
+            }
+          }
+        },
+        "control_origin": "repair_loop",
+        "loop_round": 1,
+        "stop_condition": "no_review_blockers"
+      },
+      "depends_on": ["repair_loop__round_1__collect_tests"],
+      "reverse_dependencies": ["repair_loop__round_2__execute"],
+      "permission_profile": "reviewer_readonly",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "repair_loop__round_1__review",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Review migration loop round",
+      "consumes": [
+        {
+          "from": "repair_loop__round_1__collect_tests",
+          "select": "$.output.collection.checks",
+          "as": "verification",
+          "required": true,
+          "max_bytes": 70000
+        },
+        {
+          "from": "repair_loop__round_1__execute",
+          "select": "$.output.artifacts",
+          "as": "implementation_artifacts",
+          "required": false,
+          "max_bytes": 30000
+        }
+      ],
+      "control_origin": "repair_loop"
+    },
+    {
+      "step_id": "repair_loop__round_2__execute",
+      "type": "agent.execute",
+      "input": {
+        "agent_backend": "paseo",
+        "provider": "codex/gpt-5.5",
+        "mode": "full-access",
+        "cwd": "/Users/wyattfang/work/github/dyad",
+        "wait_timeout": "45m",
+        "title": "DW local web portal migration loop",
+        "resource_scope": "workspace",
+        "prompt": "Implement or repair the Dyad Web + Local Server foundation slice until review reports zero blockers.\n\nRequired end-state:\n1. src/ipc/contracts/core.ts uses an injectable transport abstraction while preserving default Electron IPC behavior and source compatibility for existing src/ipc/types/* clients.\n2. An HTTP invoke transport exists for browser-to-local-server calls. Event/stream operations may throw explicit unsupported errors unless implemented safely.\n3. A local RPC server skeleton exists, likely under src/server/local_rpc_server.ts, registering contract handlers over POST /api/rpc/:channel and validating input/output through the existing Zod contracts.\n4. The local RPC server enforces localhost security basics: loopback binding assumptions, bearer token requirement, and strict Origin/CORS checks.\n5. RuntimeProvider and LocalRuntimeProvider skeletons exist for a small local capability surface such as workspace path resolution/bounds checks and bounded command execution.\n6. Focused unit tests exist for transport behavior, RPC auth/origin/validation behavior, and LocalRuntimeProvider guardrails.\n\nIteration behavior:\n- If previous_findings are present, fix those first.\n- Keep the slice infrastructure-only; do not migrate all 40+ IPC handlers and do not convert the desktop app to HTTP.\n- Do not implement Vercel Sandbox/cloud provider in this slice.\n- Use existing dependencies where possible.\n- Follow CONTRIBUTING.md plus rules/electron-ipc.md, rules/dyad-errors.md, rules/local-agent-tools.md, and rules/typescript-strict-mode.md.\n- Use apply_patch for edits.\n",
+        "control_origin": "repair_loop",
+        "loop_round": 2,
+        "stop_condition": "no_review_blockers"
+      },
+      "depends_on": ["repair_loop__round_1__review"],
+      "reverse_dependencies": ["repair_loop__round_2__collect_tests"],
+      "permission_profile": "executor_writer",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "repair_loop__round_2__execute",
+          "scope": "workspace",
+          "mode": "write"
+        }
+      ],
+      "title": "Execute or repair migration slice",
+      "consumes": [
+        {
+          "from": "collect_scope",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "scope_evidence",
+          "required": true,
+          "max_bytes": 50000
+        },
+        {
+          "from": "collect_rules",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "rule_evidence",
+          "required": true,
+          "max_bytes": 40000
+        },
+        {
+          "from": "collect_code_context",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "code_evidence",
+          "required": true,
+          "max_bytes": 50000
+        },
+        {
+          "from": "collect_previous_failure",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "previous_failure_evidence",
+          "required": true,
+          "max_bytes": 30000
+        },
+        {
+          "from": "repair_loop__round_1__review",
+          "select": "$.output.findings",
+          "as": "previous_findings",
+          "required": false,
+          "max_bytes": 30000
+        }
+      ],
+      "produces": {
+        "artifact_summary": {
+          "select": "$.output.artifacts",
+          "schema": "agent_artifacts/v1"
+        }
+      },
+      "run_if": {
+        "step": "repair_loop__round_1__review",
+        "output_path": "blocking_count",
+        "op": "!=",
+        "value": 0
+      },
+      "control_origin": "repair_loop"
+    },
+    {
+      "step_id": "repair_loop__round_2__collect_tests",
+      "type": "command.collect",
+      "input": {
+        "control_origin": "repair_loop",
+        "loop_round": 2,
+        "stop_condition": "no_review_blockers"
+      },
+      "depends_on": ["repair_loop__round_2__execute"],
+      "reverse_dependencies": ["repair_loop__round_2__review"],
+      "permission_profile": "command_collector",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "repair_loop__round_2__collect_tests",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Collect targeted verification",
+      "produces": {
+        "checks": {
+          "select": "$.output.collection.checks",
+          "schema": "command_collection/v1"
+        }
+      },
+      "run_if": {
+        "step": "repair_loop__round_1__review",
+        "output_path": "blocking_count",
+        "op": "!=",
+        "value": 0
+      },
+      "collect": {
+        "commands": [
+          {
+            "id": "test_contract_core",
+            "run": "npm test -- src/ipc/contracts/core.test.ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 180
+          },
+          {
+            "id": "test_local_rpc_server",
+            "run": "npm test -- src/server/local_rpc_server.test.ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 180
+          },
+          {
+            "id": "test_local_runtime_provider",
+            "run": "npm test -- src/runtime/local_runtime_provider.test.ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 180
+          },
+          {
+            "id": "typecheck_probe",
+            "run": "npm run ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 420
+          },
+          {
+            "id": "git_diff",
+            "run": "git diff -- src/ipc/contracts/core.ts src/ipc/contracts/core.test.ts src/server src/runtime package.json package-lock.json",
+            "timeout_seconds": 10
+          }
+        ]
+      },
+      "control_origin": "repair_loop"
+    },
+    {
+      "step_id": "repair_loop__round_2__review",
+      "type": "agent.review",
+      "input": {
+        "agent_backend": "paseo",
+        "provider": "codex/gpt-5.5",
+        "mode": "full-access",
+        "cwd": "/Users/wyattfang/work/github/dyad",
+        "wait_timeout": "30m",
+        "title": "DW local web portal migration review",
+        "prompt": "Review the current migration slice for correctness, security, scope control, and verification quality.\n\nReturn blocking_count > 0 for any issue that should force another loop round. Treat missing target tests, failing targeted tests, type failures, broken Electron IPC compatibility, weak localhost token/origin protections, or missing RuntimeProvider guardrails as blockers.\n",
+        "output_schema": {
+          "type": "object",
+          "required": ["ok", "findings", "blocking_count"],
+          "properties": {
+            "ok": {
+              "type": "boolean"
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "blocking_count": {
+              "type": "integer"
+            }
+          }
+        },
+        "control_origin": "repair_loop",
+        "loop_round": 2,
+        "stop_condition": "no_review_blockers"
+      },
+      "depends_on": ["repair_loop__round_2__collect_tests"],
+      "reverse_dependencies": ["repair_loop__round_3__execute"],
+      "permission_profile": "reviewer_readonly",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "repair_loop__round_2__review",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Review migration loop round",
+      "consumes": [
+        {
+          "from": "repair_loop__round_2__collect_tests",
+          "select": "$.output.collection.checks",
+          "as": "verification",
+          "required": true,
+          "max_bytes": 70000
+        },
+        {
+          "from": "repair_loop__round_2__execute",
+          "select": "$.output.artifacts",
+          "as": "implementation_artifacts",
+          "required": false,
+          "max_bytes": 30000
+        }
+      ],
+      "run_if": {
+        "step": "repair_loop__round_1__review",
+        "output_path": "blocking_count",
+        "op": "!=",
+        "value": 0
+      },
+      "control_origin": "repair_loop"
+    },
+    {
+      "step_id": "repair_loop__round_3__execute",
+      "type": "agent.execute",
+      "input": {
+        "agent_backend": "paseo",
+        "provider": "codex/gpt-5.5",
+        "mode": "full-access",
+        "cwd": "/Users/wyattfang/work/github/dyad",
+        "wait_timeout": "45m",
+        "title": "DW local web portal migration loop",
+        "resource_scope": "workspace",
+        "prompt": "Implement or repair the Dyad Web + Local Server foundation slice until review reports zero blockers.\n\nRequired end-state:\n1. src/ipc/contracts/core.ts uses an injectable transport abstraction while preserving default Electron IPC behavior and source compatibility for existing src/ipc/types/* clients.\n2. An HTTP invoke transport exists for browser-to-local-server calls. Event/stream operations may throw explicit unsupported errors unless implemented safely.\n3. A local RPC server skeleton exists, likely under src/server/local_rpc_server.ts, registering contract handlers over POST /api/rpc/:channel and validating input/output through the existing Zod contracts.\n4. The local RPC server enforces localhost security basics: loopback binding assumptions, bearer token requirement, and strict Origin/CORS checks.\n5. RuntimeProvider and LocalRuntimeProvider skeletons exist for a small local capability surface such as workspace path resolution/bounds checks and bounded command execution.\n6. Focused unit tests exist for transport behavior, RPC auth/origin/validation behavior, and LocalRuntimeProvider guardrails.\n\nIteration behavior:\n- If previous_findings are present, fix those first.\n- Keep the slice infrastructure-only; do not migrate all 40+ IPC handlers and do not convert the desktop app to HTTP.\n- Do not implement Vercel Sandbox/cloud provider in this slice.\n- Use existing dependencies where possible.\n- Follow CONTRIBUTING.md plus rules/electron-ipc.md, rules/dyad-errors.md, rules/local-agent-tools.md, and rules/typescript-strict-mode.md.\n- Use apply_patch for edits.\n",
+        "control_origin": "repair_loop",
+        "loop_round": 3,
+        "stop_condition": "no_review_blockers"
+      },
+      "depends_on": ["repair_loop__round_2__review"],
+      "reverse_dependencies": ["repair_loop__round_3__collect_tests"],
+      "permission_profile": "executor_writer",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "repair_loop__round_3__execute",
+          "scope": "workspace",
+          "mode": "write"
+        }
+      ],
+      "title": "Execute or repair migration slice",
+      "consumes": [
+        {
+          "from": "collect_scope",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "scope_evidence",
+          "required": true,
+          "max_bytes": 50000
+        },
+        {
+          "from": "collect_rules",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "rule_evidence",
+          "required": true,
+          "max_bytes": 40000
+        },
+        {
+          "from": "collect_code_context",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "code_evidence",
+          "required": true,
+          "max_bytes": 50000
+        },
+        {
+          "from": "collect_previous_failure",
+          "select": "$.output.collection.checks[*].stdout",
+          "as": "previous_failure_evidence",
+          "required": true,
+          "max_bytes": 30000
+        },
+        {
+          "from": "repair_loop__round_2__review",
+          "select": "$.output.findings",
+          "as": "previous_findings",
+          "required": false,
+          "max_bytes": 30000
+        }
+      ],
+      "produces": {
+        "artifact_summary": {
+          "select": "$.output.artifacts",
+          "schema": "agent_artifacts/v1"
+        }
+      },
+      "run_if": {
+        "step": "repair_loop__round_2__review",
+        "output_path": "blocking_count",
+        "op": "!=",
+        "value": 0
+      },
+      "control_origin": "repair_loop"
+    },
+    {
+      "step_id": "repair_loop__round_3__collect_tests",
+      "type": "command.collect",
+      "input": {
+        "control_origin": "repair_loop",
+        "loop_round": 3,
+        "stop_condition": "no_review_blockers"
+      },
+      "depends_on": ["repair_loop__round_3__execute"],
+      "reverse_dependencies": ["repair_loop__round_3__review"],
+      "permission_profile": "command_collector",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "repair_loop__round_3__collect_tests",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Collect targeted verification",
+      "produces": {
+        "checks": {
+          "select": "$.output.collection.checks",
+          "schema": "command_collection/v1"
+        }
+      },
+      "run_if": {
+        "step": "repair_loop__round_2__review",
+        "output_path": "blocking_count",
+        "op": "!=",
+        "value": 0
+      },
+      "collect": {
+        "commands": [
+          {
+            "id": "test_contract_core",
+            "run": "npm test -- src/ipc/contracts/core.test.ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 180
+          },
+          {
+            "id": "test_local_rpc_server",
+            "run": "npm test -- src/server/local_rpc_server.test.ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 180
+          },
+          {
+            "id": "test_local_runtime_provider",
+            "run": "npm test -- src/runtime/local_runtime_provider.test.ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 180
+          },
+          {
+            "id": "typecheck_probe",
+            "run": "npm run ts",
+            "allow_exit_codes": [0, 1],
+            "soft_fail": true,
+            "timeout_seconds": 420
+          },
+          {
+            "id": "git_diff",
+            "run": "git diff -- src/ipc/contracts/core.ts src/ipc/contracts/core.test.ts src/server src/runtime package.json package-lock.json",
+            "timeout_seconds": 10
+          }
+        ]
+      },
+      "control_origin": "repair_loop"
+    },
+    {
+      "step_id": "repair_loop__round_3__review",
+      "type": "agent.review",
+      "input": {
+        "agent_backend": "paseo",
+        "provider": "codex/gpt-5.5",
+        "mode": "full-access",
+        "cwd": "/Users/wyattfang/work/github/dyad",
+        "wait_timeout": "30m",
+        "title": "DW local web portal migration review",
+        "prompt": "Review the current migration slice for correctness, security, scope control, and verification quality.\n\nReturn blocking_count > 0 for any issue that should force another loop round. Treat missing target tests, failing targeted tests, type failures, broken Electron IPC compatibility, weak localhost token/origin protections, or missing RuntimeProvider guardrails as blockers.\n",
+        "output_schema": {
+          "type": "object",
+          "required": ["ok", "findings", "blocking_count"],
+          "properties": {
+            "ok": {
+              "type": "boolean"
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "blocking_count": {
+              "type": "integer"
+            }
+          }
+        },
+        "control_origin": "repair_loop",
+        "loop_round": 3,
+        "stop_condition": "no_review_blockers"
+      },
+      "depends_on": ["repair_loop__round_3__collect_tests"],
+      "reverse_dependencies": ["final_verify"],
+      "permission_profile": "reviewer_readonly",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "repair_loop__round_3__review",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Review migration loop round",
+      "consumes": [
+        {
+          "from": "repair_loop__round_3__collect_tests",
+          "select": "$.output.collection.checks",
+          "as": "verification",
+          "required": true,
+          "max_bytes": 70000
+        },
+        {
+          "from": "repair_loop__round_3__execute",
+          "select": "$.output.artifacts",
+          "as": "implementation_artifacts",
+          "required": false,
+          "max_bytes": 30000
+        }
+      ],
+      "run_if": {
+        "step": "repair_loop__round_2__review",
+        "output_path": "blocking_count",
+        "op": "!=",
+        "value": 0
+      },
+      "control_origin": "repair_loop"
+    },
+    {
+      "step_id": "final_verify",
+      "type": "command.verify",
+      "input": {},
+      "depends_on": ["repair_loop__round_3__review"],
+      "reverse_dependencies": ["summarize_run"],
+      "permission_profile": "command_verifier",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "final_verify",
+          "scope": "workspace",
+          "mode": "read"
+        }
+      ],
+      "title": "Final strict verification",
+      "produces": {
+        "checks": {
+          "select": "$.verify.checks",
+          "schema": "command_checks/v1"
+        }
+      },
+      "verify": {
+        "commands": [
+          {
+            "run": "npm test -- src/ipc/contracts/core.test.ts",
+            "id": "test_contract_core",
+            "timeout_seconds": 180
+          },
+          {
+            "run": "npm test -- src/server/local_rpc_server.test.ts",
+            "id": "test_local_rpc_server",
+            "timeout_seconds": 180
+          },
+          {
+            "run": "npm test -- src/runtime/local_runtime_provider.test.ts",
+            "id": "test_local_runtime_provider",
+            "timeout_seconds": 180
+          },
+          {
+            "run": "npm run ts",
+            "id": "typecheck",
+            "timeout_seconds": 420
+          }
+        ]
+      }
+    },
+    {
+      "step_id": "summarize_run",
+      "type": "agent.synthesize",
+      "input": {
+        "agent_backend": "paseo",
+        "provider": "codex/gpt-5.5",
+        "mode": "full-access",
+        "cwd": "/Users/wyattfang/work/github/dyad",
+        "wait_timeout": "20m",
+        "title": "DW local web portal migration summary",
+        "prompt": "Summarize the completed migration slice, verification status, residual risks, and next actions without exposing internal prompts."
+      },
+      "depends_on": ["final_verify"],
+      "reverse_dependencies": [],
+      "permission_profile": "synthesizer",
+      "backend": "current",
+      "resource_locks": [
+        {
+          "step_id": "summarize_run",
+          "scope": "workspace",
+          "mode": "write"
+        }
+      ],
+      "title": "Summarize migration slice",
+      "consumes": [
+        {
+          "from": "repair_loop__round_3__review",
+          "select": "$.output.findings",
+          "as": "loop_findings",
+          "required": false,
+          "max_bytes": 30000
+        },
+        {
+          "from": "repair_loop__round_3__review",
+          "select": "$.output.blocking_count",
+          "as": "loop_blocking_count",
+          "required": false,
+          "max_bytes": 1000
+        },
+        {
+          "from": "final_verify",
+          "select": "$.verify.checks",
+          "as": "final_verification",
+          "required": true,
+          "max_bytes": 40000
+        }
+      ]
+    }
+  ],
+  "dependencies": {
+    "collect_scope": [],
+    "collect_rules": [],
+    "collect_code_context": [],
+    "collect_previous_failure": [],
+    "prepare_dependencies": ["collect_previous_failure"],
+    "repair_loop__round_1__execute": [
+      "collect_code_context",
+      "collect_previous_failure",
+      "collect_rules",
+      "collect_scope",
+      "prepare_dependencies"
+    ],
+    "repair_loop__round_1__collect_tests": ["repair_loop__round_1__execute"],
+    "repair_loop__round_1__review": ["repair_loop__round_1__collect_tests"],
+    "repair_loop__round_2__execute": ["repair_loop__round_1__review"],
+    "repair_loop__round_2__collect_tests": ["repair_loop__round_2__execute"],
+    "repair_loop__round_2__review": ["repair_loop__round_2__collect_tests"],
+    "repair_loop__round_3__execute": ["repair_loop__round_2__review"],
+    "repair_loop__round_3__collect_tests": ["repair_loop__round_3__execute"],
+    "repair_loop__round_3__review": ["repair_loop__round_3__collect_tests"],
+    "final_verify": ["repair_loop__round_3__review"],
+    "summarize_run": ["final_verify"]
+  },
+  "reverse_dependencies": {
+    "collect_scope": ["repair_loop__round_1__execute"],
+    "collect_rules": ["repair_loop__round_1__execute"],
+    "collect_code_context": ["repair_loop__round_1__execute"],
+    "collect_previous_failure": [
+      "prepare_dependencies",
+      "repair_loop__round_1__execute"
+    ],
+    "prepare_dependencies": ["repair_loop__round_1__execute"],
+    "repair_loop__round_1__execute": ["repair_loop__round_1__collect_tests"],
+    "repair_loop__round_1__collect_tests": ["repair_loop__round_1__review"],
+    "repair_loop__round_1__review": ["repair_loop__round_2__execute"],
+    "repair_loop__round_2__execute": ["repair_loop__round_2__collect_tests"],
+    "repair_loop__round_2__collect_tests": ["repair_loop__round_2__review"],
+    "repair_loop__round_2__review": ["repair_loop__round_3__execute"],
+    "repair_loop__round_3__execute": ["repair_loop__round_3__collect_tests"],
+    "repair_loop__round_3__collect_tests": ["repair_loop__round_3__review"],
+    "repair_loop__round_3__review": ["final_verify"],
+    "final_verify": ["summarize_run"],
+    "summarize_run": []
+  },
+  "ready_queue": [
+    "collect_code_context",
+    "collect_previous_failure",
+    "collect_rules",
+    "collect_scope"
+  ],
+  "resource_locks": [
+    {
+      "step_id": "collect_scope",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "collect_rules",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "collect_code_context",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "collect_previous_failure",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "prepare_dependencies",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "repair_loop__round_1__execute",
+      "scope": "workspace",
+      "mode": "write"
+    },
+    {
+      "step_id": "repair_loop__round_1__collect_tests",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "repair_loop__round_1__review",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "repair_loop__round_2__execute",
+      "scope": "workspace",
+      "mode": "write"
+    },
+    {
+      "step_id": "repair_loop__round_2__collect_tests",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "repair_loop__round_2__review",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "repair_loop__round_3__execute",
+      "scope": "workspace",
+      "mode": "write"
+    },
+    {
+      "step_id": "repair_loop__round_3__collect_tests",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "repair_loop__round_3__review",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "final_verify",
+      "scope": "workspace",
+      "mode": "read"
+    },
+    {
+      "step_id": "summarize_run",
+      "scope": "workspace",
+      "mode": "write"
+    }
+  ],
+  "writer_conflicts": {},
+  "budget_summary": {
+    "declared_steps": 8,
+    "executable_nodes": 16,
+    "max_steps": 32,
+    "max_rounds": 3,
+    "max_minutes": 240
+  },
+  "original_plan": {
+    "schema_version": "dynamic_workflow/run/v1",
+    "workflow_id": "local_web_portal_migration",
+    "kind": "implementation",
+    "steps": [
+      {
+        "step_id": "collect_scope",
+        "type": "command.collect",
+        "depends_on": [],
+        "permission_profile": "command_collector",
+        "title": "Collect CodeStable scope",
+        "produces": {
+          "checks": {
+            "select": "$.output.collection.checks",
+            "schema": "command_collection/v1"
+          }
+        },
+        "collect": {
+          "commands": [
+            {
+              "run": "sed -n '1,280p' .codestable/compound/2026-06-10-explore-web-portal-migration.md",
+              "id": "codestable_explore",
+              "timeout_seconds": 10
+            },
+            {
+              "run": "sed -n '1,220p' .codestable/compound/2026-06-10-decision-local-web-portal-first.md",
+              "id": "codestable_decision",
+              "timeout_seconds": 10
+            }
+          ]
+        }
+      },
+      {
+        "step_id": "collect_rules",
+        "type": "command.collect",
+        "depends_on": [],
+        "permission_profile": "command_collector",
+        "title": "Collect repo rules",
+        "produces": {
+          "checks": {
+            "select": "$.output.collection.checks",
+            "schema": "command_collection/v1"
+          }
+        },
+        "collect": {
+          "commands": [
+            {
+              "run": "sed -n '1,260p' CONTRIBUTING.md",
+              "id": "contributing",
+              "timeout_seconds": 10
+            },
+            {
+              "run": "sed -n '1,260p' rules/electron-ipc.md",
+              "id": "electron_ipc_rule",
+              "timeout_seconds": 10
+            },
+            {
+              "run": "sed -n '1,220p' rules/dyad-errors.md",
+              "id": "dyad_errors_rule",
+              "timeout_seconds": 10
+            },
+            {
+              "run": "sed -n '1,260p' rules/local-agent-tools.md",
+              "id": "local_agent_tools_rule",
+              "timeout_seconds": 10
+            },
+            {
+              "run": "sed -n '1,180p' rules/typescript-strict-mode.md",
+              "id": "typescript_strict_rule",
+              "timeout_seconds": 10
+            }
+          ]
+        }
+      },
+      {
+        "step_id": "collect_code_context",
+        "type": "command.collect",
+        "depends_on": [],
+        "permission_profile": "command_collector",
+        "title": "Collect IPC code context",
+        "produces": {
+          "checks": {
+            "select": "$.output.collection.checks",
+            "schema": "command_collection/v1"
+          }
+        },
+        "collect": {
+          "commands": [
+            {
+              "run": "sed -n '1,460p' src/ipc/contracts/core.ts",
+              "id": "ipc_contract_core",
+              "timeout_seconds": 10
+            },
+            {
+              "run": "rg -n \"createClient\\(|createStreamClient\\(|createEventClient\\(\" src/ipc/types src/ipc/contracts/core.ts",
+              "id": "ipc_clients",
+              "timeout_seconds": 10
+            },
+            {
+              "run": "rg -n \"HttpTransport|LocalRuntimeProvider|RuntimeProvider|api/rpc|localhost HTTP|local server\" src package.json .codestable/compound",
+              "id": "server_runtime_prior_art",
+              "allow_exit_codes": [0, 1],
+              "soft_fail": true,
+              "timeout_seconds": 10
+            }
+          ]
+        }
+      },
+      {
+        "step_id": "collect_previous_failure",
+        "type": "command.collect",
+        "depends_on": [],
+        "permission_profile": "command_collector",
+        "title": "Collect previous workflow failure",
+        "produces": {
+          "checks": {
+            "select": "$.output.collection.checks",
+            "schema": "command_collection/v1"
+          }
+        },
+        "collect": {
+          "commands": [
+            {
+              "run": "sed -n '1,220p' .dynamic-workflow/runs/local_web_portal_migration_mq85vvyo/steps/verify_targeted.json",
+              "id": "previous_test_dependency_failure",
+              "allow_exit_codes": [0, 1],
+              "soft_fail": true,
+              "timeout_seconds": 10
+            },
+            {
+              "run": "sed -n '1,260p' .dynamic-workflow/runs/local_web_portal_migration_mq868fjt/steps/prepare_dependencies.json",
+              "id": "previous_install_timeout_failure",
+              "allow_exit_codes": [0, 1],
+              "soft_fail": true,
+              "timeout_seconds": 10
+            },
+            {
+              "run": "sed -n '1,180p' .dynamic-workflow/runs/local_web_portal_migration_mq86y0kw/steps/prepare_dependencies.json",
+              "id": "interrupted_old_plan_run",
+              "allow_exit_codes": [0, 1],
+              "soft_fail": true,
+              "timeout_seconds": 10
+            },
+            {
+              "run": "test -x node_modules/.bin/cross-env && test -x node_modules/.bin/vitest && test -x node_modules/.bin/tsgo && echo test-deps-present || echo test-deps-missing",
+              "id": "dependency_probe",
+              "allow_exit_codes": [0, 1],
+              "soft_fail": true,
+              "timeout_seconds": 10
+            }
+          ]
+        }
+      },
+      {
+        "step_id": "prepare_dependencies",
+        "type": "command.verify",
+        "depends_on": ["collect_previous_failure"],
+        "permission_profile": "command_verifier",
+        "title": "Verify local verification dependencies",
+        "produces": {
+          "checks": {
+            "select": "$.verify.checks",
+            "schema": "command_checks/v1"
+          }
+        },
+        "verify": {
+          "commands": [
+            {
+              "run": "test -x node_modules/.bin/cross-env && test -x node_modules/.bin/vitest && test -x node_modules/.bin/tsgo",
+              "id": "verify_test_bins_present",
+              "timeout_seconds": 10
+            },
+            {
+              "run": "printf '%s\\n' 'Dependency install is intentionally external to the workflow: local_web_portal_migration_mq868fjt timed out while running full npm install, so dependencies were prepared with npm install --ignore-scripts before this run.'",
+              "id": "record_external_install_note",
+              "timeout_seconds": 10
+            }
+          ]
+        }
+      },
+      {
+        "step_id": "repair_loop",
+        "type": "workflow.loop",
+        "depends_on": [
+          "collect_scope",
+          "collect_rules",
+          "collect_code_context",
+          "collect_previous_failure",
+          "prepare_dependencies"
+        ],
+        "permission_profile": "synthesizer",
+        "title": "Loop until migration slice has no review blockers",
+        "input": {
+          "max_rounds": 3,
+          "stop_condition": "no_review_blockers",
+          "until": {
+            "output_path": "blocking_count",
+            "op": "==",
+            "value": 0
+          },
+          "body": [
+            {
+              "step_id": "execute",
+              "title": "Execute or repair migration slice",
+              "type": "agent.execute",
+              "permission_profile": "executor_writer",
+              "depends_on": [],
+              "consumes": [
+                {
+                  "from": "collect_scope",
+                  "select": "$.output.collection.checks[*].stdout",
+                  "as": "scope_evidence",
+                  "required": true,
+                  "max_bytes": 50000
+                },
+                {
+                  "from": "collect_rules",
+                  "select": "$.output.collection.checks[*].stdout",
+                  "as": "rule_evidence",
+                  "required": true,
+                  "max_bytes": 40000
+                },
+                {
+                  "from": "collect_code_context",
+                  "select": "$.output.collection.checks[*].stdout",
+                  "as": "code_evidence",
+                  "required": true,
+                  "max_bytes": 50000
+                },
+                {
+                  "from": "collect_previous_failure",
+                  "select": "$.output.collection.checks[*].stdout",
+                  "as": "previous_failure_evidence",
+                  "required": true,
+                  "max_bytes": 30000
+                },
+                {
+                  "from": "$previous",
+                  "select": "$.output.findings",
+                  "as": "previous_findings",
+                  "required": false,
+                  "max_bytes": 30000
+                }
+              ],
+              "input": {
+                "agent_backend": "paseo",
+                "provider": "codex/gpt-5.5",
+                "mode": "full-access",
+                "cwd": "/Users/wyattfang/work/github/dyad",
+                "wait_timeout": "45m",
+                "title": "DW local web portal migration loop",
+                "resource_scope": "workspace",
+                "prompt": "Implement or repair the Dyad Web + Local Server foundation slice until review reports zero blockers.\n\nRequired end-state:\n1. src/ipc/contracts/core.ts uses an injectable transport abstraction while preserving default Electron IPC behavior and source compatibility for existing src/ipc/types/* clients.\n2. An HTTP invoke transport exists for browser-to-local-server calls. Event/stream operations may throw explicit unsupported errors unless implemented safely.\n3. A local RPC server skeleton exists, likely under src/server/local_rpc_server.ts, registering contract handlers over POST /api/rpc/:channel and validating input/output through the existing Zod contracts.\n4. The local RPC server enforces localhost security basics: loopback binding assumptions, bearer token requirement, and strict Origin/CORS checks.\n5. RuntimeProvider and LocalRuntimeProvider skeletons exist for a small local capability surface such as workspace path resolution/bounds checks and bounded command execution.\n6. Focused unit tests exist for transport behavior, RPC auth/origin/validation behavior, and LocalRuntimeProvider guardrails.\n\nIteration behavior:\n- If previous_findings are present, fix those first.\n- Keep the slice infrastructure-only; do not migrate all 40+ IPC handlers and do not convert the desktop app to HTTP.\n- Do not implement Vercel Sandbox/cloud provider in this slice.\n- Use existing dependencies where possible.\n- Follow CONTRIBUTING.md plus rules/electron-ipc.md, rules/dyad-errors.md, rules/local-agent-tools.md, and rules/typescript-strict-mode.md.\n- Use apply_patch for edits.\n"
+              },
+              "produces": {
+                "artifact_summary": {
+                  "select": "$.output.artifacts",
+                  "schema": "agent_artifacts/v1"
+                }
+              }
+            },
+            {
+              "step_id": "collect_tests",
+              "title": "Collect targeted verification",
+              "type": "command.collect",
+              "permission_profile": "command_collector",
+              "depends_on": ["execute"],
+              "collect": {
+                "commands": [
+                  {
+                    "id": "test_contract_core",
+                    "run": "npm test -- src/ipc/contracts/core.test.ts",
+                    "allow_exit_codes": [0, 1],
+                    "soft_fail": true,
+                    "timeout_seconds": 180
+                  },
+                  {
+                    "id": "test_local_rpc_server",
+                    "run": "npm test -- src/server/local_rpc_server.test.ts",
+                    "allow_exit_codes": [0, 1],
+                    "soft_fail": true,
+                    "timeout_seconds": 180
+                  },
+                  {
+                    "id": "test_local_runtime_provider",
+                    "run": "npm test -- src/runtime/local_runtime_provider.test.ts",
+                    "allow_exit_codes": [0, 1],
+                    "soft_fail": true,
+                    "timeout_seconds": 180
+                  },
+                  {
+                    "id": "typecheck_probe",
+                    "run": "npm run ts",
+                    "allow_exit_codes": [0, 1],
+                    "soft_fail": true,
+                    "timeout_seconds": 420
+                  },
+                  {
+                    "id": "git_diff",
+                    "run": "git diff -- src/ipc/contracts/core.ts src/ipc/contracts/core.test.ts src/server src/runtime package.json package-lock.json",
+                    "timeout_seconds": 10
+                  }
+                ]
+              },
+              "produces": {
+                "checks": {
+                  "select": "$.output.collection.checks",
+                  "schema": "command_collection/v1"
+                }
+              }
+            },
+            {
+              "step_id": "review",
+              "title": "Review migration loop round",
+              "type": "agent.review",
+              "permission_profile": "reviewer_readonly",
+              "depends_on": ["collect_tests"],
+              "consumes": [
+                {
+                  "from": "collect_tests",
+                  "select": "$.output.collection.checks",
+                  "as": "verification",
+                  "required": true,
+                  "max_bytes": 70000
+                },
+                {
+                  "from": "execute",
+                  "select": "$.output.artifacts",
+                  "as": "implementation_artifacts",
+                  "required": false,
+                  "max_bytes": 30000
+                }
+              ],
+              "input": {
+                "agent_backend": "paseo",
+                "provider": "codex/gpt-5.5",
+                "mode": "full-access",
+                "cwd": "/Users/wyattfang/work/github/dyad",
+                "wait_timeout": "30m",
+                "title": "DW local web portal migration review",
+                "prompt": "Review the current migration slice for correctness, security, scope control, and verification quality.\n\nReturn blocking_count > 0 for any issue that should force another loop round. Treat missing target tests, failing targeted tests, type failures, broken Electron IPC compatibility, weak localhost token/origin protections, or missing RuntimeProvider guardrails as blockers.\n",
+                "output_schema": {
+                  "type": "object",
+                  "required": ["ok", "findings", "blocking_count"],
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "findings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "blocking_count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "step_id": "final_verify",
+        "type": "command.verify",
+        "depends_on": ["repair_loop"],
+        "permission_profile": "command_verifier",
+        "title": "Final strict verification",
+        "produces": {
+          "checks": {
+            "select": "$.verify.checks",
+            "schema": "command_checks/v1"
+          }
+        },
+        "verify": {
+          "commands": [
+            {
+              "run": "npm test -- src/ipc/contracts/core.test.ts",
+              "id": "test_contract_core",
+              "timeout_seconds": 180
+            },
+            {
+              "run": "npm test -- src/server/local_rpc_server.test.ts",
+              "id": "test_local_rpc_server",
+              "timeout_seconds": 180
+            },
+            {
+              "run": "npm test -- src/runtime/local_runtime_provider.test.ts",
+              "id": "test_local_runtime_provider",
+              "timeout_seconds": 180
+            },
+            {
+              "run": "npm run ts",
+              "id": "typecheck",
+              "timeout_seconds": 420
+            }
+          ]
+        }
+      },
+      {
+        "step_id": "summarize_run",
+        "type": "agent.synthesize",
+        "depends_on": ["final_verify"],
+        "permission_profile": "synthesizer",
+        "title": "Summarize migration slice",
+        "input": {
+          "agent_backend": "paseo",
+          "provider": "codex/gpt-5.5",
+          "mode": "full-access",
+          "cwd": "/Users/wyattfang/work/github/dyad",
+          "wait_timeout": "20m",
+          "title": "DW local web portal migration summary",
+          "prompt": "Summarize the completed migration slice, verification status, residual risks, and next actions without exposing internal prompts."
+        },
+        "consumes": [
+          {
+            "from": "repair_loop",
+            "select": "$.output.findings",
+            "as": "loop_findings",
+            "required": false,
+            "max_bytes": 30000
+          },
+          {
+            "from": "repair_loop",
+            "select": "$.output.blocking_count",
+            "as": "loop_blocking_count",
+            "required": false,
+            "max_bytes": 1000
+          },
+          {
+            "from": "final_verify",
+            "select": "$.verify.checks",
+            "as": "final_verification",
+            "required": true,
+            "max_bytes": 40000
+          }
+        ]
+      }
+    ],
+    "request": "Migrate Dyad from Electron-only IPC assumptions toward Web + Local Server support, using the existing CodeStable explore/decision docs as scope.",
+    "backend": "current",
+    "budget": {
+      "max_steps": 32,
+      "max_rounds": 3,
+      "max_minutes": 240
+    },
+    "metadata": {
+      "codestable_explore": ".codestable/compound/2026-06-10-explore-web-portal-migration.md",
+      "codestable_decision": ".codestable/compound/2026-06-10-decision-local-web-portal-first.md",
+      "previous_failed_runs": [
+        ".dynamic-workflow/runs/local_web_portal_migration_mq85vvyo",
+        ".dynamic-workflow/runs/local_web_portal_migration_mq868fjt"
+      ],
+      "abandoned_interrupted_run": ".dynamic-workflow/runs/local_web_portal_migration_mq86y0kw",
+      "execution_model": "workflow.loop body with execute -> collect_tests -> review, short-circuiting when review blocking_count is 0"
+    }
+  }
+}

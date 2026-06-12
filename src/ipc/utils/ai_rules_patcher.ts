@@ -3,6 +3,8 @@ import path from "node:path";
 
 export const NITRO_RULES_START = "<!-- nitro:start -->";
 export const NITRO_RULES_END = "<!-- nitro:end -->";
+export const NEXT_APP_ROUTER_RULES_START = "<!-- next-app-router:start -->";
+export const NEXT_APP_ROUTER_RULES_END = "<!-- next-app-router:end -->";
 
 export const NITRO_RULES_SECTION = `${NITRO_RULES_START}
 
@@ -56,6 +58,34 @@ Any package used inside \`server/\` (database drivers like \`@neondatabase/serve
 
 ${NITRO_RULES_END}`;
 
+export const NEXT_APP_ROUTER_RULES_SECTION = `${NEXT_APP_ROUTER_RULES_START}
+
+## Next.js App Router Server/Client Boundaries
+
+This project uses the Next.js App Router. Files under \`src/app/\` are Server Components by default unless the file starts with \`"use client"\`.
+
+### Client Component Requirements
+
+Start a component file with \`"use client"\` before any imports when it uses:
+
+- React hooks such as \`useState\`, \`useEffect\`, \`useMemo\`, \`useRef\`, or \`useTransition\`.
+- Event handlers such as \`onClick\`, \`onSubmit\`, \`onChange\`, \`onMouseEnter\`, or keyboard handlers.
+- Browser-only APIs such as \`window\`, \`document\`, \`localStorage\`, \`navigator\`, or media queries.
+- Interactive form behavior, client-side validation state, dialogs, menus, toasts, animations, or other UI state.
+
+### Composition Rules
+
+- Do not pass functions from Server Components into Client Components. Event handlers must live inside a Client Component.
+- Keep Server Components for static layout, data loading, and non-interactive markup.
+- Move interactive islands into small Client Components instead of marking an entire route client-side unless the whole route is interactive.
+- If a Server Component renders a form that needs \`onSubmit\`, create a child Client Component containing the form and its handler.
+
+### Common Runtime Error To Avoid
+
+If Next.js reports \`Event handlers cannot be passed to Client Component props\`, the file with the handler is missing \`"use client"\` or a Server Component is passing a function into a Client Component. Fix by moving the handler into a Client Component.
+
+${NEXT_APP_ROUTER_RULES_END}`;
+
 export interface AiRulesBackup {
   /** Original contents before patching, or null if the file did not exist. */
   backup: string | null;
@@ -88,23 +118,20 @@ async function readIfExists(filePath: string): Promise<string | null> {
 export async function appendNitroRules(
   appPath: string,
 ): Promise<AiRulesBackup> {
-  const filePath = aiRulesPath(appPath);
-  const existing = await readIfExists(filePath);
+  return appendAiRulesSection(appPath, NITRO_RULES_START, NITRO_RULES_SECTION);
+}
 
-  if (existing !== null && existing.includes(NITRO_RULES_START)) {
-    return { backup: existing, wasAppended: false };
-  }
-
-  const separator =
-    existing === null || existing.length === 0
-      ? ""
-      : existing.endsWith("\n")
-        ? "\n"
-        : "\n\n";
-  const next = (existing ?? "") + separator + NITRO_RULES_SECTION + "\n";
-
-  await fs.writeFile(filePath, next, "utf8");
-  return { backup: existing, wasAppended: true };
+/**
+ * Idempotently append Next.js App Router boundary rules to `<app>/AI_RULES.md`.
+ */
+export async function appendNextAppRouterRules(
+  appPath: string,
+): Promise<AiRulesBackup> {
+  return appendAiRulesSection(
+    appPath,
+    NEXT_APP_ROUTER_RULES_START,
+    NEXT_APP_ROUTER_RULES_SECTION,
+  );
 }
 
 /**
@@ -122,4 +149,28 @@ export async function restoreAiRules(
     return;
   }
   await fs.writeFile(filePath, backup, "utf8");
+}
+
+async function appendAiRulesSection(
+  appPath: string,
+  markerStart: string,
+  section: string,
+): Promise<AiRulesBackup> {
+  const filePath = aiRulesPath(appPath);
+  const existing = await readIfExists(filePath);
+
+  if (existing !== null && existing.includes(markerStart)) {
+    return { backup: existing, wasAppended: false };
+  }
+
+  const separator =
+    existing === null || existing.length === 0
+      ? ""
+      : existing.endsWith("\n")
+        ? "\n"
+        : "\n\n";
+  const next = (existing ?? "") + separator + section + "\n";
+
+  await fs.writeFile(filePath, next, "utf8");
+  return { backup: existing, wasAppended: true };
 }

@@ -10,7 +10,7 @@ const {
   unregisterRunningCloudSandboxMock: vi.fn(),
 }));
 
-vi.mock("./cloud_sandbox_provider", () => ({
+vi.mock("@/ipc/utils/cloud_sandbox_provider", () => ({
   destroyCloudSandbox: destroyCloudSandboxMock,
   stopCloudSandboxFileSync: stopCloudSandboxFileSyncMock,
   unregisterRunningCloudSandbox: unregisterRunningCloudSandboxMock,

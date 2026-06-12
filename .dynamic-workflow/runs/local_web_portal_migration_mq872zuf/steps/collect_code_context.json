@@ -1,0 +1,117 @@
+{
+  "step_id": "collect_code_context",
+  "status": "succeeded",
+  "summary": "Collection commands completed.",
+  "output": {
+    "status": "succeeded",
+    "step_id": "collect_code_context",
+    "collection": {
+      "ok": true,
+      "checks": [
+        {
+          "id": "ipc_contract_core",
+          "command": "sed -n '1,460p' src/ipc/contracts/core.ts",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 6,
+          "stdout": "t<TChannel, TInput, TKey, TChunk, TEnd, TError>,\n  transport: IpcTransport = createElectronIpcTransport(),\n) {\n  type Input = z.infer<TInput>;\n  // Use string | number for KeyValue to support common key types while\n  // maintaining better type safety than unknown. TypeScript cannot infer\n  // the exact key type from TInput[TKey] due to Zod v4 type system limitations.\n  type KeyValue = string | number;\n\n  const streams = new Map<\n    KeyValue,\n    {\n      onChunk: (data: z.infer<TChunk>) => void;\n      onEnd: (data: z.infer<TEnd>) => void;\n      onError: (data: z.infer<TError>) => void;\n    }\n  >();\n\n  let listenersSetUp = false;\n\n  const setupListeners = () => {\n    if (listenersSetUp) return;\n\n    if (!transport.on) {\n      throw unsupportedTransportOperation(\"streams\");\n    }\n\n    transport.on(contract.events.chunk.channel, (data: unknown) => {\n      const parsed = contract.events.chunk.payload.safeParse(data);\n      if (parsed.success) {\n        const key = (parsed.data as Record<string, unknown>)[\n          contract.keyField\n        ] as KeyValue;\n        streams.get(key)?.onChunk(parsed.data);\n      }\n    });\n\n    transport.on(contract.events.end.channel, (data: unknown) => {\n      const parsed = contract.events.end.payload.safeParse(data);\n      if (parsed.success) {\n        const key = (parsed.data as Record<string, unknown>)[\n          contract.keyField\n        ] as KeyValue;\n        streams.get(key)?.onEnd(parsed.data);\n        streams.delete(key);\n      }\n    });\n\n    transport.on(contract.events.error.channel, (data: unknown) => {\n      const parsed = contract.events.error.payload.safeParse(data);\n      if (parsed.success) {\n        const key = (parsed.data as Record<string, unknown>)[\n          contract.keyField\n        ] as KeyValue;\n        streams.get(key)?.onError(parsed.data);\n        streams.delete(key);\n      }\n    });\n\n    listenersSetUp = true;\n  };\n\n  return {\n    /**\n     * Start a stream with the given input and callbacks.\n     */\n    start(\n",
+          "stderr": "",
+          "stdout_bytes": 13785,
+          "stderr_bytes": 0,
+          "stdout_truncated": true,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        },
+        {
+          "id": "ipc_clients",
+          "command": "rg -n \"createClient\\(|createStreamClient\\(|createEventClient\\(\" src/ipc/types src/ipc/contracts/core.ts",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 9,
+          "stdout": "es/integration.ts:42:export const integrationEventClient = createEventClient(integrationEvents);\nsrc/ipc/types/integration.ts:44:export const integrationClient = createClient(integrationContracts);\nsrc/ipc/types/github.ts:350:export const githubClient = createClient(githubContracts);\nsrc/ipc/types/github.ts:351:export const gitClient = createClient(gitContracts);\nsrc/ipc/types/github.ts:352:export const githubEventClient = createEventClient(githubEvents);\nsrc/ipc/types/migration.ts:87:export const migrationClient = createClient(migrationContracts);\nsrc/ipc/types/proposals.ts:136:export const proposalClient = createClient(proposalContracts);\nsrc/ipc/types/templates.ts:298:export const templateClient = createClient(templateContracts);\nsrc/ipc/types/chat.ts:397:export const chatClient = createClient(chatContracts);\nsrc/ipc/types/chat.ts:413:export const chatStreamClient = createStreamClient(chatStreamContract);\nsrc/ipc/types/settings.ts:47:export const settingsClient = createClient(settingsContracts);\nsrc/ipc/types/agent.ts:207:export const agentClient = createClient(agentContracts);\nsrc/ipc/types/agent.ts:218:export const agentEventClient = createEventClient(agentEvents);\nsrc/ipc/types/free_agent_quota.ts:57:export const freeAgentQuotaClient = createClient(freeAgentQuotaContracts);\nsrc/ipc/types/context.ts:68:export const contextClient = createClient(contextContracts);\nsrc/ipc/types/mcp.ts:294:export const mcpClient = createClient(mcpContracts);\nsrc/ipc/types/mcp.ts:295:export const mcpEventClient = createEventClient(mcpEvents);\nsrc/ipc/types/help.ts:80:export const helpClient = createClient(helpContracts);\nsrc/ipc/types/help.ts:81:export const helpStreamClient = createStreamClient(helpStreamContract);\nsrc/ipc/types/audio.ts:38:export const audioClient = createClient(audioContracts);\nsrc/ipc/types/app.ts:548:export const appClient = createClient(appContracts);\nsrc/ipc/types/language-model.ts:152:export const languageModelClient = createClient(languageModelContracts);\n",
+          "stderr": "",
+          "stdout_bytes": 4323,
+          "stderr_bytes": 0,
+          "stdout_truncated": true,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        },
+        {
+          "id": "server_runtime_prior_art",
+          "command": "rg -n \"HttpTransport|LocalRuntimeProvider|RuntimeProvider|api/rpc|localhost HTTP|local server\" src package.json .codestable/compound",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 23,
+          "stdout": "件、进程、git、preview、日志、terminal 等执行能力从 API transport 中分离出来。这样本机 Web portal、Electron desktop、后续 cloud portal 都可以共用同一组 service 接口，只替换 runtime provider。\n.codestable/compound/2026-06-10-decision-local-web-portal-first.md:56:- 第一阶段 roadmap 应以 `HttpTransport`、localhost API server、service extraction、`LocalRuntimeProvider` 为主。\n.codestable/compound/2026-06-10-decision-local-web-portal-first.md:60:- 后续云化时，`LocalRuntimeProvider` 与 `VercelSandboxRuntimeProvider` 必须实现同一 capability contract。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:171:   Browser 无法直接 spawn、npm install、git、terminal、filesystem mutation。首版由本机 HTTP server 提供 `LocalRuntimeProvider`：\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:180:   后续云化时，在同一 provider adapter 下新增 `VercelSandboxRuntimeProvider`，再补 object storage、isolated worker/container、quota/rate limit 等云能力。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:215:1. 抽 transport client：让 React 可以在 Electron IPC 和 localhost HTTP server 间切换。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:218:4. 建 `LocalRuntimeProvider`：本机文件、spawn、git、preview proxy、日志/terminal。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:219:5. 接 agent write/read/add dependency/typecheck/read logs 的最小 tool set 到 `LocalRuntimeProvider`。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:224:- Web portal 首版按本机方案实现：浏览器访问本机托管的 localhost HTTP server，不依赖 Electron IPC。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:226:- Runtime provider 首版实现 `LocalRuntimeProvider`，复用本机 filesystem、child_process、git、SQLite、preview proxy、日志和 terminal。\n",
+          "stderr": "",
+          "stdout_bytes": 2902,
+          "stderr_bytes": 0,
+          "stdout_truncated": true,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        }
+      ],
+      "gaps": []
+    },
+    "checks": [
+      {
+        "id": "ipc_contract_core",
+        "command": "sed -n '1,460p' src/ipc/contracts/core.ts",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 6,
+        "stdout": "t<TChannel, TInput, TKey, TChunk, TEnd, TError>,\n  transport: IpcTransport = createElectronIpcTransport(),\n) {\n  type Input = z.infer<TInput>;\n  // Use string | number for KeyValue to support common key types while\n  // maintaining better type safety than unknown. TypeScript cannot infer\n  // the exact key type from TInput[TKey] due to Zod v4 type system limitations.\n  type KeyValue = string | number;\n\n  const streams = new Map<\n    KeyValue,\n    {\n      onChunk: (data: z.infer<TChunk>) => void;\n      onEnd: (data: z.infer<TEnd>) => void;\n      onError: (data: z.infer<TError>) => void;\n    }\n  >();\n\n  let listenersSetUp = false;\n\n  const setupListeners = () => {\n    if (listenersSetUp) return;\n\n    if (!transport.on) {\n      throw unsupportedTransportOperation(\"streams\");\n    }\n\n    transport.on(contract.events.chunk.channel, (data: unknown) => {\n      const parsed = contract.events.chunk.payload.safeParse(data);\n      if (parsed.success) {\n        const key = (parsed.data as Record<string, unknown>)[\n          contract.keyField\n        ] as KeyValue;\n        streams.get(key)?.onChunk(parsed.data);\n      }\n    });\n\n    transport.on(contract.events.end.channel, (data: unknown) => {\n      const parsed = contract.events.end.payload.safeParse(data);\n      if (parsed.success) {\n        const key = (parsed.data as Record<string, unknown>)[\n          contract.keyField\n        ] as KeyValue;\n        streams.get(key)?.onEnd(parsed.data);\n        streams.delete(key);\n      }\n    });\n\n    transport.on(contract.events.error.channel, (data: unknown) => {\n      const parsed = contract.events.error.payload.safeParse(data);\n      if (parsed.success) {\n        const key = (parsed.data as Record<string, unknown>)[\n          contract.keyField\n        ] as KeyValue;\n        streams.get(key)?.onError(parsed.data);\n        streams.delete(key);\n      }\n    });\n\n    listenersSetUp = true;\n  };\n\n  return {\n    /**\n     * Start a stream with the given input and callbacks.\n     */\n    start(\n",
+        "stderr": "",
+        "stdout_bytes": 13785,
+        "stderr_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      },
+      {
+        "id": "ipc_clients",
+        "command": "rg -n \"createClient\\(|createStreamClient\\(|createEventClient\\(\" src/ipc/types src/ipc/contracts/core.ts",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 9,
+        "stdout": "es/integration.ts:42:export const integrationEventClient = createEventClient(integrationEvents);\nsrc/ipc/types/integration.ts:44:export const integrationClient = createClient(integrationContracts);\nsrc/ipc/types/github.ts:350:export const githubClient = createClient(githubContracts);\nsrc/ipc/types/github.ts:351:export const gitClient = createClient(gitContracts);\nsrc/ipc/types/github.ts:352:export const githubEventClient = createEventClient(githubEvents);\nsrc/ipc/types/migration.ts:87:export const migrationClient = createClient(migrationContracts);\nsrc/ipc/types/proposals.ts:136:export const proposalClient = createClient(proposalContracts);\nsrc/ipc/types/templates.ts:298:export const templateClient = createClient(templateContracts);\nsrc/ipc/types/chat.ts:397:export const chatClient = createClient(chatContracts);\nsrc/ipc/types/chat.ts:413:export const chatStreamClient = createStreamClient(chatStreamContract);\nsrc/ipc/types/settings.ts:47:export const settingsClient = createClient(settingsContracts);\nsrc/ipc/types/agent.ts:207:export const agentClient = createClient(agentContracts);\nsrc/ipc/types/agent.ts:218:export const agentEventClient = createEventClient(agentEvents);\nsrc/ipc/types/free_agent_quota.ts:57:export const freeAgentQuotaClient = createClient(freeAgentQuotaContracts);\nsrc/ipc/types/context.ts:68:export const contextClient = createClient(contextContracts);\nsrc/ipc/types/mcp.ts:294:export const mcpClient = createClient(mcpContracts);\nsrc/ipc/types/mcp.ts:295:export const mcpEventClient = createEventClient(mcpEvents);\nsrc/ipc/types/help.ts:80:export const helpClient = createClient(helpContracts);\nsrc/ipc/types/help.ts:81:export const helpStreamClient = createStreamClient(helpStreamContract);\nsrc/ipc/types/audio.ts:38:export const audioClient = createClient(audioContracts);\nsrc/ipc/types/app.ts:548:export const appClient = createClient(appContracts);\nsrc/ipc/types/language-model.ts:152:export const languageModelClient = createClient(languageModelContracts);\n",
+        "stderr": "",
+        "stdout_bytes": 4323,
+        "stderr_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      },
+      {
+        "id": "server_runtime_prior_art",
+        "command": "rg -n \"HttpTransport|LocalRuntimeProvider|RuntimeProvider|api/rpc|localhost HTTP|local server\" src package.json .codestable/compound",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 23,
+        "stdout": "件、进程、git、preview、日志、terminal 等执行能力从 API transport 中分离出来。这样本机 Web portal、Electron desktop、后续 cloud portal 都可以共用同一组 service 接口，只替换 runtime provider。\n.codestable/compound/2026-06-10-decision-local-web-portal-first.md:56:- 第一阶段 roadmap 应以 `HttpTransport`、localhost API server、service extraction、`LocalRuntimeProvider` 为主。\n.codestable/compound/2026-06-10-decision-local-web-portal-first.md:60:- 后续云化时，`LocalRuntimeProvider` 与 `VercelSandboxRuntimeProvider` 必须实现同一 capability contract。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:171:   Browser 无法直接 spawn、npm install、git、terminal、filesystem mutation。首版由本机 HTTP server 提供 `LocalRuntimeProvider`：\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:180:   后续云化时，在同一 provider adapter 下新增 `VercelSandboxRuntimeProvider`，再补 object storage、isolated worker/container、quota/rate limit 等云能力。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:215:1. 抽 transport client：让 React 可以在 Electron IPC 和 localhost HTTP server 间切换。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:218:4. 建 `LocalRuntimeProvider`：本机文件、spawn、git、preview proxy、日志/terminal。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:219:5. 接 agent write/read/add dependency/typecheck/read logs 的最小 tool set 到 `LocalRuntimeProvider`。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:224:- Web portal 首版按本机方案实现：浏览器访问本机托管的 localhost HTTP server，不依赖 Electron IPC。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:226:- Runtime provider 首版实现 `LocalRuntimeProvider`，复用本机 filesystem、child_process、git、SQLite、preview proxy、日志和 terminal。\n",
+        "stderr": "",
+        "stdout_bytes": 2902,
+        "stderr_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      }
+    ]
+  },
+  "verify": {
+    "ok": true,
+    "checks": []
+  }
+}

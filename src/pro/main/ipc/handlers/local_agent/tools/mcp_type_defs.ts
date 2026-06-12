@@ -1,4 +1,3 @@
-import type { IpcMainInvokeEvent } from "electron";
 import { asSchema } from "@ai-sdk/provider-utils";
 import type { JSONSchema7 } from "@ai-sdk/provider";
 import type { MCPClient } from "@ai-sdk/mcp";
@@ -12,6 +11,7 @@ import { requireMcpToolConsent } from "@/ipc/utils/mcp_consent";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
 import { AgentContext, escapeXmlAttr, escapeXmlContent } from "./types";
 import { jsonSchemaToTs } from "./json_schema_to_ts";
+import type { IpcInvokeEventLike } from "@/ipc/utils/ipc_event";
 
 const MCP_RESULT_TYPE = `type McpResult = {
   content: Array<
@@ -120,7 +120,7 @@ export async function collectMcpToolDefs(): Promise<McpToolDef[]> {
  * the UI, mirroring the behavior of individually-registered MCP tools.
  */
 export function buildMcpCapabilityMap(params: {
-  event: IpcMainInvokeEvent;
+  event: IpcInvokeEventLike;
   ctx: AgentContext;
   defs: McpToolDef[];
 }): Record<string, (...args: unknown[]) => unknown> {

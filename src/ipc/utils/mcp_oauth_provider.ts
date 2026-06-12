@@ -1,4 +1,3 @@
-import { shell, safeStorage } from "electron";
 import log from "electron-log";
 import { eq } from "drizzle-orm";
 import type {
@@ -10,6 +9,7 @@ import type {
 import { db } from "../../db";
 import { mcpServers } from "../../db/schema";
 import { DEFAULT_OAUTH_CALLBACK_PORT } from "../types/mcp";
+import { getElectronModule } from "./electron_module";
 
 const logger = log.scope("mcp_oauth_provider");
 
@@ -42,6 +42,7 @@ function formUrlEncode(s: string): string {
 const PLAINTEXT_PREFIX = "plain:";
 
 export function encryptToString(plaintext: string): string {
+  const safeStorage = getElectronSafeStorage();
   if (!safeStorage.isEncryptionAvailable()) {
     // No keyring (e.g. Linux without libsecret): store plaintext
     // rather than blocking OAuth on those hosts.
@@ -61,6 +62,7 @@ export function decryptFromString(stored: string): string {
     ).toString("utf8");
   }
   const buf = Buffer.from(stored, "base64");
+  const safeStorage = getElectronSafeStorage();
   if (!safeStorage.isEncryptionAvailable()) {
     // Untagged blob without a keyring: best-effort UTF-8. Garbage
     // bytes fall through JSON.parse upstream as empty state. Log so a
@@ -379,6 +381,10 @@ export class DyadOAuthClientProvider implements OAuthClientProvider {
     logger.info(
       `Opening browser for OAuth: ${authorizationUrl.origin}${authorizationUrl.pathname}`,
     );
+    const shell = getElectronShell();
+    if (!shell) {
+      throw new Error("Electron shell is not available for OAuth");
+    }
     await shell.openExternal(authorizationUrl.toString());
   }
 
@@ -479,5 +485,35 @@ export class DyadOAuthClientProvider implements OAuthClientProvider {
       }
       await writeState(this.serverId, state);
     });
+  }
+}
+
+function getElectronSafeStorage(): typeof import("electron").safeStorage {
+  try {
+    if (process.versions.electron) {
+      const safeStorage =
+        getElectronModule<typeof import("electron")>()?.safeStorage;
+      if (safeStorage) {
+        return safeStorage;
+      }
+    }
+  } catch {
+    // Fall through to plaintext fallback.
+  }
+  return {
+    isEncryptionAvailable: () => false,
+    encryptString: (value: string) => Buffer.from(value, "utf8"),
+    decryptString: (value: Buffer) => value.toString("utf8"),
+  } as typeof import("electron").safeStorage;
+}
+
+function getElectronShell(): typeof import("electron").shell | null {
+  try {
+    if (!process.versions.electron) {
+      return null;
+    }
+    return getElectronModule<typeof import("electron")>()?.shell ?? null;
+  } catch {
+    return null;
   }
 }

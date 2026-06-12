@@ -18,6 +18,22 @@ import { usePlanImplementation } from "@/hooks/usePlanImplementation";
 import { ipc } from "@/ipc/types";
 
 const DEFAULT_CHAT_PANEL_SIZE = 50;
+const MIN_VISIBLE_CHAT_PANEL_SIZE = 20;
+
+function useIsMobileChatLayout() {
+  const [isMobileLayout, setIsMobileLayout] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const updateLayout = () => setIsMobileLayout(mediaQuery.matches);
+
+    updateLayout();
+    mediaQuery.addEventListener("change", updateLayout);
+    return () => mediaQuery.removeEventListener("change", updateLayout);
+  }, []);
+
+  return isMobileLayout;
+}
 
 export default function ChatPage() {
   const { id: chatId, appId: routeAppId } = useSearch({ from: "/chat" });
@@ -34,6 +50,10 @@ export default function ChatPage() {
   const previousSizeRef = useRef<number>(DEFAULT_CHAT_PANEL_SIZE);
   const isInitialMountRef = useRef(true);
   const selectedAppIdRef = useRef(selectedAppId);
+  const ref = useRef<ImperativePanelHandle>(null);
+  const chatPanelRef = useRef<ImperativePanelHandle>(null);
+  const isMobileLayout = useIsMobileChatLayout();
+  const [mobilePane, setMobilePane] = useState<"chat" | "preview">("chat");
 
   useEffect(() => {
     selectedAppIdRef.current = selectedAppId;
@@ -43,6 +63,10 @@ export default function ChatPage() {
   useEffect(() => {
     setSelectedChatId(chatId ?? null);
   }, [chatId, setSelectedChatId]);
+
+  useEffect(() => {
+    setMobilePane("chat");
+  }, [chatId]);
 
   // Handle plan implementation when a plan is accepted
   usePlanImplementation();
@@ -115,12 +139,19 @@ export default function ChatPage() {
   useEffect(() => {
     if (isPreviewOpen) {
       ref.current?.expand();
+      const chatPanelSize = chatPanelRef.current?.getSize() ?? 0;
+      const previewPanelSize = ref.current?.getSize() ?? 0;
+      if (
+        chatPanelSize > 100 - MIN_VISIBLE_CHAT_PANEL_SIZE ||
+        previewPanelSize < MIN_VISIBLE_CHAT_PANEL_SIZE
+      ) {
+        chatPanelRef.current?.resize(DEFAULT_CHAT_PANEL_SIZE);
+        ref.current?.resize(DEFAULT_CHAT_PANEL_SIZE);
+      }
     } else {
       ref.current?.collapse();
     }
   }, [isPreviewOpen]);
-  const ref = useRef<ImperativePanelHandle>(null);
-  const chatPanelRef = useRef<ImperativePanelHandle>(null);
 
   // Keep chat panel size in sync with hidden state (from toolbar button / other views)
   useEffect(() => {
@@ -144,6 +175,30 @@ export default function ChatPage() {
     }
   }, [isChatPanelHidden]);
 
+  if (isMobileLayout) {
+    return (
+      <div className="h-full min-w-0 flex-1 overflow-hidden">
+        {mobilePane === "preview" ? (
+          <PreviewPanel
+            onBackToChat={() => {
+              setMobilePane("chat");
+              setIsPreviewOpen(false);
+            }}
+          />
+        ) : (
+          <ChatPanel
+            chatId={chatId}
+            isPreviewOpen={false}
+            onTogglePreview={() => {
+              setMobilePane("preview");
+              setIsPreviewOpen(true);
+            }}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <PanelGroup autoSaveId="persistence" direction="horizontal">
       <Panel
@@ -159,11 +214,13 @@ export default function ChatPage() {
               chatId={chatId}
               isPreviewOpen={isPreviewOpen}
               onTogglePreview={() => {
-                setIsPreviewOpen(!isPreviewOpen);
-                if (isPreviewOpen) {
-                  ref.current?.collapse();
+                const nextPreviewOpen = !isPreviewOpen;
+                setIsPreviewOpen(nextPreviewOpen);
+                if (nextPreviewOpen) {
+                  chatPanelRef.current?.resize(DEFAULT_CHAT_PANEL_SIZE);
+                  ref.current?.resize(DEFAULT_CHAT_PANEL_SIZE);
                 } else {
-                  ref.current?.expand();
+                  ref.current?.collapse();
                 }
               }}
             />

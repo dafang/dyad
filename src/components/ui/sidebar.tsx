@@ -74,20 +74,30 @@ function SidebarProvider({
     setOpen((open) => !open);
   }, [setOpen]);
 
+  const setOpenRef = React.useRef(setOpen);
+  React.useEffect(() => {
+    setOpenRef.current = setOpen;
+  }, [setOpen]);
+
   // Auto-collapse on small screens
   React.useEffect(() => {
     const mql = window.matchMedia("(max-width: 480px)");
+    let wasSmallScreen = mql.matches;
     const handleResize = () => {
-      if (mql.matches) {
-        setOpen(false);
+      const isSmallScreen = mql.matches;
+      if (isSmallScreen && !wasSmallScreen) {
+        setOpenRef.current(false);
       }
+      wasSmallScreen = isSmallScreen;
     };
 
     mql.addEventListener("change", handleResize);
-    handleResize(); // Check initial size
+    if (mql.matches) {
+      setOpenRef.current(false);
+    }
 
     return () => mql.removeEventListener("change", handleResize);
-  }, [setOpen]);
+  }, []);
 
   // Adds a keyboard shortcut to toggle the sidebar.
   React.useEffect(() => {
@@ -188,6 +198,7 @@ function Sidebar({
         data-slot="sidebar-gap"
         className={cn(
           "relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear",
+          "max-sm:w-(--sidebar-width-icon)",
           "group-data-[collapsible=offcanvas]:w-0",
           "group-data-[side=right]:rotate-180",
           variant === "floating" || variant === "inset"
@@ -198,14 +209,14 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 flex h-svh w-(--sidebar-width) transition-[left,right,width,transform] duration-200 ease-linear",
+          "fixed inset-y-0 z-40 flex h-svh w-(--sidebar-width) transition-[left,right,width,transform] duration-200 ease-linear",
           side === "left"
             ? "left-0 translate-x-0 group-data-[collapsible=offcanvas]:translate-x-[-100%]"
             : "right-0 translate-x-0 group-data-[collapsible=offcanvas]:translate-x-[100%]",
           // Adjust the padding for floating and inset variants.
           variant === "floating" || variant === "inset"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l border-sidebar-border",
+            : "max-sm:max-w-[calc(100vw-0.75rem)] group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l border-sidebar-border",
           className,
         )}
         {...props}
@@ -232,6 +243,7 @@ function SidebarTrigger({
   return (
     <Tooltip>
       <TooltipTrigger
+        aria-label="Toggle Menu"
         data-sidebar="trigger"
         data-slot="sidebar-trigger"
         className={cn(

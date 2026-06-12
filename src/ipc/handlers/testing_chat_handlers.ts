@@ -1,6 +1,7 @@
 import { safeSend } from "../utils/safe_sender";
 import { cleanFullResponse } from "../utils/cleanFullResponse";
 import { computeStreamingPatch } from "../utils/stream_text_utils";
+import type { IpcInvokeEventLike } from "../utils/ipc_event";
 
 /**
  * Maximum number of unacked chunks the canned test stream is allowed to
@@ -203,7 +204,7 @@ const CHUNK_SIZE = 500;
  * — and pre-cleaning avoids an O(N²) regex sweep over the accumulator.
  */
 export async function streamTestResponse(
-  event: Electron.IpcMainInvokeEvent,
+  event: IpcInvokeEventLike,
   chatId: number,
   testResponse: string,
   abortController: AbortController,

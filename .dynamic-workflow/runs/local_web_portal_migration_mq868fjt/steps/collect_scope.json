@@ -1,0 +1,85 @@
+{
+  "step_id": "collect_scope",
+  "status": "succeeded",
+  "summary": "Collection commands completed.",
+  "output": {
+    "status": "succeeded",
+    "step_id": "collect_scope",
+    "collection": {
+      "ok": true,
+      "checks": [
+        {
+          "id": "codestable_explore",
+          "command": "sed -n '1,280p' .codestable/compound/2026-06-10-explore-web-portal-migration.md",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 9,
+          "stdout": "dependency/typecheck/read logs 的最小 tool set 到 `LocalRuntimeProvider`。\n6. 最后补 Vercel Sandbox cloud provider、auth/workspace/project ownership、deploy/integrations/advanced capability。\n\n## 已拍板约束\n\n- Web portal 首版按本机方案实现：浏览器访问本机托管的 localhost HTTP server，不依赖 Electron IPC。\n- 本机 HTTP server 只监听 loopback，使用随机 token 和严格 CORS/Origin 校验保护本机高权限能力。\n- Runtime provider 首版实现 `LocalRuntimeProvider`，复用本机 filesystem、child_process、git、SQLite、preview proxy、日志和 terminal。\n- 保留 runtime provider adapter；Vercel Sandbox 延后作为 cloud provider，不作为首版默认。\n- Desktop 继续使用 IPC，不改成“Electron shell + local HTTP server”；迁移重点放在 client 层 transport adapter 和 shared service/runtime 抽象。\n- 数据层优先复用 SQLite；本机 Web portal 可先用本机 userData/server data dir，云化时再按 SQLite-per-user/tenant 拆分。\n- Web 的 agent tools 采用 operation-level approval timeline；现有工具 consent 语义继续保留为默认策略/快捷偏好来源。\n- Desktop local 与未来 Web cloud 的代码同步只支持 GitHub，不做 proprietary snapshot sync；本机 Web portal 首版直接操作本机项目路径。\n\n## 后续建议\n\n下一步可以基于这份 explore 写一个 Web portal 迁移 roadmap，把 MVP 闭环拆成 contract adapter、service extraction、cloud runtime、auth/data model 四条并行线。\n\n## 相关文档\n\n- `docs/architecture.md`\n- `docs/agent_architecture.md`\n- `docs/adrs/0001-host-capability-interface.md`\n- `docs/adrs/0002-cloud-runtime-topology.md`\n- `docs/adrs/0003-authentication-authorization-model.md`\n- `plans/desktop-mobile-web-unification.md`\n- `plans/multi-platform-web-and-mobile.md`\n- `plans/sandbox-engine-implementation-plan.md`\n- `plans/sandbox-gaps.md`\n- `.codestable/compound/2026-06-10-decision-local-web-portal-first.md`\n",
+          "stderr": "",
+          "stdout_bytes": 14183,
+          "stderr_bytes": 0,
+          "stdout_truncated": true,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        },
+        {
+          "id": "codestable_decision",
+          "command": "sed -n '1,220p' .codestable/compound/2026-06-10-decision-local-web-portal-first.md",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 9,
+          "stdout": "tal、Electron desktop、后续 cloud portal 都可以共用同一组 service 接口，只替换 runtime provider。\n\nDesktop 继续 IPC 能保护现有桌面产品稳定性；本机 Web portal 是新入口，不强迫 desktop 先变成本地 HTTP shell。\n\nlocalhost API 必须默认按高权限本机服务处理。它可以读写用户文件、启动命令、访问本地 SQLite 和项目目录，因此需要 loopback 绑定、随机 token 和严格 Origin/CORS 校验，不能让任意网页调用。\n\n## 考虑过的替代方案\n\n- 直接做 cloud Web + Vercel Sandbox：长期方向仍可行，但首版会同时引入云 runtime、远程存储、租户隔离、配额、安全审计和运维复杂度。\n- 把 Electron desktop 改成本地 HTTP server shell：能统一 transport，但会扰动稳定桌面路径。\n- 不抽 runtime provider，只写 localhost API：短期更快，但会把本机执行细节泄漏到 API/service 层，后续接 Vercel Sandbox 时需要二次大改。\n- PostgreSQL multi-tenant：不适合当前本机首版；云化后可重新评估。\n\n## 后果\n\n- 第一阶段 roadmap 应以 `HttpTransport`、localhost API server、service extraction、`LocalRuntimeProvider` 为主。\n- Cloud/Vercel Sandbox 相关工作降级为后续 provider，不阻塞本机 Web portal MVP。\n- API security 成为本机方案的首要非功能需求：loopback、token、Origin/CORS、请求审计都要从一开始设计。\n- 现有 Electron IPC handler 不应直接复制成 HTTP handler；应抽 service，再分别接 IPC wrapper 和 HTTP route。\n- 后续云化时，`LocalRuntimeProvider` 与 `VercelSandboxRuntimeProvider` 必须实现同一 capability contract。\n\n## 相关文档\n\n- `.codestable/compound/2026-06-10-explore-web-portal-migration.md`\n- `.codestable/compound/2026-06-10-decision-web-portal-migration-constraints.md`\n- `docs/adrs/0001-host-capability-interface.md`\n- `plans/multi-platform-web-and-mobile.md`\n- `plans/sandbox-engine-implementation-plan.md`\n",
+          "stderr": "",
+          "stdout_bytes": 4579,
+          "stderr_bytes": 0,
+          "stdout_truncated": true,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        }
+      ],
+      "gaps": []
+    },
+    "checks": [
+      {
+        "id": "codestable_explore",
+        "command": "sed -n '1,280p' .codestable/compound/2026-06-10-explore-web-portal-migration.md",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 9,
+        "stdout": "dependency/typecheck/read logs 的最小 tool set 到 `LocalRuntimeProvider`。\n6. 最后补 Vercel Sandbox cloud provider、auth/workspace/project ownership、deploy/integrations/advanced capability。\n\n## 已拍板约束\n\n- Web portal 首版按本机方案实现：浏览器访问本机托管的 localhost HTTP server，不依赖 Electron IPC。\n- 本机 HTTP server 只监听 loopback，使用随机 token 和严格 CORS/Origin 校验保护本机高权限能力。\n- Runtime provider 首版实现 `LocalRuntimeProvider`，复用本机 filesystem、child_process、git、SQLite、preview proxy、日志和 terminal。\n- 保留 runtime provider adapter；Vercel Sandbox 延后作为 cloud provider，不作为首版默认。\n- Desktop 继续使用 IPC，不改成“Electron shell + local HTTP server”；迁移重点放在 client 层 transport adapter 和 shared service/runtime 抽象。\n- 数据层优先复用 SQLite；本机 Web portal 可先用本机 userData/server data dir，云化时再按 SQLite-per-user/tenant 拆分。\n- Web 的 agent tools 采用 operation-level approval timeline；现有工具 consent 语义继续保留为默认策略/快捷偏好来源。\n- Desktop local 与未来 Web cloud 的代码同步只支持 GitHub，不做 proprietary snapshot sync；本机 Web portal 首版直接操作本机项目路径。\n\n## 后续建议\n\n下一步可以基于这份 explore 写一个 Web portal 迁移 roadmap，把 MVP 闭环拆成 contract adapter、service extraction、cloud runtime、auth/data model 四条并行线。\n\n## 相关文档\n\n- `docs/architecture.md`\n- `docs/agent_architecture.md`\n- `docs/adrs/0001-host-capability-interface.md`\n- `docs/adrs/0002-cloud-runtime-topology.md`\n- `docs/adrs/0003-authentication-authorization-model.md`\n- `plans/desktop-mobile-web-unification.md`\n- `plans/multi-platform-web-and-mobile.md`\n- `plans/sandbox-engine-implementation-plan.md`\n- `plans/sandbox-gaps.md`\n- `.codestable/compound/2026-06-10-decision-local-web-portal-first.md`\n",
+        "stderr": "",
+        "stdout_bytes": 14183,
+        "stderr_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      },
+      {
+        "id": "codestable_decision",
+        "command": "sed -n '1,220p' .codestable/compound/2026-06-10-decision-local-web-portal-first.md",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 9,
+        "stdout": "tal、Electron desktop、后续 cloud portal 都可以共用同一组 service 接口，只替换 runtime provider。\n\nDesktop 继续 IPC 能保护现有桌面产品稳定性；本机 Web portal 是新入口，不强迫 desktop 先变成本地 HTTP shell。\n\nlocalhost API 必须默认按高权限本机服务处理。它可以读写用户文件、启动命令、访问本地 SQLite 和项目目录，因此需要 loopback 绑定、随机 token 和严格 Origin/CORS 校验，不能让任意网页调用。\n\n## 考虑过的替代方案\n\n- 直接做 cloud Web + Vercel Sandbox：长期方向仍可行，但首版会同时引入云 runtime、远程存储、租户隔离、配额、安全审计和运维复杂度。\n- 把 Electron desktop 改成本地 HTTP server shell：能统一 transport，但会扰动稳定桌面路径。\n- 不抽 runtime provider，只写 localhost API：短期更快，但会把本机执行细节泄漏到 API/service 层，后续接 Vercel Sandbox 时需要二次大改。\n- PostgreSQL multi-tenant：不适合当前本机首版；云化后可重新评估。\n\n## 后果\n\n- 第一阶段 roadmap 应以 `HttpTransport`、localhost API server、service extraction、`LocalRuntimeProvider` 为主。\n- Cloud/Vercel Sandbox 相关工作降级为后续 provider，不阻塞本机 Web portal MVP。\n- API security 成为本机方案的首要非功能需求：loopback、token、Origin/CORS、请求审计都要从一开始设计。\n- 现有 Electron IPC handler 不应直接复制成 HTTP handler；应抽 service，再分别接 IPC wrapper 和 HTTP route。\n- 后续云化时，`LocalRuntimeProvider` 与 `VercelSandboxRuntimeProvider` 必须实现同一 capability contract。\n\n## 相关文档\n\n- `.codestable/compound/2026-06-10-explore-web-portal-migration.md`\n- `.codestable/compound/2026-06-10-decision-web-portal-migration-constraints.md`\n- `docs/adrs/0001-host-capability-interface.md`\n- `plans/multi-platform-web-and-mobile.md`\n- `plans/sandbox-engine-implementation-plan.md`\n",
+        "stderr": "",
+        "stdout_bytes": 4579,
+        "stderr_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      }
+    ]
+  },
+  "verify": {
+    "ok": true,
+    "checks": []
+  }
+}

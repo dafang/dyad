@@ -1,0 +1,117 @@
+{
+  "step_id": "collect_code_context",
+  "status": "succeeded",
+  "summary": "Collection commands completed.",
+  "output": {
+    "status": "succeeded",
+    "step_id": "collect_code_context",
+    "collection": {
+      "ok": true,
+      "checks": [
+        {
+          "id": "ipc_contract_core",
+          "command": "sed -n '1,460p' src/ipc/contracts/core.ts",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 7,
+          "stdout": "  }\n\n      const key = (input as Record<string, unknown>)[\n        contract.keyField\n      ] as KeyValue;\n      streams.set(key, callbacks);\n\n      ipcRenderer.invoke(contract.channel, input).catch((err: Error) => {\n        callbacks.onError({\n          [contract.keyField]: key,\n          error: err.message,\n        } as any);\n        streams.delete(key);\n      });\n    },\n\n    /**\n     * Cancel a stream by its key value.\n     */\n    cancel(key: KeyValue): void {\n      streams.delete(key);\n    },\n\n    /**\n     * Check if a stream is active for a given key.\n     */\n    isActive(key: KeyValue): boolean {\n      return streams.has(key);\n    },\n  };\n}\n\n// =============================================================================\n// Channel Extraction Helpers\n// =============================================================================\n\n/**\n * Extract all invoke channels from a contracts object.\n * Used for building the preload whitelist.\n */\nexport function getInvokeChannels<\n  T extends Record<string, { channel: string }>,\n>(contracts: T): T[keyof T][\"channel\"][] {\n  return Object.values(contracts).map((c) => c.channel);\n}\n\n/**\n * Extract all receive (event) channels from an events object.\n * Used for building the preload whitelist.\n */\nexport function getReceiveChannels<\n  T extends Record<string, { channel: string }>,\n>(events: T): T[keyof T][\"channel\"][] {\n  return Object.values(events).map((e) => e.channel);\n}\n\n/**\n * Extract all channels from a stream contract (invoke + events).\n */\nexport function getStreamChannels<\n  TChannel extends string,\n  TInput extends z.ZodType,\n  TKey extends string,\n  TChunk extends z.ZodType,\n  TEnd extends z.ZodType,\n  TError extends z.ZodType,\n>(\n  stream: StreamContract<TChannel, TInput, TKey, TChunk, TEnd, TError>,\n): { invoke: TChannel; receive: string[] } {\n  return {\n    invoke: stream.channel,\n    receive: [\n      stream.events.chunk.channel,\n      stream.events.end.channel,\n      stream.events.error.channel,\n    ],\n  };\n}\n",
+          "stderr": "",
+          "stdout_bytes": 13006,
+          "stderr_bytes": 0,
+          "stdout_truncated": true,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        },
+        {
+          "id": "ipc_clients",
+          "command": "rg -n \"createClient\\(|createStreamClient\\(|createEventClient\\(\" src/ipc/types src/ipc/contracts/core.ts",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 9,
+          "stdout": "es/free_agent_quota.ts:57:export const freeAgentQuotaClient = createClient(freeAgentQuotaContracts);\nsrc/ipc/types/integration.ts:42:export const integrationEventClient = createEventClient(integrationEvents);\nsrc/ipc/types/integration.ts:44:export const integrationClient = createClient(integrationContracts);\nsrc/ipc/types/templates.ts:298:export const templateClient = createClient(templateContracts);\nsrc/ipc/types/app.ts:548:export const appClient = createClient(appContracts);\nsrc/ipc/types/chat.ts:397:export const chatClient = createClient(chatContracts);\nsrc/ipc/types/chat.ts:413:export const chatStreamClient = createStreamClient(chatStreamContract);\nsrc/ipc/types/language-model.ts:152:export const languageModelClient = createClient(languageModelContracts);\nsrc/ipc/types/context.ts:68:export const contextClient = createClient(contextContracts);\nsrc/ipc/types/settings.ts:47:export const settingsClient = createClient(settingsContracts);\nsrc/ipc/types/mcp.ts:294:export const mcpClient = createClient(mcpContracts);\nsrc/ipc/types/mcp.ts:295:export const mcpEventClient = createEventClient(mcpEvents);\nsrc/ipc/types/audio.ts:38:export const audioClient = createClient(audioContracts);\nsrc/ipc/types/agent.ts:207:export const agentClient = createClient(agentContracts);\nsrc/ipc/types/agent.ts:218:export const agentEventClient = createEventClient(agentEvents);\nsrc/ipc/types/github.ts:350:export const githubClient = createClient(githubContracts);\nsrc/ipc/types/github.ts:351:export const gitClient = createClient(gitContracts);\nsrc/ipc/types/github.ts:352:export const githubEventClient = createEventClient(githubEvents);\nsrc/ipc/types/proposals.ts:136:export const proposalClient = createClient(proposalContracts);\nsrc/ipc/types/migration.ts:87:export const migrationClient = createClient(migrationContracts);\nsrc/ipc/types/help.ts:80:export const helpClient = createClient(helpContracts);\nsrc/ipc/types/help.ts:81:export const helpStreamClient = createStreamClient(helpStreamContract);\n",
+          "stderr": "",
+          "stdout_bytes": 4323,
+          "stderr_bytes": 0,
+          "stdout_truncated": true,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        },
+        {
+          "id": "server_runtime_prior_art",
+          "command": "rg -n \"HttpTransport|LocalRuntimeProvider|RuntimeProvider|api/rpc|localhost HTTP|local server\" src package.json .codestable/compound",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 23,
+          "stdout": "件、进程、git、preview、日志、terminal 等执行能力从 API transport 中分离出来。这样本机 Web portal、Electron desktop、后续 cloud portal 都可以共用同一组 service 接口，只替换 runtime provider。\n.codestable/compound/2026-06-10-decision-local-web-portal-first.md:56:- 第一阶段 roadmap 应以 `HttpTransport`、localhost API server、service extraction、`LocalRuntimeProvider` 为主。\n.codestable/compound/2026-06-10-decision-local-web-portal-first.md:60:- 后续云化时，`LocalRuntimeProvider` 与 `VercelSandboxRuntimeProvider` 必须实现同一 capability contract。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:171:   Browser 无法直接 spawn、npm install、git、terminal、filesystem mutation。首版由本机 HTTP server 提供 `LocalRuntimeProvider`：\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:180:   后续云化时，在同一 provider adapter 下新增 `VercelSandboxRuntimeProvider`，再补 object storage、isolated worker/container、quota/rate limit 等云能力。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:215:1. 抽 transport client：让 React 可以在 Electron IPC 和 localhost HTTP server 间切换。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:218:4. 建 `LocalRuntimeProvider`：本机文件、spawn、git、preview proxy、日志/terminal。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:219:5. 接 agent write/read/add dependency/typecheck/read logs 的最小 tool set 到 `LocalRuntimeProvider`。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:224:- Web portal 首版按本机方案实现：浏览器访问本机托管的 localhost HTTP server，不依赖 Electron IPC。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:226:- Runtime provider 首版实现 `LocalRuntimeProvider`，复用本机 filesystem、child_process、git、SQLite、preview proxy、日志和 terminal。\n",
+          "stderr": "",
+          "stdout_bytes": 2902,
+          "stderr_bytes": 0,
+          "stdout_truncated": true,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        }
+      ],
+      "gaps": []
+    },
+    "checks": [
+      {
+        "id": "ipc_contract_core",
+        "command": "sed -n '1,460p' src/ipc/contracts/core.ts",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 7,
+        "stdout": "  }\n\n      const key = (input as Record<string, unknown>)[\n        contract.keyField\n      ] as KeyValue;\n      streams.set(key, callbacks);\n\n      ipcRenderer.invoke(contract.channel, input).catch((err: Error) => {\n        callbacks.onError({\n          [contract.keyField]: key,\n          error: err.message,\n        } as any);\n        streams.delete(key);\n      });\n    },\n\n    /**\n     * Cancel a stream by its key value.\n     */\n    cancel(key: KeyValue): void {\n      streams.delete(key);\n    },\n\n    /**\n     * Check if a stream is active for a given key.\n     */\n    isActive(key: KeyValue): boolean {\n      return streams.has(key);\n    },\n  };\n}\n\n// =============================================================================\n// Channel Extraction Helpers\n// =============================================================================\n\n/**\n * Extract all invoke channels from a contracts object.\n * Used for building the preload whitelist.\n */\nexport function getInvokeChannels<\n  T extends Record<string, { channel: string }>,\n>(contracts: T): T[keyof T][\"channel\"][] {\n  return Object.values(contracts).map((c) => c.channel);\n}\n\n/**\n * Extract all receive (event) channels from an events object.\n * Used for building the preload whitelist.\n */\nexport function getReceiveChannels<\n  T extends Record<string, { channel: string }>,\n>(events: T): T[keyof T][\"channel\"][] {\n  return Object.values(events).map((e) => e.channel);\n}\n\n/**\n * Extract all channels from a stream contract (invoke + events).\n */\nexport function getStreamChannels<\n  TChannel extends string,\n  TInput extends z.ZodType,\n  TKey extends string,\n  TChunk extends z.ZodType,\n  TEnd extends z.ZodType,\n  TError extends z.ZodType,\n>(\n  stream: StreamContract<TChannel, TInput, TKey, TChunk, TEnd, TError>,\n): { invoke: TChannel; receive: string[] } {\n  return {\n    invoke: stream.channel,\n    receive: [\n      stream.events.chunk.channel,\n      stream.events.end.channel,\n      stream.events.error.channel,\n    ],\n  };\n}\n",
+        "stderr": "",
+        "stdout_bytes": 13006,
+        "stderr_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      },
+      {
+        "id": "ipc_clients",
+        "command": "rg -n \"createClient\\(|createStreamClient\\(|createEventClient\\(\" src/ipc/types src/ipc/contracts/core.ts",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 9,
+        "stdout": "es/free_agent_quota.ts:57:export const freeAgentQuotaClient = createClient(freeAgentQuotaContracts);\nsrc/ipc/types/integration.ts:42:export const integrationEventClient = createEventClient(integrationEvents);\nsrc/ipc/types/integration.ts:44:export const integrationClient = createClient(integrationContracts);\nsrc/ipc/types/templates.ts:298:export const templateClient = createClient(templateContracts);\nsrc/ipc/types/app.ts:548:export const appClient = createClient(appContracts);\nsrc/ipc/types/chat.ts:397:export const chatClient = createClient(chatContracts);\nsrc/ipc/types/chat.ts:413:export const chatStreamClient = createStreamClient(chatStreamContract);\nsrc/ipc/types/language-model.ts:152:export const languageModelClient = createClient(languageModelContracts);\nsrc/ipc/types/context.ts:68:export const contextClient = createClient(contextContracts);\nsrc/ipc/types/settings.ts:47:export const settingsClient = createClient(settingsContracts);\nsrc/ipc/types/mcp.ts:294:export const mcpClient = createClient(mcpContracts);\nsrc/ipc/types/mcp.ts:295:export const mcpEventClient = createEventClient(mcpEvents);\nsrc/ipc/types/audio.ts:38:export const audioClient = createClient(audioContracts);\nsrc/ipc/types/agent.ts:207:export const agentClient = createClient(agentContracts);\nsrc/ipc/types/agent.ts:218:export const agentEventClient = createEventClient(agentEvents);\nsrc/ipc/types/github.ts:350:export const githubClient = createClient(githubContracts);\nsrc/ipc/types/github.ts:351:export const gitClient = createClient(gitContracts);\nsrc/ipc/types/github.ts:352:export const githubEventClient = createEventClient(githubEvents);\nsrc/ipc/types/proposals.ts:136:export const proposalClient = createClient(proposalContracts);\nsrc/ipc/types/migration.ts:87:export const migrationClient = createClient(migrationContracts);\nsrc/ipc/types/help.ts:80:export const helpClient = createClient(helpContracts);\nsrc/ipc/types/help.ts:81:export const helpStreamClient = createStreamClient(helpStreamContract);\n",
+        "stderr": "",
+        "stdout_bytes": 4323,
+        "stderr_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      },
+      {
+        "id": "server_runtime_prior_art",
+        "command": "rg -n \"HttpTransport|LocalRuntimeProvider|RuntimeProvider|api/rpc|localhost HTTP|local server\" src package.json .codestable/compound",
+        "exit_code": 0,
+        "signal": null,
+        "timed_out": false,
+        "elapsed_ms": 23,
+        "stdout": "件、进程、git、preview、日志、terminal 等执行能力从 API transport 中分离出来。这样本机 Web portal、Electron desktop、后续 cloud portal 都可以共用同一组 service 接口，只替换 runtime provider。\n.codestable/compound/2026-06-10-decision-local-web-portal-first.md:56:- 第一阶段 roadmap 应以 `HttpTransport`、localhost API server、service extraction、`LocalRuntimeProvider` 为主。\n.codestable/compound/2026-06-10-decision-local-web-portal-first.md:60:- 后续云化时，`LocalRuntimeProvider` 与 `VercelSandboxRuntimeProvider` 必须实现同一 capability contract。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:171:   Browser 无法直接 spawn、npm install、git、terminal、filesystem mutation。首版由本机 HTTP server 提供 `LocalRuntimeProvider`：\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:180:   后续云化时，在同一 provider adapter 下新增 `VercelSandboxRuntimeProvider`，再补 object storage、isolated worker/container、quota/rate limit 等云能力。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:215:1. 抽 transport client：让 React 可以在 Electron IPC 和 localhost HTTP server 间切换。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:218:4. 建 `LocalRuntimeProvider`：本机文件、spawn、git、preview proxy、日志/terminal。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:219:5. 接 agent write/read/add dependency/typecheck/read logs 的最小 tool set 到 `LocalRuntimeProvider`。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:224:- Web portal 首版按本机方案实现：浏览器访问本机托管的 localhost HTTP server，不依赖 Electron IPC。\n.codestable/compound/2026-06-10-explore-web-portal-migration.md:226:- Runtime provider 首版实现 `LocalRuntimeProvider`，复用本机 filesystem、child_process、git、SQLite、preview proxy、日志和 terminal。\n",
+        "stderr": "",
+        "stdout_bytes": 2902,
+        "stderr_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "acceptable": true,
+        "soft_failed": false
+      }
+    ]
+  },
+  "verify": {
+    "ok": true,
+    "checks": []
+  }
+}

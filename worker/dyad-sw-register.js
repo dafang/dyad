@@ -11,9 +11,16 @@
     return;
   }
 
+  const previewPrefix =
+    typeof window.__DYAD_LOCAL_WEB_PREVIEW_PREFIX__ === "string"
+      ? window.__DYAD_LOCAL_WEB_PREVIEW_PREFIX__.replace(/\/$/, "")
+      : "";
+  const serviceWorkerUrl = `${previewPrefix}/dyad-sw.js`;
+  const serviceWorkerScope = `${previewPrefix || ""}/`;
+
   // Register the Service Worker
   navigator.serviceWorker
-    .register("/dyad-sw.js", { scope: "/" })
+    .register(serviceWorkerUrl, { scope: serviceWorkerScope })
     .then((registration) => {
       console.log("[Dyad] Service Worker registered:", registration.scope);
 

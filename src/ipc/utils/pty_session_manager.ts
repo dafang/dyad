@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import { spawn as defaultSpawnPty } from "node-pty";
-import type { WebContents } from "electron";
 import log from "electron-log";
 import { shellEnvSync } from "shell-env";
 import { eq } from "drizzle-orm";
@@ -9,7 +8,7 @@ import { db } from "../../db";
 import { apps } from "../../db/schema";
 import { getDyadAppPath } from "../../paths/paths";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
-import { safeSend } from "./safe_sender";
+import { safeSend, type WebContentsLike } from "./safe_sender";
 import { terminatePtyProcess, type PtyProcessLike } from "./pty_command_runner";
 
 const logger = log.scope("pty_session_manager");
@@ -52,10 +51,15 @@ export interface TerminalSessionManagerDeps {
   ptySpawner: TerminalPtySpawner;
   getShellEnv(): Record<string, string | undefined>;
   send(
-    sender: WebContents | null | undefined,
+    sender: WebContentsLike | null | undefined,
     channel: string,
     payload: unknown,
   ): void;
+  sendToSubscriber?: (
+    subscriber: TerminalSubscriberTarget,
+    channel: string,
+    payload: unknown,
+  ) => void;
   now(): number;
 }
 
@@ -64,8 +68,16 @@ interface TerminalExit {
   signal?: number | null;
 }
 
+export type TerminalSubscriberTarget =
+  | { type: "electron"; webContents: WebContentsLike & { id: number } }
+  | {
+      type: "local-web";
+      subscriberId: string;
+      send(channel: string, payload: unknown): void;
+    };
+
 interface TerminalSubscriber {
-  webContents: WebContents;
+  target: TerminalSubscriberTarget;
   nextOutputOffset: number;
   attachmentCount: number;
 }
@@ -80,7 +92,7 @@ interface PtySession {
   pty: TerminalPtyProcess | null;
   dataSubscription: { dispose(): void };
   exitSubscription: { dispose(): void };
-  subscribers: Map<number, TerminalSubscriber>;
+  subscribers: Map<string, TerminalSubscriber>;
   scrollback: string;
   pendingOutput: string;
   pendingOutputStartOffset: number;
@@ -96,7 +108,8 @@ export interface OpenTerminalSessionParams {
   appId: number;
   cols?: number;
   rows?: number;
-  sender?: WebContents;
+  sender?: WebContentsLike & { id: number };
+  subscriber?: TerminalSubscriberTarget;
 }
 
 export interface OpenTerminalSessionResult {
@@ -216,7 +229,7 @@ export class PtySessionManager {
   ): Promise<OpenTerminalSessionResult> {
     const existingSession = this.sessions.get(params.appId);
     if (existingSession) {
-      this.attach(params.sender, existingSession);
+      this.attach(resolveTerminalSubscriberTarget(params), existingSession);
       existingSession.lastUsedAt = this.deps.now();
       return {
         sessionId: existingSession.sessionId,
@@ -299,7 +312,7 @@ export class PtySessionManager {
     });
 
     this.sessions.set(terminalApp.id, session);
-    this.attach(params.sender, session);
+    this.attach(resolveTerminalSubscriberTarget(params), session);
 
     return {
       sessionId,
@@ -312,14 +325,18 @@ export class PtySessionManager {
     };
   }
 
-  closeSession(sessionId: string, sender?: WebContents): void {
+  closeSession(
+    sessionId: string,
+    senderOrSubscriber?: TerminalSenderOrSubscriber,
+  ): void {
     const session = this.findSession(sessionId);
-    if (!session || !sender) return;
-    const subscriber = session.subscribers.get(sender.id);
+    const subscriberKey = getTerminalSubscriberKey(senderOrSubscriber);
+    if (!session || !subscriberKey) return;
+    const subscriber = session.subscribers.get(subscriberKey);
     if (subscriber) {
       subscriber.attachmentCount -= 1;
       if (subscriber.attachmentCount <= 0) {
-        session.subscribers.delete(sender.id);
+        session.subscribers.delete(subscriberKey);
       }
     }
     if (session.exited) {
@@ -327,8 +344,12 @@ export class PtySessionManager {
     }
   }
 
-  write(sessionId: string, data: string, sender?: WebContents): void {
-    const session = this.findAuthorizedSession(sessionId, sender);
+  write(
+    sessionId: string,
+    data: string,
+    senderOrSubscriber?: TerminalSenderOrSubscriber,
+  ): void {
+    const session = this.findAuthorizedSession(sessionId, senderOrSubscriber);
     if (!session?.pty) {
       throw new DyadError(
         "Terminal session is not running",
@@ -343,9 +364,9 @@ export class PtySessionManager {
     sessionId: string,
     cols: number,
     rows: number,
-    sender?: WebContents,
+    senderOrSubscriber?: TerminalSenderOrSubscriber,
   ): void {
-    const session = this.findAuthorizedSession(sessionId, sender);
+    const session = this.findAuthorizedSession(sessionId, senderOrSubscriber);
     if (!session?.pty) return;
     session.lastUsedAt = this.deps.now();
     session.pty.resize(cols, rows);
@@ -353,14 +374,15 @@ export class PtySessionManager {
 
   serialize(
     sessionId: string,
-    sender?: WebContents,
+    senderOrSubscriber?: TerminalSenderOrSubscriber,
   ): SerializedTerminalSession {
-    const session = this.findAuthorizedSession(sessionId, sender);
+    const session = this.findAuthorizedSession(sessionId, senderOrSubscriber);
     if (!session) {
       throw new DyadError("Terminal session not found", DyadErrorKind.NotFound);
     }
-    if (sender) {
-      const subscriber = session.subscribers.get(sender.id);
+    const subscriberKey = getTerminalSubscriberKey(senderOrSubscriber);
+    if (subscriberKey) {
+      const subscriber = session.subscribers.get(subscriberKey);
       if (subscriber) {
         subscriber.nextOutputOffset = session.outputEndOffset;
       }
@@ -371,8 +393,11 @@ export class PtySessionManager {
     };
   }
 
-  killSession(sessionId: string, sender?: WebContents): void {
-    const session = this.findAuthorizedSession(sessionId, sender);
+  killSession(
+    sessionId: string,
+    senderOrSubscriber?: TerminalSenderOrSubscriber,
+  ): void {
+    const session = this.findAuthorizedSession(sessionId, senderOrSubscriber);
     if (!session) return;
     this.disposeSession(session, { remove: true, notifyExit: true });
   }
@@ -398,17 +423,22 @@ export class PtySessionManager {
       .length;
   }
 
-  private attach(sender: WebContents | undefined, session: PtySession): void {
-    if (!sender || sender.isDestroyed()) return;
-    const existingSubscriber = session.subscribers.get(sender.id);
+  private attach(
+    target: TerminalSubscriberTarget | undefined,
+    session: PtySession,
+  ): void {
+    if (!target || isTerminalSubscriberDestroyed(target)) return;
+    const subscriberKey = getTerminalSubscriberKey(target);
+    if (!subscriberKey) return;
+    const existingSubscriber = session.subscribers.get(subscriberKey);
     if (existingSubscriber) {
-      existingSubscriber.webContents = sender;
+      existingSubscriber.target = target;
       existingSubscriber.attachmentCount += 1;
       return;
     }
 
-    session.subscribers.set(sender.id, {
-      webContents: sender,
+    session.subscribers.set(subscriberKey, {
+      target,
       nextOutputOffset: session.outputEndOffset,
       attachmentCount: 1,
     });
@@ -422,15 +452,19 @@ export class PtySessionManager {
 
   private findAuthorizedSession(
     sessionId: string,
-    sender?: WebContents,
+    senderOrSubscriber?: TerminalSenderOrSubscriber,
   ): PtySession | undefined {
     const session = this.findSession(sessionId);
-    if (!session || !sender) {
+    const subscriberKey = getTerminalSubscriberKey(senderOrSubscriber);
+    if (!session || !subscriberKey) {
       return session;
     }
 
     this.removeDestroyedSubscribers(session);
-    if (sender.isDestroyed() || !session.subscribers.has(sender.id)) {
+    if (
+      isTerminalSubscriberDestroyed(senderOrSubscriber) ||
+      !session.subscribers.has(subscriberKey)
+    ) {
       throw new DyadError(
         "Terminal session is not attached to this window",
         DyadErrorKind.Precondition,
@@ -441,7 +475,7 @@ export class PtySessionManager {
 
   private removeDestroyedSubscribers(session: PtySession): void {
     for (const [id, subscriber] of session.subscribers) {
-      if (subscriber.webContents.isDestroyed()) {
+      if (isTerminalSubscriberDestroyed(subscriber.target)) {
         session.subscribers.delete(id);
       }
     }
@@ -454,7 +488,7 @@ export class PtySessionManager {
   ): void {
     this.removeDestroyedSubscribers(session);
     for (const subscriber of session.subscribers.values()) {
-      this.deps.send(subscriber.webContents, channel, payload);
+      this.sendToSubscriber(subscriber.target, channel, payload);
     }
   }
 
@@ -492,7 +526,7 @@ export class PtySessionManager {
       subscriber.nextOutputOffset = chunkEndOffset;
       const visibleChunk = chunk.slice(offset);
       if (!visibleChunk) continue;
-      this.deps.send(subscriber.webContents, channel, {
+      this.sendToSubscriber(subscriber.target, channel, {
         sessionId: session.sessionId,
         chunk: visibleChunk,
         startOffset: chunkStartOffset + offset,
@@ -601,7 +635,77 @@ export class PtySessionManager {
       appName: sessionToEvict.appName,
     };
   }
+
+  private sendToSubscriber(
+    target: TerminalSubscriberTarget,
+    channel: string,
+    payload: unknown,
+  ): void {
+    if (this.deps.sendToSubscriber) {
+      this.deps.sendToSubscriber(target, channel, payload);
+      return;
+    }
+    if (target.type === "electron") {
+      this.deps.send(target.webContents, channel, payload);
+    } else {
+      target.send(channel, payload);
+    }
+  }
 }
+
+function resolveTerminalSubscriberTarget(
+  params: Pick<OpenTerminalSessionParams, "sender" | "subscriber">,
+): TerminalSubscriberTarget | undefined {
+  if (params.subscriber) {
+    return params.subscriber;
+  }
+  if (params.sender) {
+    return { type: "electron", webContents: params.sender };
+  }
+  return undefined;
+}
+
+function getTerminalSubscriberKey(
+  senderOrSubscriber?: TerminalSenderOrSubscriber,
+): string | undefined {
+  if (!senderOrSubscriber) {
+    return undefined;
+  }
+  if (isTerminalSubscriberTarget(senderOrSubscriber)) {
+    return senderOrSubscriber.type === "electron"
+      ? `electron:${senderOrSubscriber.webContents.id}`
+      : `local-web:${senderOrSubscriber.subscriberId}`;
+  }
+  return `electron:${senderOrSubscriber.id}`;
+}
+
+function isTerminalSubscriberDestroyed(
+  senderOrSubscriber?: TerminalSenderOrSubscriber,
+): boolean {
+  if (!senderOrSubscriber) {
+    return false;
+  }
+  if (isTerminalSubscriberTarget(senderOrSubscriber)) {
+    return senderOrSubscriber.type === "electron"
+      ? senderOrSubscriber.webContents.isDestroyed()
+      : false;
+  }
+  return senderOrSubscriber.isDestroyed();
+}
+
+function isTerminalSubscriberTarget(
+  value: TerminalSenderOrSubscriber,
+): value is TerminalSubscriberTarget {
+  return (
+    typeof (value as TerminalSubscriberTarget).type === "string" &&
+    ((value as TerminalSubscriberTarget).type === "electron" ||
+      (value as TerminalSubscriberTarget).type === "local-web")
+  );
+}
+
+type TerminalSenderOrSubscriber =
+  | (WebContentsLike & { id: number })
+  | TerminalSubscriberTarget;
 
 let ptySessionManager: PtySessionManager | null = null;
 

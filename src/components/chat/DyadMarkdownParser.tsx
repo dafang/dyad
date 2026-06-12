@@ -929,6 +929,7 @@ function renderCustomTag(
               theme: attributes.theme || "default",
               "design-direction": attributes["design-direction"] || "",
               "primary-color": attributes["primary-color"] || "",
+              data: attributes.data,
               complete: attributes.complete,
               state: getState({ isStreaming, inProgress }),
             },

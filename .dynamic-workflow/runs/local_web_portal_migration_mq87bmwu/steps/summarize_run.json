@@ -1,0 +1,123 @@
+{
+  "step_id": "summarize_run",
+  "status": "succeeded",
+  "summary": "Executed summarize_run through current host boundary.",
+  "output": {
+    "status": "succeeded",
+    "step_id": "summarize_run",
+    "type": "agent.synthesize",
+    "summary": "Executed summarize_run through current host boundary.",
+    "context": {
+      "loop_findings": [],
+      "loop_blocking_count": 0,
+      "final_verification": [
+        {
+          "id": "test_contract_core",
+          "command": "npm test -- src/ipc/contracts/core.test.ts",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 935,
+          "stdout": "\n> dyad@1.3.0 test\n> cross-env NODE_OPTIONS=--no-deprecation VITE_CJS_IGNORE_WARNING=true vitest run src/ipc/contracts/core.test.ts\n\n\n RUN  v3.2.4 /Users/wyattfang/work/github/dyad\n\n ✓ src/ipc/contracts/core.test.ts (8 tests) 6ms\n\n Test Files  1 passed (1)\n      Tests  8 passed (8)\n   Start at  23:08:22\n   Duration  423ms (transform 20ms, setup 0ms, collect 32ms, tests 6ms, environment 70ms, prepare 40ms)\n\n",
+          "stderr": "",
+          "stdout_bytes": 412,
+          "stderr_bytes": 0,
+          "stdout_truncated": false,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        },
+        {
+          "id": "test_local_rpc_server",
+          "command": "npm test -- src/server/local_rpc_server.test.ts",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 830,
+          "stdout": "\n> dyad@1.3.0 test\n> cross-env NODE_OPTIONS=--no-deprecation VITE_CJS_IGNORE_WARNING=true vitest run src/server/local_rpc_server.test.ts\n\n\n RUN  v3.2.4 /Users/wyattfang/work/github/dyad\n\n ✓ src/server/local_rpc_server.test.ts (5 tests) 21ms\n\n Test Files  1 passed (1)\n      Tests  5 passed (5)\n   Start at  23:08:23\n   Duration  395ms (transform 28ms, setup 0ms, collect 40ms, tests 21ms, environment 69ms, prepare 39ms)\n\n",
+          "stderr": "",
+          "stdout_bytes": 424,
+          "stderr_bytes": 0,
+          "stdout_truncated": false,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        },
+        {
+          "id": "test_local_runtime_provider",
+          "command": "npm test -- src/runtime/local_runtime_provider.test.ts",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 843,
+          "stdout": "\n> dyad@1.3.0 test\n> cross-env NODE_OPTIONS=--no-deprecation VITE_CJS_IGNORE_WARNING=true vitest run src/runtime/local_runtime_provider.test.ts\n\n\n RUN  v3.2.4 /Users/wyattfang/work/github/dyad\n\n ✓ src/runtime/local_runtime_provider.test.ts (5 tests) 54ms\n\n Test Files  1 passed (1)\n      Tests  5 passed (5)\n   Start at  23:08:24\n   Duration  405ms (transform 22ms, setup 0ms, collect 22ms, tests 54ms, environment 70ms, prepare 31ms)\n\n",
+          "stderr": "",
+          "stdout_bytes": 438,
+          "stderr_bytes": 0,
+          "stdout_truncated": false,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        },
+        {
+          "id": "typecheck",
+          "command": "npm run ts",
+          "exit_code": 0,
+          "signal": null,
+          "timed_out": false,
+          "elapsed_ms": 1357,
+          "stdout": "\n> dyad@1.3.0 ts\n> npm run ts:main && npm run ts:workers\n\n\n> dyad@1.3.0 ts:main\n> npx tsgo -p tsconfig.app.json --noEmit --incremental\n\n\n> dyad@1.3.0 ts:workers\n> npx tsc -p workers/tsc/tsconfig.json --noEmit --incremental\n\n",
+          "stderr": "",
+          "stdout_bytes": 224,
+          "stderr_bytes": 0,
+          "stdout_truncated": false,
+          "stderr_truncated": false,
+          "acceptable": true,
+          "soft_failed": false
+        }
+      ]
+    },
+    "context_sources": [
+      {
+        "alias": "loop_findings",
+        "from_step": "repair_loop__round_3__review",
+        "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_3__review.json",
+        "selected_path": "$.output.findings",
+        "required": false,
+        "clipped": false,
+        "original_bytes": 2,
+        "selected_bytes": 2
+      },
+      {
+        "alias": "loop_blocking_count",
+        "from_step": "repair_loop__round_3__review",
+        "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/repair_loop__round_3__review.json",
+        "selected_path": "$.output.blocking_count",
+        "required": false,
+        "clipped": false,
+        "original_bytes": 1,
+        "selected_bytes": 1
+      },
+      {
+        "alias": "final_verification",
+        "from_step": "final_verify",
+        "output_path": ".dynamic-workflow/runs/local_web_portal_migration_mq87bmwu/steps/final_verify.json",
+        "selected_path": "$.verify.checks",
+        "required": true,
+        "clipped": false,
+        "original_bytes": 2718,
+        "selected_bytes": 2718
+      }
+    ],
+    "decisions": [],
+    "next_actions": [],
+    "metadata": {
+      "contract": "agent.synthesize",
+      "generated_by": "current_stub"
+    }
+  },
+  "verify": {
+    "ok": true,
+    "checks": []
+  }
+}

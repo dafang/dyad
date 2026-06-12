@@ -4,6 +4,7 @@ import log from "electron-log";
 import { ToolDefinition, AgentContext, escapeXmlAttr } from "./types";
 import { setAppBlueprintForChat } from "@/ipc/handlers/app_blueprint_handlers";
 import { AppBlueprintVisualTypeSchema } from "@/ipc/types/app_blueprint";
+import { encodeAppBlueprintData } from "@/lib/app_blueprint_data";
 import { safeSend } from "@/ipc/utils/safe_sender";
 import { readSettings } from "@/main/settings";
 import { localTemplatesData } from "@/shared/templates";
@@ -188,8 +189,29 @@ export const writeAppBlueprintTool: ToolDefinition<
     const primaryColor = args.primary_color
       ? escapeXmlAttr(args.primary_color)
       : "";
+    const data =
+      args.user_prompt &&
+      args.design_direction &&
+      args.primary_color &&
+      args.visuals
+        ? ` data="${encodeAppBlueprintData({
+            appName: args.app_name,
+            userPrompt: args.user_prompt,
+            attachments: args.attachments ?? [],
+            templateId: resolveTemplateId(args.template_id, settings),
+            themeId: resolveThemeId(args.theme_id, settings),
+            designDirection: args.design_direction,
+            primaryColor: args.primary_color,
+            visuals: args.visuals.map((visual, index) => ({
+              id: `visual_${index}`,
+              type: visual.type,
+              description: visual.description,
+              prompt: visual.prompt,
+            })),
+          })}"`
+        : "";
 
-    return `<dyad-app-blueprint app-name="${appName}" template="${template}" theme="${theme}" design-direction="${designDirection}" primary-color="${primaryColor}" complete="${isComplete}"></dyad-app-blueprint>`;
+    return `<dyad-app-blueprint app-name="${appName}" template="${template}" theme="${theme}" design-direction="${designDirection}" primary-color="${primaryColor}"${data} complete="${isComplete}"></dyad-app-blueprint>`;
   },
 
   execute: async (args, ctx: AgentContext) => {
@@ -221,6 +243,10 @@ export const writeAppBlueprintTool: ToolDefinition<
       chatId: ctx.chatId,
       data,
     });
+
+    await ctx.onXmlComplete(
+      `<dyad-app-blueprint app-name="${escapeXmlAttr(data.appName)}" template="${escapeXmlAttr(data.templateId)}" theme="${escapeXmlAttr(data.themeId)}" design-direction="${escapeXmlAttr(data.designDirection)}" primary-color="${escapeXmlAttr(data.primaryColor)}" data="${encodeAppBlueprintData(data)}" complete="true"></dyad-app-blueprint>`,
+    );
 
     // Return immediately without waiting for approval. The agent's `stopWhen`
     // ends the turn after this tool, so the model can't proceed against the

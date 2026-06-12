@@ -34,19 +34,27 @@ function findFreePort(): Promise<number> {
  */
 function startUpstream(
   setCookie: string[],
-  { contentType = "text/plain", body = "ok" } = {},
+  { chunked = false, contentType = "text/plain", body = "ok" } = {},
 ): Promise<{
   origin: string;
   close: () => Promise<void>;
 }> {
   return new Promise((resolve, reject) => {
     const server = http.createServer((_req, res) => {
-      res.writeHead(200, {
+      const headers: http.OutgoingHttpHeaders = {
         "content-type": contentType,
-        "content-length": Buffer.byteLength(body),
         "set-cookie": setCookie,
-      });
-      res.end(body);
+      };
+      if (!chunked) {
+        headers["content-length"] = Buffer.byteLength(body);
+      }
+      res.writeHead(200, headers);
+      if (chunked) {
+        res.write(body.slice(0, Math.max(1, Math.floor(body.length / 2))));
+        res.end(body.slice(Math.max(1, Math.floor(body.length / 2))));
+      } else {
+        res.end(body);
+      }
     });
     server.once("error", reject);
     server.listen(0, "localhost", () => {
@@ -67,6 +75,29 @@ function getSetCookie(port: number): Promise<string[]> {
       // Drain the body so the socket can close.
       res.on("data", () => {});
       res.on("end", () => resolve(res.headers["set-cookie"] ?? []));
+    });
+    req.once("error", reject);
+  });
+}
+
+function getResponse(port: number): Promise<{
+  status: number | undefined;
+  headers: http.IncomingHttpHeaders;
+  body: string;
+}> {
+  return new Promise((resolve, reject) => {
+    const req = http.get({ host: "localhost", port, path: "/" }, (res) => {
+      const chunks: Buffer[] = [];
+      res.on("data", (chunk) => {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      });
+      res.on("end", () =>
+        resolve({
+          status: res.statusCode,
+          headers: res.headers,
+          body: Buffer.concat(chunks).toString("utf8"),
+        }),
+      );
     });
     req.once("error", reject);
   });
@@ -130,9 +161,26 @@ describe("proxy worker cookie rewriting", () => {
     };
   }
 
+  async function proxyResponseFromUpstream(upstream: {
+    origin: string;
+    close: () => Promise<void>;
+  }) {
+    cleanup.push(upstream.close);
+
+    const port = await findFreePort();
+    const { waitForStart } = startWorker({
+      targetOrigin: upstream.origin,
+      port,
+      fallbackPortStart: await findFreePort(),
+      maxPortAttempts: 20,
+    });
+    const proxyPort = await waitForStart();
+    return { proxyPort, get: () => getResponse(proxyPort) };
+  }
+
   async function proxyCookies(
     setCookie: string[],
-    upstreamOpts?: { contentType?: string; body?: string },
+    upstreamOpts?: { chunked?: boolean; contentType?: string; body?: string },
   ): Promise<string[]> {
     const upstream = await startUpstream(setCookie, upstreamOpts);
     cleanup.push(upstream.close);
@@ -146,6 +194,28 @@ describe("proxy worker cookie rewriting", () => {
     });
     const proxyPort = await waitForStart();
     return getSetCookie(proxyPort);
+  }
+
+  async function proxyResponse(upstreamOpts?: {
+    chunked?: boolean;
+    contentType?: string;
+    body?: string;
+  }) {
+    const upstream = await startUpstream(
+      ["session=abc123; Path=/"],
+      upstreamOpts,
+    );
+    cleanup.push(upstream.close);
+
+    const port = await findFreePort();
+    const { waitForStart } = startWorker({
+      targetOrigin: upstream.origin,
+      port,
+      fallbackPortStart: await findFreePort(),
+      maxPortAttempts: 20,
+    });
+    const proxyPort = await waitForStart();
+    return getResponse(proxyPort);
   }
 
   it("forces SameSite=None; Secure on a default Lax cookie", async () => {
@@ -213,5 +283,56 @@ describe("proxy worker cookie rewriting", () => {
     expect(cookie).toMatch(/;\s*SameSite=None/i);
     expect(cookie).not.toMatch(/Partitioned/i);
     expect(cookie).not.toMatch(/SameSite=Lax/i);
+  });
+
+  it("does not emit transfer-encoding with content-length after HTML injection", async () => {
+    const response = await proxyResponse({
+      chunked: true,
+      contentType: "text/html",
+      body: "<html><head></head><body>hi</body></html>",
+    });
+
+    expect(response.body).toContain("<script>");
+    expect(response.headers["content-length"]).toBeDefined();
+    expect(response.headers["transfer-encoding"]).toBeUndefined();
+  });
+
+  it("keeps the worker alive when upstream errors after response headers were sent", async () => {
+    let shouldDestroy = true;
+    const upstream = await new Promise<{
+      origin: string;
+      close: () => Promise<void>;
+    }>((resolve, reject) => {
+      const server = http.createServer((_req, res) => {
+        if (shouldDestroy) {
+          res.writeHead(200, { "content-type": "text/plain" });
+          res.write("partial");
+          res.socket?.destroy(new Error("simulated upstream reset"));
+          shouldDestroy = false;
+          return;
+        }
+        res.writeHead(200, { "content-type": "text/plain" });
+        res.end("ok-after-reset");
+      });
+      server.once("error", reject);
+      server.listen(0, "localhost", () => {
+        const addr = server.address();
+        const port = typeof addr === "object" && addr ? addr.port : 0;
+        resolve({
+          origin: `http://localhost:${port}`,
+          close: () => new Promise<void>((res) => server.close(() => res())),
+        });
+      });
+    });
+    const proxy = await proxyResponseFromUpstream(upstream);
+
+    await expect(proxy.get()).resolves.toMatchObject({
+      status: 502,
+      body: expect.stringContaining("Upstream error"),
+    });
+    await expect(proxy.get()).resolves.toMatchObject({
+      status: 200,
+      body: "ok-after-reset",
+    });
   });
 });

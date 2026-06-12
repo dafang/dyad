@@ -1,0 +1,3 @@
+- project_dyad_local_web_runtime: Local Web runtime already uses HTTP/RPC/SSE and public preview path proxy; mobile/desktop work should preserve the local server + IPC adapter boundary.
+- project_dyad_local_web_e2e: Existing Web E2E harness and real-provider verification exist; new responsive work should extend browser viewport coverage instead of relying only on unit tests.
+- project_local_web_parity: Prior parity run stabilized chat, preview, runtime output, terminal SSE, and real-provider Web E2E; this task should build on that baseline and avoid re-solving provider/runtime issues.

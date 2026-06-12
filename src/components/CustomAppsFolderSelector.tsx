@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { showError, showSuccess } from "@/lib/toast";
 import { ipc } from "@/ipc/types";
 import { FolderOpen, RotateCcw } from "lucide-react";
+import { webHostCapabilities } from "@/lib/web_host_capabilities";
 
 export function CustomAppsFolderSelector() {
   const [isSelectingPath, setIsSelectingPath] = useState(false);
@@ -20,6 +21,12 @@ export function CustomAppsFolderSelector() {
   const handleSelectCustomAppsFolder = async () => {
     setIsSelectingPath(true);
     try {
+      if (webHostCapabilities.isLocalWeb) {
+        showError(
+          "Browser folder selection cannot grant the local server a stable writable folder path yet. New apps use the local Web data directory.",
+        );
+        return;
+      }
       // Call the IPC method to select folder
       const result = await ipc.system.selectCustomAppsFolder();
       if (result.path) {
@@ -113,9 +120,11 @@ export function CustomAppsFolderSelector() {
         {/* Help Text */}
         <div className="text-sm text-gray-500 dark:text-gray-400">
           <p>
-            {isPathAvailable
-              ? "This is the top-level folder that Dyad will store new applications in."
-              : "Your apps folder is inaccessible. Make sure that the folder exists and has write permissions, or change it."}
+            {webHostCapabilities.isLocalWeb
+              ? "In Web mode, new apps are stored under the local Web server data directory. Browser folder pickers cannot currently grant a reusable writable path to the local server."
+              : isPathAvailable
+                ? "This is the top-level folder that Dyad will store new applications in."
+                : "Your apps folder is inaccessible. Make sure that the folder exists and has write permissions, or change it."}
           </p>
         </div>
       </div>

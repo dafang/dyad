@@ -36,6 +36,38 @@ describe("resolvePreviewBrowserUrl", () => {
     expect(createCloudSandboxShareLink).not.toHaveBeenCalled();
   });
 
+  it("returns the local web preview URL for non-cloud local web previews", async () => {
+    const createCloudSandboxShareLink = vi.fn();
+
+    await expect(
+      resolvePreviewBrowserUrl({
+        isCloudMode: false,
+        selectedAppId: 44,
+        appUrl: "https://dyad.example.test/api/preview/44/",
+        originalUrl: "http://localhost:32144/",
+        createCloudSandboxShareLink,
+      }),
+    ).resolves.toBe("https://dyad.example.test/api/preview/44/");
+
+    expect(createCloudSandboxShareLink).not.toHaveBeenCalled();
+  });
+
+  it("falls back to the original preview URL for non-local-web previews", async () => {
+    const createCloudSandboxShareLink = vi.fn();
+
+    await expect(
+      resolvePreviewBrowserUrl({
+        isCloudMode: false,
+        selectedAppId: 44,
+        appUrl: "http://localhost:42144/",
+        originalUrl: "http://localhost:32144/",
+        createCloudSandboxShareLink,
+      }),
+    ).resolves.toBe("http://localhost:32144/");
+
+    expect(createCloudSandboxShareLink).not.toHaveBeenCalled();
+  });
+
   it("throws when cloud preview browser open is requested without an app id", async () => {
     await expect(
       resolvePreviewBrowserUrl({

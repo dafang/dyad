@@ -11,15 +11,16 @@ export function AutoApproveSwitch({
 }) {
   const { settings, updateSettings } = useSettings();
   const { t } = useTranslation("settings");
+  const isEnabled = !!settings?.autoApproveChanges;
   return (
     <div className="flex items-center space-x-2">
       <Switch
         id="auto-approve"
         aria-label="Auto-approve"
-        checked={settings?.autoApproveChanges}
+        checked={isEnabled}
         onCheckedChange={() => {
-          updateSettings({ autoApproveChanges: !settings?.autoApproveChanges });
-          if (!settings?.autoApproveChanges && showToast) {
+          updateSettings({ autoApproveChanges: !isEnabled });
+          if (!isEnabled && showToast) {
             showInfo("You can disable auto-approve in the Settings.");
           }
         }}

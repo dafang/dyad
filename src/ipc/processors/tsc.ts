@@ -1,4 +1,5 @@
 import * as path from "node:path";
+import fs from "node:fs";
 import { Worker } from "node:worker_threads";
 
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
@@ -47,7 +48,7 @@ export async function generateProblemReport({
 }): Promise<ProblemReport> {
   return new Promise((resolve, reject) => {
     // Determine the worker script path
-    const workerPath = path.join(__dirname, "tsc_worker.js");
+    const workerPath = resolveTscWorkerPath();
 
     logger.info(`Starting TSC worker for app ${appPath}`);
 
@@ -108,4 +109,15 @@ export async function generateProblemReport({
 
     worker.postMessage(input);
   });
+}
+
+function resolveTscWorkerPath(): string {
+  const candidates = [
+    path.join(__dirname, "tsc_worker.js"),
+    path.resolve(process.cwd(), ".vite/build/tsc_worker.js"),
+  ];
+
+  return (
+    candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0]
+  );
 }

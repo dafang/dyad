@@ -12,6 +12,7 @@ import {
   encrypt,
   decrypt,
   notifyRendererErrorToastListenerReady,
+  configureSettingsElectronModuleForTest,
 } from "@/main/settings";
 import { getUserDataPath } from "@/paths/paths";
 import { UserSettings } from "@/lib/schemas";
@@ -26,6 +27,39 @@ const mockWebContents = {
 const mockWindow = {
   webContents: mockWebContents,
 };
+const originalElectronVersionDescriptor = Object.getOwnPropertyDescriptor(
+  process.versions,
+  "electron",
+);
+
+function setElectronVersionForTest(): void {
+  Object.defineProperty(process.versions, "electron", {
+    value: "test-electron",
+    configurable: true,
+  });
+}
+
+function restoreElectronVersionForTest(): void {
+  if (originalElectronVersionDescriptor) {
+    Object.defineProperty(
+      process.versions,
+      "electron",
+      originalElectronVersionDescriptor,
+    );
+    return;
+  }
+  Reflect.deleteProperty(process.versions, "electron");
+}
+
+function configureSettingsElectronTestModule(): void {
+  configureSettingsElectronModuleForTest({
+    safeStorage,
+    BrowserWindow: {
+      fromWebContents: vi.fn(() => mockWindow),
+      getAllWindows: vi.fn(() => [mockWindow]),
+    },
+  });
+}
 
 // Mock dependencies
 vi.mock("node:fs");
@@ -61,13 +95,17 @@ describe("readSettings", () => {
   const mockSettingsPath = "/mock/user/data/user-settings.json";
 
   beforeEach(() => {
+    setElectronVersionForTest();
     vi.clearAllMocks();
     mockGetUserDataPath.mockReturnValue(mockUserDataPath);
     mockPath.join.mockReturnValue(mockSettingsPath);
     mockSafeStorage.isEncryptionAvailable.mockReturnValue(true);
+    configureSettingsElectronTestModule();
   });
 
   afterEach(() => {
+    configureSettingsElectronModuleForTest(undefined);
+    restoreElectronVersionForTest();
     vi.restoreAllMocks();
   });
 
@@ -730,13 +768,17 @@ describe("writeSettings", () => {
   const mockSettingsPath = "/mock/user/data/user-settings.json";
 
   beforeEach(() => {
+    setElectronVersionForTest();
     vi.clearAllMocks();
     mockGetUserDataPath.mockReturnValue(mockUserDataPath);
     mockPath.join.mockReturnValue(mockSettingsPath);
     mockSafeStorage.isEncryptionAvailable.mockReturnValue(true);
+    configureSettingsElectronTestModule();
   });
 
   afterEach(() => {
+    configureSettingsElectronModuleForTest(undefined);
+    restoreElectronVersionForTest();
     vi.restoreAllMocks();
   });
 
@@ -885,12 +927,19 @@ describe("decrypt", () => {
   });
 
   it("should trim whitespace from electron-safe-storage secrets", () => {
-    mockSafeStorage.decryptString.mockReturnValue("  decrypted-key\n");
-    const result = decrypt({
-      value: Buffer.from("encrypted").toString("base64"),
-      encryptionType: "electron-safe-storage",
-    });
-    expect(result).toBe("decrypted-key");
+    setElectronVersionForTest();
+    configureSettingsElectronTestModule();
+    try {
+      mockSafeStorage.decryptString.mockReturnValue("  decrypted-key\n");
+      const result = decrypt({
+        value: Buffer.from("encrypted").toString("base64"),
+        encryptionType: "electron-safe-storage",
+      });
+      expect(result).toBe("decrypted-key");
+    } finally {
+      configureSettingsElectronModuleForTest(undefined);
+      restoreElectronVersionForTest();
+    }
   });
 
   it("should not alter values without whitespace", () => {

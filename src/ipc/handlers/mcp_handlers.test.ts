@@ -7,7 +7,7 @@
 // payload, exercising the real handler logic without an Electron
 // process.
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 // --- ipcMain capture ----------------------------------------------------
 const handlers = new Map<string, (event: unknown, input: unknown) => unknown>();
@@ -48,6 +48,27 @@ vi.mock("electron", () => ({
     encryptString: vi.fn((s: string) => Buffer.from(`enc:${s}`, "utf8")),
   },
 }));
+
+const { setElectronModuleForTest } =
+  await import("@/ipc/utils/electron_module");
+setElectronModuleForTest({
+  ipcMain: {
+    handle: (
+      channel: string,
+      fn: (event: unknown, input: unknown) => unknown,
+    ) => {
+      handlers.set(channel, fn);
+    },
+  },
+  safeStorage: {
+    isEncryptionAvailable: vi.fn(() => true),
+    encryptString: vi.fn((s: string) => Buffer.from(`enc:${s}`, "utf8")),
+  },
+});
+
+afterAll(() => {
+  setElectronModuleForTest(undefined);
+});
 
 vi.mock("electron-log", () => ({
   default: {

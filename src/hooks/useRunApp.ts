@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import { HttpInvokeAbortError } from "@/ipc/contracts/core";
 import { ipc, type AppOutput } from "@/ipc/types";
 import { selectedAppIdAtom } from "@/atoms/appAtoms";
 import {
@@ -23,11 +24,60 @@ import {
   type RuntimeMode2,
   type UserSettings,
 } from "@/lib/schemas";
+import { toLocalWebPreviewPublicUrl } from "@/lib/local_web_transport";
 import { useSettings } from "./useSettings";
 
 const CLOUD_SYNC_ERROR_TOAST_WINDOW_MS = 30_000;
+const PREVIEW_URL_POLL_INTERVAL_MS = 500;
+const PREVIEW_URL_POLL_TIMEOUT_MS = 90_000;
 
 type UpdateSettings = (newSettings: Partial<UserSettings>) => Promise<unknown>;
+export interface RunAppOptions {
+  isCancelled?: () => boolean;
+  suppressCancelledError?: boolean;
+}
+
+export interface RestartAppOptions extends RunAppOptions {
+  removeNodeModules?: boolean;
+  recreateSandbox?: boolean;
+}
+
+async function getRunningPreviewAppUrl(appId: number) {
+  const preview = await ipc.app.getRunningAppPreview({ appId });
+  if (!preview) {
+    return null;
+  }
+
+  return {
+    appUrl: toLocalWebPreviewPublicUrl(preview.appUrl, preview.appId),
+    appId: preview.appId,
+    originalUrl: preview.originalUrl,
+    mode: preview.mode,
+  };
+}
+
+async function waitForRunningPreviewAppUrl({
+  appId,
+  isCancelled,
+}: {
+  appId: number;
+  isCancelled?: () => boolean;
+}) {
+  const deadline = Date.now() + PREVIEW_URL_POLL_TIMEOUT_MS;
+  while (!isCancelled?.()) {
+    const appUrl = await getRunningPreviewAppUrl(appId);
+    if (appUrl) {
+      return appUrl;
+    }
+    if (Date.now() >= deadline) {
+      return null;
+    }
+    await new Promise((resolve) =>
+      setTimeout(resolve, PREVIEW_URL_POLL_INTERVAL_MS),
+    );
+  }
+  return null;
+}
 
 export function showPnpmMinimumReleaseAgeWarningToast({
   message,
@@ -187,10 +237,11 @@ export function useAppOutputSubscription() {
           const proxyUrl = proxyUrlMatch[1];
           const originalUrl = originalUrlMatch && originalUrlMatch[1];
           const mode = (modeMatch?.[1] as RuntimeMode2 | undefined) ?? "host";
+          const appUrl = toLocalWebPreviewPublicUrl(proxyUrl, output.appId);
           setAppUrl({
             appId: output.appId,
             appUrl: {
-              appUrl: proxyUrl,
+              appUrl,
               appId: output.appId,
               originalUrl: originalUrl!,
               mode,
@@ -385,7 +436,7 @@ export function useRunApp() {
   const setPreviewError = useSetAtom(setPreviewErrorForAppAtom);
 
   const runApp = useCallback(
-    async (appId: number) => {
+    async (appId: number, options: RunAppOptions = {}) => {
       const startedAt = Date.now();
       setPreviewRunState({
         appId,
@@ -393,8 +444,6 @@ export function useRunApp() {
       });
       setPreviewAppExit({ appId, exit: null });
       try {
-        console.debug("Running app", appId);
-
         setAppUrl({
           appId,
           appUrl: { appUrl: null, appId: null, originalUrl: null, mode: null },
@@ -411,8 +460,24 @@ export function useRunApp() {
         ipc.misc.addLog(logEntry);
         appendConsoleEntries({ appId, entries: [logEntry] });
         await ipc.app.runApp({ appId });
+        if (options.isCancelled?.()) {
+          return;
+        }
+        const previewAppUrl = await waitForRunningPreviewAppUrl({
+          appId,
+          isCancelled: options.isCancelled,
+        });
+        if (previewAppUrl && !options.isCancelled?.()) {
+          setAppUrl({ appId, appUrl: previewAppUrl });
+        }
         setPreviewError({ appId, error: undefined });
       } catch (error) {
+        if (
+          options.suppressCancelledError &&
+          (options.isCancelled?.() || error instanceof HttpInvokeAbortError)
+        ) {
+          return;
+        }
         console.error(`Error running app ${appId}:`, error);
         setPreviewError({
           appId,
@@ -473,7 +538,9 @@ export function useRunApp() {
     async ({
       removeNodeModules = false,
       recreateSandbox = false,
-    }: { removeNodeModules?: boolean; recreateSandbox?: boolean } = {}) => {
+      isCancelled,
+      suppressCancelledError,
+    }: RestartAppOptions = {}) => {
       if (appId === null) {
         return;
       }
@@ -484,13 +551,6 @@ export function useRunApp() {
       });
       setPreviewAppExit({ appId, exit: null });
       try {
-        console.debug(
-          "Restarting app",
-          appId,
-          recreateSandbox ? "with sandbox recreation" : "",
-          removeNodeModules ? "with node_modules cleanup" : "",
-        );
-
         setAppUrl({
           appId,
           appUrl: { appUrl: null, appId: null, originalUrl: null, mode: null },
@@ -517,8 +577,24 @@ export function useRunApp() {
         appendConsoleEntries({ appId, entries: [logEntry] });
 
         await ipc.app.restartApp({ appId, removeNodeModules, recreateSandbox });
+        if (isCancelled?.()) {
+          return;
+        }
+        const previewAppUrl = await waitForRunningPreviewAppUrl({
+          appId,
+          isCancelled,
+        });
+        if (previewAppUrl && !isCancelled?.()) {
+          setAppUrl({ appId, appUrl: previewAppUrl });
+        }
         setPreviewError({ appId, error: undefined });
       } catch (error) {
+        if (
+          suppressCancelledError &&
+          (isCancelled?.() || error instanceof HttpInvokeAbortError)
+        ) {
+          return;
+        }
         console.error(`Error restarting app ${appId}:`, error);
         setPreviewError({
           appId,

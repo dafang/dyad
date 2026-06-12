@@ -38,6 +38,7 @@ import { OnboardingBanner } from "./home/OnboardingBanner";
 import { showError } from "@/lib/toast";
 import { useSettings } from "@/hooks/useSettings";
 import { DyadProTrialDialog } from "./DyadProTrialDialog";
+import { HttpInvokeAbortError } from "@/ipc/contracts/core";
 
 type NodeInstallStep =
   | "install"
@@ -58,17 +59,25 @@ export function SetupBanner() {
   const [nodeCheckError, setNodeCheckError] = useState<boolean>(false);
   const [nodeInstallStep, setNodeInstallStep] =
     useState<NodeInstallStep>("install");
-  const checkNode = useCallback(async () => {
-    try {
-      setNodeCheckError(false);
-      const status = await ipc.system.getNodejsStatus();
-      setNodeSystemInfo(status);
-    } catch (error) {
-      console.error("Failed to check Node.js status:", error);
-      setNodeSystemInfo(null);
-      setNodeCheckError(true);
-    }
-  }, [setNodeSystemInfo, setNodeCheckError]);
+  const checkNode = useCallback(
+    async (options?: { isCancelled?: () => boolean }) => {
+      try {
+        setNodeCheckError(false);
+        const status = await ipc.system.getNodejsStatus();
+        if (options?.isCancelled?.()) {
+          return;
+        }
+        setNodeSystemInfo(status);
+      } catch (error) {
+        if (options?.isCancelled?.() || error instanceof HttpInvokeAbortError) {
+          return;
+        }
+        setNodeSystemInfo(null);
+        setNodeCheckError(true);
+      }
+    },
+    [setNodeSystemInfo, setNodeCheckError],
+  );
   const [showManualConfig, setShowManualConfig] = useState(false);
   const [isSelectingPath, setIsSelectingPath] = useState(false);
   const [showDyadProTrialDialog, setShowDyadProTrialDialog] = useState(false);
@@ -98,7 +107,11 @@ export function SetupBanner() {
   }, [checkNode]);
 
   useEffect(() => {
-    checkNode();
+    let cancelled = false;
+    checkNode({ isCancelled: () => cancelled });
+    return () => {
+      cancelled = true;
+    };
   }, [checkNode]);
 
   const settingsScrollAndNavigateTo = useScrollAndNavigateTo("/settings", {

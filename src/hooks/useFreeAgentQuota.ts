@@ -4,6 +4,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { useSettings } from "./useSettings";
 import { isDyadProEnabled } from "@/lib/schemas";
 import { FREE_AGENT_QUOTA_LIMIT } from "@/lib/free_agent_quota_limit";
+import { isLocalWebRuntime } from "@/lib/runtime_client";
 
 const THIRTY_MINUTES_IN_MS = 30 * 60 * 1000;
 // In test mode, use very short staleTime for faster E2E tests
@@ -21,6 +22,7 @@ export function useFreeAgentQuota() {
   const { settings } = useSettings();
   const queryClient = useQueryClient();
   const isPro = settings ? isDyadProEnabled(settings) : false;
+  const quotaDisabled = isPro || isLocalWebRuntime();
   const isTestMode = settings?.isTestMode ?? false;
 
   const {
@@ -30,8 +32,10 @@ export function useFreeAgentQuota() {
   } = useQuery<FreeAgentQuotaStatus, Error, FreeAgentQuotaStatus>({
     queryKey: queryKeys.freeAgentQuota.status,
     queryFn: () => ipc.freeAgentQuota.getFreeAgentQuotaStatus(),
-    // Only fetch for non-Pro users
-    enabled: !isPro && !!settings,
+    // Only fetch for non-Pro Electron users. Local Web runs against the
+    // user's own local provider settings and is not part of the Basic Agent
+    // free quota.
+    enabled: !quotaDisabled && !!settings,
     // Refetch periodically to check for quota reset
     refetchInterval: THIRTY_MINUTES_IN_MS,
     // Consider stale after 30 seconds (500ms in test mode for faster E2E tests)
@@ -47,18 +51,25 @@ export function useFreeAgentQuota() {
   };
 
   return {
-    quotaStatus,
-    isLoading,
-    error,
+    quotaStatus: quotaDisabled ? undefined : quotaStatus,
+    isLoading: quotaDisabled ? false : isLoading,
+    error: quotaDisabled ? null : error,
     invalidateQuota,
     // Convenience properties for easier consumption
-    isQuotaExceeded: quotaStatus?.isQuotaExceeded ?? false,
-    messagesUsed: quotaStatus?.messagesUsed ?? 0,
-    messagesLimit: quotaStatus?.messagesLimit ?? FREE_AGENT_QUOTA_LIMIT,
-    messagesRemaining: quotaStatus
-      ? Math.max(0, quotaStatus.messagesLimit - quotaStatus.messagesUsed)
-      : FREE_AGENT_QUOTA_LIMIT,
-    hoursUntilReset: quotaStatus?.hoursUntilReset ?? null,
-    resetTime: quotaStatus?.resetTime ?? null,
+    isQuotaExceeded: quotaDisabled
+      ? false
+      : (quotaStatus?.isQuotaExceeded ?? false),
+    messagesUsed: quotaDisabled ? 0 : (quotaStatus?.messagesUsed ?? 0),
+    messagesLimit: quotaDisabled
+      ? FREE_AGENT_QUOTA_LIMIT
+      : (quotaStatus?.messagesLimit ?? FREE_AGENT_QUOTA_LIMIT),
+    messagesRemaining:
+      !quotaDisabled && quotaStatus
+        ? Math.max(0, quotaStatus.messagesLimit - quotaStatus.messagesUsed)
+        : FREE_AGENT_QUOTA_LIMIT,
+    hoursUntilReset: quotaDisabled
+      ? null
+      : (quotaStatus?.hoursUntilReset ?? null),
+    resetTime: quotaDisabled ? null : (quotaStatus?.resetTime ?? null),
   };
 }

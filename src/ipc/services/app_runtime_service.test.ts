@@ -328,6 +328,38 @@ describe("executeApp", () => {
     });
   });
 
+  it("emits URL-bearing stdout immediately so preview startup is observable", async () => {
+    const process = new FakeChildProcess(101);
+    spawnMock.mockReturnValueOnce(process);
+    startProxyMock.mockResolvedValue({ terminate: vi.fn() });
+
+    const event = createEvent();
+    await executeApp({
+      appPath: "/tmp/app",
+      appId: 1,
+      event,
+      isNeon: false,
+      installCommand: 'node -e "process.exit(0)"',
+      startCommand: "node -e \"console.log('ready http://localhost:32101/')\"",
+    });
+
+    process.stdout.emit("data", Buffer.from("ready http://localhost:32101/\n"));
+
+    expect(safeSendMock).toHaveBeenCalledWith(
+      event.sender,
+      "app:output",
+      expect.objectContaining({
+        type: "stdout",
+        appId: 1,
+        message: "ready http://localhost:32101/\n",
+      }),
+    );
+    expect(startProxyMock).toHaveBeenCalledWith(
+      "http://localhost:32101/",
+      expect.anything(),
+    );
+  });
+
   it("starts the proxy on the deterministic port without killing the occupant", async () => {
     const terminate = vi.fn();
     startProxyMock.mockImplementation(async (_originalUrl, opts) => {

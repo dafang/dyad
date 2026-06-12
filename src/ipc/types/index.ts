@@ -119,7 +119,9 @@ export type {
   ChangeAppLocationResult,
   ListAppsResponse,
   RenameBranchParams,
+  AppSearchResult,
   UpdateAppCommandsParams,
+  RunningAppPreview,
 } from "./app";
 
 // Chat types
@@ -233,6 +235,7 @@ export type {
 
 // System types
 export type {
+  InstallPnpmResult,
   NodeSystemInfo,
   SystemDebugInfo,
   SelectNodeFolderResult,
@@ -264,6 +267,14 @@ export type {
   CreatePromptParamsDto,
   UpdatePromptParamsDto,
 } from "./prompts";
+
+// App collection types
+export type {
+  AppCollectionDto,
+  CreateAppCollectionParams,
+  UpdateAppCollectionParams,
+  AssignAppsParams,
+} from "./app_collections";
 
 // Template types
 export type {
@@ -382,40 +393,10 @@ export {
 export { UserBudgetInfoSchema } from "./system";
 
 // =============================================================================
-// Aggregated IPC Client
+// Aggregated Runtime Client
 // =============================================================================
 
-import { settingsClient } from "./settings";
-import { appClient } from "./app";
-import { chatClient, chatStreamClient } from "./chat";
-import { agentClient, agentEventClient } from "./agent";
-import { githubClient, gitClient, githubEventClient } from "./github";
-import { mcpClient, mcpEventClient } from "./mcp";
-import { vercelClient } from "./vercel";
-import { supabaseClient } from "./supabase";
-import { neonClient } from "./neon";
-import { migrationClient } from "./migration";
-import { systemClient, systemEventClient } from "./system";
-import { versionClient } from "./version";
-import { languageModelClient } from "./language-model";
-import { promptClient } from "./prompts";
-import { templateClient } from "./templates";
-import { proposalClient } from "./proposals";
-import { importClient } from "./import";
-import { helpClient, helpStreamClient } from "./help";
-import { capacitorClient } from "./capacitor";
-import { contextClient } from "./context";
-import { upgradeClient } from "./upgrade";
-import { visualEditingClient } from "./visual-editing";
-import { securityClient } from "./security";
-import { miscClient, miscEventClient } from "./misc";
-import { freeAgentQuotaClient } from "./free_agent_quota";
-import { audioClient } from "./audio";
-import { mediaClient } from "./media";
-import { imageGenerationClient } from "./image_generation";
-import { appBlueprintClient, appBlueprintEventClient } from "./app_blueprint";
-import { appCollectionClient } from "./app_collections";
-import { terminalClient } from "./terminal";
+import { getRuntimeIpc } from "@/lib/runtime_client";
 
 /**
  * Unified IPC client with all domains organized by namespace.
@@ -436,56 +417,4 @@ import { terminalClient } from "./terminal";
  * // Event subscriptions
  * ipc.events.agent.onTodosUpdate(handler);
  */
-export const ipc = {
-  // Core domains
-  settings: settingsClient,
-  app: appClient,
-  chat: chatClient,
-  agent: agentClient,
-
-  // Streaming clients
-  chatStream: chatStreamClient,
-  helpStream: helpStreamClient,
-
-  // Integrations
-  github: githubClient,
-  git: gitClient,
-  mcp: mcpClient,
-  vercel: vercelClient,
-  supabase: supabaseClient,
-  neon: neonClient,
-  migration: migrationClient,
-
-  // Features
-  system: systemClient,
-  version: versionClient,
-  languageModel: languageModelClient,
-  prompt: promptClient,
-  template: templateClient,
-  proposal: proposalClient,
-  import: importClient,
-  help: helpClient,
-  capacitor: capacitorClient,
-  context: contextClient,
-  upgrade: upgradeClient,
-  visualEditing: visualEditingClient,
-  security: securityClient,
-  misc: miscClient,
-  freeAgentQuota: freeAgentQuotaClient,
-  audio: audioClient,
-  media: mediaClient,
-  imageGeneration: imageGenerationClient,
-  appBlueprint: appBlueprintClient,
-  appCollection: appCollectionClient,
-  terminal: terminalClient,
-
-  // Event clients for main->renderer pub/sub
-  events: {
-    agent: agentEventClient,
-    github: githubEventClient,
-    mcp: mcpEventClient,
-    system: systemEventClient,
-    misc: miscEventClient,
-    appBlueprint: appBlueprintEventClient,
-  },
-} as const;
+export const ipc = getRuntimeIpc();

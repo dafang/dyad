@@ -751,7 +751,10 @@ export function ChatInput({ chatId }: { chatId?: number }) {
           {t("errorLoadingProposal", { message: proposalError.message })}
         </div>
       )}
-      <div className="p-2 pt-0" data-testid="chat-input-container">
+      <div
+        className="p-2 pt-0 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
+        data-testid="chat-input-container"
+      >
         {/* Show context limit banner above chat input for visibility */}
         {showBanner && tokenCountResult && (
           <ContextLimitBanner
@@ -785,11 +788,18 @@ export function ChatInput({ chatId }: { chatId?: number }) {
                   requestId: pendingAgentConsent.requestId,
                   decision,
                 });
-                // Remove this consent from the queue by requestId
+                // "Always allow" updates the tool-level policy, so any queued
+                // requests for the same tool in this chat should disappear too.
                 setPendingAgentConsents((prev) =>
-                  prev.filter(
-                    (c) => c.requestId !== pendingAgentConsent.requestId,
-                  ),
+                  prev.filter((c) => {
+                    if (decision === "accept-always") {
+                      return (
+                        c.chatId !== pendingAgentConsent.chatId ||
+                        c.toolName !== pendingAgentConsent.toolName
+                      );
+                    }
+                    return c.requestId !== pendingAgentConsent.requestId;
+                  }),
                 );
               }}
               onClose={() => {
@@ -931,7 +941,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
             onCancel={cancelPendingFiles}
           />
 
-          <div className="flex items-end gap-1">
+          <div className="flex min-w-0 items-end gap-1">
             <LexicalChatInput
               value={inputValue}
               onChange={setInputValue}
@@ -1043,8 +1053,8 @@ export function ChatInput({ chatId }: { chatId?: number }) {
               </Tooltip>
             )}
           </div>
-          <div className="px-2 flex items-center justify-between pb-0.5 pt-0.5">
-            <div className="flex items-center">
+          <div className="flex min-w-0 items-center justify-between gap-2 px-2 pb-0.5 pt-0.5">
+            <div className="scrollbar-on-hover flex min-w-0 items-center overflow-x-auto">
               <ChatInputControls showContextFilesPicker={false} />
             </div>
 

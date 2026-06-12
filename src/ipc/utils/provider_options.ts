@@ -54,10 +54,20 @@ export function getProviderOptions({
       })),
     },
     openai: {
+      store: false,
       reasoningSummary: "auto",
       reasoningEffort: getThinkingBudgetEffort(settings.thinkingBudget),
     } satisfies OpenAIResponsesProviderOptions,
+    openaiCompatible: {
+      store: false,
+    },
   };
+
+  if (settings.selectedModel.provider.startsWith("custom::")) {
+    providerOptions[settings.selectedModel.provider] = {
+      store: false,
+    };
+  }
 
   // Conditionally include Google thinking config only for supported models
   const selectedModelName = settings.selectedModel.name || "";

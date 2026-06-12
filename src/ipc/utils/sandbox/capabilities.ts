@@ -338,6 +338,9 @@ export async function sandboxListFiles(
     realDirPath = await fs.realpath(dirPath);
   } catch (error) {
     if (isNodeErrorWithCode(error, "ENOENT")) {
+      if (dir === getDyadMediaDir(appPath) || dir === ".dyad/media") {
+        return [];
+      }
       throw new DyadError(
         `Directory not found: ${dir}`,
         DyadErrorKind.NotFound,

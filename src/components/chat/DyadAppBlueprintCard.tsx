@@ -27,6 +27,10 @@ import type {
   AppBlueprintVisual,
 } from "@/ipc/types/app_blueprint";
 import { showError } from "@/lib/toast";
+import {
+  createAppBlueprintDataFromAttributes,
+  decodeAppBlueprintData,
+} from "@/lib/app_blueprint_data";
 import { queryKeys } from "@/lib/queryKeys";
 import { AppBlueprintUserPrompt } from "./AppBlueprintUserPrompt";
 import { AppBlueprintDesignDirection } from "./AppBlueprintDesignDirection";
@@ -58,6 +62,7 @@ interface DyadAppBlueprintCardProps {
       theme?: string;
       "design-direction"?: string;
       "primary-color"?: string;
+      data?: string;
       complete?: string;
       state?: CustomTagState;
     };
@@ -83,7 +88,18 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
   const isApproved = chatId
     ? appBlueprintState.approvedChatIds.has(chatId)
     : false;
-  const planData = chatId ? appBlueprintState.plansByChatId.get(chatId) : null;
+  const embeddedPlanData =
+    decodeAppBlueprintData(props.data) ??
+    createAppBlueprintDataFromAttributes({
+      "app-name": props["app-name"],
+      template: props.template,
+      theme: props.theme,
+      "design-direction": props["design-direction"],
+      "primary-color": props["primary-color"],
+    });
+  const planData = chatId
+    ? (appBlueprintState.plansByChatId.get(chatId) ?? embeddedPlanData)
+    : embeddedPlanData;
   const isTimedOut = chatId
     ? appBlueprintState.timedOutChatIds.has(chatId)
     : false;
@@ -145,6 +161,23 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
   // Synchronous guard against fast double-clicks on Approve — `isApproving`
   // state wouldn't see a second click within the same render tick.
   const approvingRef = useRef(false);
+
+  useEffect(() => {
+    if (!chatId || !embeddedPlanData) {
+      return;
+    }
+    setAppBlueprintState((prev) => {
+      if (prev.plansByChatId.has(chatId)) {
+        return prev;
+      }
+      const nextPlans = new Map(prev.plansByChatId);
+      nextPlans.set(chatId, embeddedPlanData);
+      return {
+        ...prev,
+        plansByChatId: nextPlans,
+      };
+    });
+  }, [chatId, embeddedPlanData, setAppBlueprintState]);
 
   // Sync local state when props change (e.g. from streaming updates)
   useEffect(() => {
@@ -332,7 +365,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
       if (!chatId || isApproved) return;
       if (approvingRef.current) return;
 
-      const plan = appBlueprintState.plansByChatId.get(chatId);
+      const plan = appBlueprintState.plansByChatId.get(chatId) ?? planData;
       if (!plan) {
         showError("Blueprint data is unavailable. Please regenerate the plan.");
         return;
@@ -367,17 +400,13 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         }
       }
 
-      // Optimistically mark as approved so UI updates immediately
-      setAppBlueprintState((prev) => {
-        const nextApproved = new Set(prev.approvedChatIds);
-        nextApproved.add(chatId);
-        return { ...prev, approvedChatIds: nextApproved };
-      });
+      let approvalPersisted = false;
       try {
         const applyErrors: string[] = [];
         let templateApplyFailed = false;
         let renameFailed = false;
         let nameConflictDetected = false;
+        let templateNeedsRestart = false;
         const recordApplyError = (message: string, error: unknown) => {
           console.error(message, error);
           const detail =
@@ -392,7 +421,6 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         // Apply plan settings to the app before resolving the agent's promise
         if (selectedAppId) {
           let currentApp = app;
-          let templateNeedsRestart = false;
 
           if (!currentApp) {
             try {
@@ -440,14 +468,9 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
           }
 
           if (nameConflictDetected) {
-            // Roll back the optimistic approval and open the rename dialog so the
-            // user can choose a different name and re-approve. We bail before
-            // touching the template/theme so nothing is half-applied.
-            setAppBlueprintState((prev) => {
-              const nextApproved = new Set(prev.approvedChatIds);
-              nextApproved.delete(chatId);
-              return { ...prev, approvedChatIds: nextApproved };
-            });
+            // Open the rename dialog so the user can choose a different name
+            // and re-approve. We bail before touching the template/theme so
+            // nothing is half-applied.
             setNameConflictName(effectiveAppName);
             return;
           }
@@ -480,31 +503,6 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
           } catch (error) {
             recordApplyError("Could not apply the selected theme.", error);
           }
-
-          if (templateNeedsRestart) {
-            try {
-              await ipc.app.restartApp({
-                appId: selectedAppId,
-                removeNodeModules: true,
-              });
-            } catch (error) {
-              recordApplyError(
-                "Could not restart the app after the template change.",
-                error,
-              );
-            }
-          }
-
-          // Refresh app data so the sidebar/header reflect the new name. Also
-          // invalidate token counts since AI_RULES.md changes with the
-          // template, which alters the system-prompt size.
-          await Promise.all([
-            refreshApp(),
-            queryClient.invalidateQueries({ queryKey: queryKeys.apps.all }),
-            queryClient.invalidateQueries({
-              queryKey: queryKeys.tokenCount.all,
-            }),
-          ]);
         }
 
         // Template application and rename are critical — if either failed,
@@ -512,11 +510,6 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         // Otherwise the agent would build for the wrong framework or under the
         // wrong app name/path.
         if (templateApplyFailed || renameFailed) {
-          setAppBlueprintState((prev) => {
-            const nextApproved = new Set(prev.approvedChatIds);
-            nextApproved.delete(chatId);
-            return { ...prev, approvedChatIds: nextApproved };
-          });
           const errorPrefix = renameFailed
             ? "Could not rename the app. Please choose a different name and try again"
             : "Could not apply the selected template. Please review the plan and try again";
@@ -538,6 +531,52 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         // start a fresh chat stream right away — it will rebuild `AgentContext`
         // from the renamed app row.
         await ipc.appBlueprint.approve({ chatId });
+        approvalPersisted = true;
+
+        // Refresh app data so the sidebar/header reflect the new name. Also
+        // invalidate token counts since AI_RULES.md changes with the
+        // template, which alters the system-prompt size. Keep this off the
+        // critical approval path; template installs can be slow and must not
+        // leave the UI approved while the DB flag is still unset.
+        const refreshAppMetadata = async () => {
+          await Promise.all([
+            refreshApp(),
+            queryClient.invalidateQueries({ queryKey: queryKeys.apps.all }),
+            queryClient.invalidateQueries({
+              queryKey: queryKeys.tokenCount.all,
+            }),
+          ]);
+        };
+
+        if (selectedAppId && templateNeedsRestart) {
+          void (async () => {
+            try {
+              await ipc.app.restartApp({
+                appId: selectedAppId,
+                removeNodeModules: true,
+              });
+            } catch {
+              const restartError =
+                "Blueprint approved, but the app preview could not be restarted after the template change.";
+              setApprovalError(restartError);
+              showError(restartError);
+            } finally {
+              try {
+                await refreshAppMetadata();
+              } catch {
+                setApprovalError(
+                  "Blueprint approved, but app metadata refresh failed.",
+                );
+              }
+            }
+          })();
+        } else {
+          void refreshAppMetadata().catch(() => {
+            setApprovalError(
+              "Blueprint approved, but app metadata refresh failed.",
+            );
+          });
+        }
 
         // Build the follow-up user message with the approved blueprint inline.
         const visualsSummary =
@@ -571,11 +610,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         // all succeeded) and would block the user from continuing.
         try {
           await streamMessage({ chatId, prompt: followUpPrompt });
-        } catch (error) {
-          console.error(
-            "Failed to send app blueprint follow-up message:",
-            error,
-          );
+        } catch {
           const followUpError =
             "Blueprint approved, but the follow-up message could not be sent. You can type your next message to continue building.";
           setApprovalError(followUpError);
@@ -583,15 +618,22 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         }
       } catch (error) {
         console.error("Failed to approve app blueprint:", error);
-        setAppBlueprintState((prev) => {
-          const nextApproved = new Set(prev.approvedChatIds);
-          nextApproved.delete(chatId);
-          return { ...prev, approvedChatIds: nextApproved };
-        });
-        setApprovalError(
-          "Failed to approve the app blueprint. Please try again.",
-        );
-        showError("Failed to approve the app blueprint. Please try again.");
+        if (!approvalPersisted) {
+          setAppBlueprintState((prev) => {
+            const nextApproved = new Set(prev.approvedChatIds);
+            nextApproved.delete(chatId);
+            return { ...prev, approvedChatIds: nextApproved };
+          });
+          setApprovalError(
+            "Failed to approve the app blueprint. Please try again.",
+          );
+          showError("Failed to approve the app blueprint. Please try again.");
+        } else {
+          const errorMessage =
+            "Blueprint approved, but follow-up work could not be started. You can type your next message to continue building.";
+          setApprovalError(errorMessage);
+          showError(errorMessage);
+        }
       } finally {
         setIsApproving(false);
         approvingRef.current = false;

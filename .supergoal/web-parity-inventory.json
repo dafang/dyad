@@ -1,0 +1,2896 @@
+{
+  "schemaVersion": 1,
+  "sourceOfTruth": {
+    "preloadAllowlist": "src/ipc/preload/channels.ts",
+    "contractGlobs": ["src/ipc/types/*.ts"]
+  },
+  "clusters": [
+    "shell/read",
+    "mutations",
+    "runtime/preview",
+    "chat/agent",
+    "integrations",
+    "electron-only/system",
+    "test-only"
+  ],
+  "summary": {
+    "invokeChannels": 241,
+    "receiveChannels": 29,
+    "directRendererElectronUsages": 4,
+    "backendTopLevelElectronImports": 18,
+    "unclassifiedChannels": 0,
+    "missingPreloadDefinitions": 0,
+    "duplicateChannelDefinitions": 2
+  },
+  "clusterCounts": {
+    "shell/read": 41,
+    "mutations": 50,
+    "runtime/preview": 18,
+    "chat/agent": 50,
+    "integrations": 90,
+    "electron-only/system": 18,
+    "test-only": 3
+  },
+  "invokeChannels": [
+    {
+      "channel": "get-user-settings",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/settings.ts:18",
+      "group": "settingsContracts",
+      "method": "getUserSettings",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "set-user-settings",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/settings.ts:28",
+      "group": "settingsContracts",
+      "method": "setUserSettings",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "create-app",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:345",
+      "group": "appContracts",
+      "method": "createApp",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-app",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:351",
+      "group": "appContracts",
+      "method": "getApp",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "list-apps",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:357",
+      "group": "appContracts",
+      "method": "listApps",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "delete-app",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:363",
+      "group": "appContracts",
+      "method": "deleteApp",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "delete-apps",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:369",
+      "group": "appContracts",
+      "method": "deleteApps",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "copy-app",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:375",
+      "group": "appContracts",
+      "method": "copyApp",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "rename-app",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:381",
+      "group": "appContracts",
+      "method": "renameApp",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "run-app",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:387",
+      "group": "appContracts",
+      "method": "runApp",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "stop-app",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:393",
+      "group": "appContracts",
+      "method": "stopApp",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "restart-app",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:399",
+      "group": "appContracts",
+      "method": "restartApp",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-cloud-sandbox-status",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:405",
+      "group": "appContracts",
+      "method": "getCloudSandboxStatus",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "create-cloud-sandbox-share-link",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:411",
+      "group": "appContracts",
+      "method": "createCloudSandboxShareLink",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "edit-app-file",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:417",
+      "group": "appContracts",
+      "method": "editAppFile",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "read-app-file",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:423",
+      "group": "appContracts",
+      "method": "readAppFile",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "respond-to-app-input",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:429",
+      "group": "appContracts",
+      "method": "respondToAppInput",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "search-app-files",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:435",
+      "group": "appContracts",
+      "method": "searchAppFiles",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "change-app-location",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:441",
+      "group": "appContracts",
+      "method": "changeAppLocation",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "rename-branch",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:447",
+      "group": "appContracts",
+      "method": "renameBranch",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "add-to-favorite",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:453",
+      "group": "appContracts",
+      "method": "addToFavorite",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "select-app-location",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:459",
+      "group": "appContracts",
+      "method": "selectAppLocation",
+      "webReplacement": "Browser-safe picker flow backed by local server path capability"
+    },
+    {
+      "channel": "check-app-name",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:465",
+      "group": "appContracts",
+      "method": "checkAppName",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "search-app",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:471",
+      "group": "appContracts",
+      "method": "searchApps",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "update-app-commands",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:477",
+      "group": "appContracts",
+      "method": "updateAppCommands",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "select-app-for-preview",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:487",
+      "group": "appContracts",
+      "method": "selectAppForPreview",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app:get-current-commit-hash",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:493",
+      "group": "appContracts",
+      "method": "getCurrentCommitHash",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app:save-screenshot",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:499",
+      "group": "appContracts",
+      "method": "saveAppScreenshot",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app:list-screenshots",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:512",
+      "group": "appContracts",
+      "method": "listAppScreenshots",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app:list-thumbnails",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/app.ts:522",
+      "group": "appContracts",
+      "method": "listAppThumbnails",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-chat",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:252",
+      "group": "chatContracts",
+      "method": "getChat",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-chats",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:258",
+      "group": "chatContracts",
+      "method": "getChats",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-chat-metadata",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:272",
+      "group": "chatContracts",
+      "method": "getChatMetadata",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "create-chat",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:284",
+      "group": "chatContracts",
+      "method": "createChat",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "update-chat",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:296",
+      "group": "chatContracts",
+      "method": "updateChat",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "delete-chat",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:302",
+      "group": "chatContracts",
+      "method": "deleteChat",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "delete-messages",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:308",
+      "group": "chatContracts",
+      "method": "deleteMessages",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "search-chats",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:314",
+      "group": "chatContracts",
+      "method": "searchChats",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "chat:count-tokens",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:331",
+      "group": "chatContracts",
+      "method": "countTokens",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "chat:cancel",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:337",
+      "group": "chatContracts",
+      "method": "cancelStream",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "chat:response:ack",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/chat.ts:347",
+      "group": "chatContracts",
+      "method": "responseAck",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "agent-tool:get-tools",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/agent.ts:147",
+      "group": "agentContracts",
+      "method": "getTools",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "agent-tool:set-consent",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/agent.ts:153",
+      "group": "agentContracts",
+      "method": "setConsent",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "agent-tool:consent-response",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/agent.ts:159",
+      "group": "agentContracts",
+      "method": "respondToConsent",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "chat:stream",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "stream",
+      "source": "src/ipc/types/chat.ts:365",
+      "group": "chatStreamContract",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "help:chat:start",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/help.ts:39",
+      "group": "helpContracts",
+      "method": "start",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:start-flow",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:127",
+      "group": "githubContracts",
+      "method": "startFlow",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:list-repos",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:133",
+      "group": "githubContracts",
+      "method": "listRepos",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:get-repo-branches",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:139",
+      "group": "githubContracts",
+      "method": "getRepoBranches",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:is-repo-available",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:145",
+      "group": "githubContracts",
+      "method": "isRepoAvailable",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:create-repo",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:151",
+      "group": "githubContracts",
+      "method": "createRepo",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:connect-existing-repo",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:162",
+      "group": "githubContracts",
+      "method": "connectExistingRepo",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:push",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:173",
+      "group": "githubContracts",
+      "method": "push",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:fetch",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:183",
+      "group": "githubContracts",
+      "method": "fetch",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:pull",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:189",
+      "group": "githubContracts",
+      "method": "pull",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:rebase",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:195",
+      "group": "githubContracts",
+      "method": "rebase",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:rebase-abort",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:201",
+      "group": "githubContracts",
+      "method": "rebaseAbort",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:merge-abort",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:207",
+      "group": "githubContracts",
+      "method": "mergeAbort",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:rebase-continue",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:213",
+      "group": "githubContracts",
+      "method": "rebaseContinue",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:list-local-branches",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:219",
+      "group": "githubContracts",
+      "method": "listLocalBranches",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:list-remote-branches",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:225",
+      "group": "githubContracts",
+      "method": "listRemoteBranches",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:create-branch",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:231",
+      "group": "githubContracts",
+      "method": "createBranch",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:switch-branch",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:237",
+      "group": "githubContracts",
+      "method": "switchBranch",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:delete-branch",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:243",
+      "group": "githubContracts",
+      "method": "deleteBranch",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:rename-branch",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:249",
+      "group": "githubContracts",
+      "method": "renameBranch",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:merge-branch",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:255",
+      "group": "githubContracts",
+      "method": "mergeBranch",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:get-conflicts",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:261",
+      "group": "githubContracts",
+      "method": "getConflicts",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:get-git-state",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:267",
+      "group": "githubContracts",
+      "method": "getGitState",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:disconnect",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:273",
+      "group": "githubContracts",
+      "method": "disconnect",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:list-collaborators",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:279",
+      "group": "githubContracts",
+      "method": "listCollaborators",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:invite-collaborator",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:285",
+      "group": "githubContracts",
+      "method": "inviteCollaborator",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:remove-collaborator",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:291",
+      "group": "githubContracts",
+      "method": "removeCollaborator",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:clone-repo-from-url",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:297",
+      "group": "githubContracts",
+      "method": "cloneRepoFromUrl",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "git:get-uncommitted-files",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:306",
+      "group": "gitContracts",
+      "method": "getUncommittedFiles",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "git:commit-changes",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:312",
+      "group": "gitContracts",
+      "method": "commitChanges",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "git:discard-changes",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/github.ts:318",
+      "group": "gitContracts",
+      "method": "discardChanges",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:list-servers",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:184",
+      "group": "mcpContracts",
+      "method": "listServers",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:create-server",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:190",
+      "group": "mcpContracts",
+      "method": "createServer",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:update-server",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:196",
+      "group": "mcpContracts",
+      "method": "updateServer",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:delete-server",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:202",
+      "group": "mcpContracts",
+      "method": "deleteServer",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:list-tools",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:208",
+      "group": "mcpContracts",
+      "method": "listTools",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:get-tool-consents",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:214",
+      "group": "mcpContracts",
+      "method": "getToolConsents",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:set-tool-consent",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:220",
+      "group": "mcpContracts",
+      "method": "setToolConsent",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:tool-consent-response",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:226",
+      "group": "mcpContracts",
+      "method": "respondToConsent",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:start-oauth",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:232",
+      "group": "mcpContracts",
+      "method": "startOAuth",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:disconnect-oauth",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:250",
+      "group": "mcpContracts",
+      "method": "disconnectOAuth",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:probe-callback-port",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:256",
+      "group": "mcpContracts",
+      "method": "probeCallbackPort",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:probe-connection",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:262",
+      "group": "mcpContracts",
+      "method": "probeConnection",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:is-oauth-storage-encrypted",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/mcp.ts:272",
+      "group": "mcpContracts",
+      "method": "isOauthStorageEncrypted",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "vercel:save-token",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/vercel.ts:152",
+      "group": "vercelContracts",
+      "method": "saveToken",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "vercel:list-projects",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/vercel.ts:158",
+      "group": "vercelContracts",
+      "method": "listProjects",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "vercel:is-project-available",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/vercel.ts:164",
+      "group": "vercelContracts",
+      "method": "isProjectAvailable",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "vercel:create-project",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/vercel.ts:170",
+      "group": "vercelContracts",
+      "method": "createProject",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "vercel:connect-existing-project",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/vercel.ts:176",
+      "group": "vercelContracts",
+      "method": "connectExistingProject",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "vercel:get-deployments",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/vercel.ts:182",
+      "group": "vercelContracts",
+      "method": "getDeployments",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "vercel:disconnect",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/vercel.ts:188",
+      "group": "vercelContracts",
+      "method": "disconnect",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "vercel:get-sync-preview",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/vercel.ts:194",
+      "group": "vercelContracts",
+      "method": "getSyncPreview",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "vercel:sync-neon-config",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/vercel.ts:200",
+      "group": "vercelContracts",
+      "method": "syncNeonConfig",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "vercel:remove-neon-env-vars",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/vercel.ts:206",
+      "group": "vercelContracts",
+      "method": "removeNeonEnvVars",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "supabase:list-organizations",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/supabase.ts:84",
+      "group": "supabaseContracts",
+      "method": "listOrganizations",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "supabase:delete-organization",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/supabase.ts:90",
+      "group": "supabaseContracts",
+      "method": "deleteOrganization",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "supabase:list-all-projects",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/supabase.ts:96",
+      "group": "supabaseContracts",
+      "method": "listAllProjects",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "supabase:list-branches",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/supabase.ts:102",
+      "group": "supabaseContracts",
+      "method": "listBranches",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "supabase:get-edge-logs",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/supabase.ts:108",
+      "group": "supabaseContracts",
+      "method": "getEdgeLogs",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "supabase:set-app-project",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/supabase.ts:114",
+      "group": "supabaseContracts",
+      "method": "setAppProject",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "supabase:unset-app-project",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/supabase.ts:120",
+      "group": "supabaseContracts",
+      "method": "unsetAppProject",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "supabase:fake-connect-and-set-project",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/supabase.ts:127",
+      "group": "supabaseContracts",
+      "method": "fakeConnectAndSetProject",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:create-project",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:144",
+      "group": "neonContracts",
+      "method": "createProject",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:get-project",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:150",
+      "group": "neonContracts",
+      "method": "getProject",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:list-projects",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:156",
+      "group": "neonContracts",
+      "method": "listProjects",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:set-app-project",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:162",
+      "group": "neonContracts",
+      "method": "setAppProject",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:unset-app-project",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:171",
+      "group": "neonContracts",
+      "method": "unsetAppProject",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:set-active-branch",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:177",
+      "group": "neonContracts",
+      "method": "setActiveBranch",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:get-email-password-config",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:186",
+      "group": "neonContracts",
+      "method": "getEmailPasswordConfig",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:update-email-verification",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:192",
+      "group": "neonContracts",
+      "method": "updateEmailVerification",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:fake-connect",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:198",
+      "group": "neonContracts",
+      "method": "fakeConnect",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:get-branch-env-vars",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:204",
+      "group": "neonContracts",
+      "method": "getBranchEnvVars",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "neon:set-selected-database-branch-type",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/neon.ts:210",
+      "group": "neonContracts",
+      "method": "setSelectedDatabaseBranchType",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "migration:migrate",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/migration.ts:71",
+      "group": "migrationContracts",
+      "method": "migrate",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "migration:preview",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/migration.ts:76",
+      "group": "migrationContracts",
+      "method": "preview",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "window:minimize",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:120",
+      "group": "systemContracts",
+      "method": "minimizeWindow",
+      "webReplacement": "No-op or browser navigation state; browser chrome owns window controls"
+    },
+    {
+      "channel": "window:maximize",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:126",
+      "group": "systemContracts",
+      "method": "maximizeWindow",
+      "webReplacement": "No-op or browser navigation state; browser chrome owns window controls"
+    },
+    {
+      "channel": "window:close",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:132",
+      "group": "systemContracts",
+      "method": "closeWindow",
+      "webReplacement": "No-op or browser navigation state; browser chrome owns window controls"
+    },
+    {
+      "channel": "window:focus",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:139",
+      "group": "systemContracts",
+      "method": "focusWindow",
+      "webReplacement": "No-op or browser navigation state; browser chrome owns window controls"
+    },
+    {
+      "channel": "get-system-platform",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:146",
+      "group": "systemContracts",
+      "method": "getSystemPlatform",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-initial-load-telemetry-context",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:152",
+      "group": "systemContracts",
+      "method": "getInitialLoadTelemetryContext",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-system-debug-info",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:160",
+      "group": "systemContracts",
+      "method": "getSystemDebugInfo",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-app-version",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:166",
+      "group": "systemContracts",
+      "method": "getAppVersion",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "nodejs-status",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:173",
+      "group": "systemContracts",
+      "method": "getNodejsStatus",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "install-pnpm",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:179",
+      "group": "systemContracts",
+      "method": "installPnpm",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "select-node-folder",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:185",
+      "group": "systemContracts",
+      "method": "selectNodeFolder",
+      "webReplacement": "Browser-safe picker flow backed by local server path capability"
+    },
+    {
+      "channel": "get-node-path",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:191",
+      "group": "systemContracts",
+      "method": "getNodePath",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "select-app-folder",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:198",
+      "group": "systemContracts",
+      "method": "selectAppFolder",
+      "webReplacement": "Browser-safe picker flow backed by local server path capability"
+    },
+    {
+      "channel": "get-custom-apps-folder",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:205",
+      "group": "systemContracts",
+      "method": "getCustomAppsFolder",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "select-custom-apps-folder",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:211",
+      "group": "systemContracts",
+      "method": "selectCustomAppsFolder",
+      "webReplacement": "Browser-safe picker flow backed by local server path capability"
+    },
+    {
+      "channel": "set-custom-apps-folder",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:217",
+      "group": "systemContracts",
+      "method": "setCustomAppsFolder",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "open-external-url",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:224",
+      "group": "systemContracts",
+      "method": "openExternalUrl",
+      "webReplacement": "Server-mediated local OS action with explicit user intent"
+    },
+    {
+      "channel": "show-item-in-folder",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:230",
+      "group": "systemContracts",
+      "method": "showItemInFolder",
+      "webReplacement": "Server-mediated local OS action with explicit user intent"
+    },
+    {
+      "channel": "open-file-path",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:236",
+      "group": "systemContracts",
+      "method": "openFilePath",
+      "webReplacement": "Server-mediated local OS action with explicit user intent"
+    },
+    {
+      "channel": "clear-session-data",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:243",
+      "group": "systemContracts",
+      "method": "clearSessionData",
+      "webReplacement": "Browser storage clear plus server session cleanup"
+    },
+    {
+      "channel": "reset-all",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:249",
+      "group": "systemContracts",
+      "method": "resetAll",
+      "webReplacement": "Local server lifecycle/reset endpoint plus browser reload"
+    },
+    {
+      "channel": "reload-env-path",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:255",
+      "group": "systemContracts",
+      "method": "reloadEnvPath",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "does-release-note-exist",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:262",
+      "group": "systemContracts",
+      "method": "doesReleaseNoteExist",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-user-budget",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:269",
+      "group": "systemContracts",
+      "method": "getUserBudget",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "upload-to-signed-url",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:276",
+      "group": "systemContracts",
+      "method": "uploadToSignedUrl",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "take-screenshot",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:287",
+      "group": "systemContracts",
+      "method": "takeScreenshot",
+      "webReplacement": "Browser screenshot/canvas capture where available; otherwise server-side preview capture"
+    },
+    {
+      "channel": "restart-dyad",
+      "direction": "invoke",
+      "cluster": "electron-only/system",
+      "kind": "contract",
+      "source": "src/ipc/types/system.ts:294",
+      "group": "systemContracts",
+      "method": "restartDyad",
+      "webReplacement": "Local server lifecycle/reset endpoint plus browser reload"
+    },
+    {
+      "channel": "list-versions",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/version.ts:53",
+      "group": "versionContracts",
+      "method": "listVersions",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "revert-version",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/version.ts:59",
+      "group": "versionContracts",
+      "method": "revertVersion",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "checkout-version",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/version.ts:65",
+      "group": "versionContracts",
+      "method": "checkoutVersion",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-current-branch",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/version.ts:71",
+      "group": "versionContracts",
+      "method": "getCurrentBranch",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-language-model-providers",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:81",
+      "group": "languageModelContracts",
+      "method": "getProviders",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-language-models",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:87",
+      "group": "languageModelContracts",
+      "method": "getModels",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-language-models-by-providers",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:93",
+      "group": "languageModelContracts",
+      "method": "getModelsByProviders",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "create-custom-language-model-provider",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:99",
+      "group": "languageModelContracts",
+      "method": "createCustomProvider",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "edit-custom-language-model-provider",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:105",
+      "group": "languageModelContracts",
+      "method": "editCustomProvider",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "delete-custom-language-model-provider",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:111",
+      "group": "languageModelContracts",
+      "method": "deleteCustomProvider",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "create-custom-language-model",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:117",
+      "group": "languageModelContracts",
+      "method": "createCustomModel",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "delete-custom-language-model",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:123",
+      "group": "languageModelContracts",
+      "method": "deleteCustomModel",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "delete-custom-model",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:129",
+      "group": "languageModelContracts",
+      "method": "deleteModel",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "local-models:list-ollama",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:135",
+      "group": "languageModelContracts",
+      "method": "listOllamaModels",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "local-models:list-lmstudio",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/language-model.ts:141",
+      "group": "languageModelContracts",
+      "method": "listLMStudioModels",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "prompts:list",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/prompts.ts:55",
+      "group": "promptContracts",
+      "method": "list",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "prompts:create",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/prompts.ts:61",
+      "group": "promptContracts",
+      "method": "create",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "prompts:update",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/prompts.ts:67",
+      "group": "promptContracts",
+      "method": "update",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "prompts:delete",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/prompts.ts:73",
+      "group": "promptContracts",
+      "method": "delete",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-templates",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:207",
+      "group": "templateContracts",
+      "method": "getTemplates",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-themes",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:213",
+      "group": "templateContracts",
+      "method": "getThemes",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "set-app-theme",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:219",
+      "group": "templateContracts",
+      "method": "setAppTheme",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-app-theme",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:225",
+      "group": "templateContracts",
+      "method": "getAppTheme",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "apply-app-template",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:231",
+      "group": "templateContracts",
+      "method": "applyAppTemplate",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-custom-themes",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:238",
+      "group": "templateContracts",
+      "method": "getCustomThemes",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-theme-generation-model-options",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:244",
+      "group": "templateContracts",
+      "method": "getThemeGenerationModelOptions",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "create-custom-theme",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:250",
+      "group": "templateContracts",
+      "method": "createCustomTheme",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "update-custom-theme",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:256",
+      "group": "templateContracts",
+      "method": "updateCustomTheme",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "delete-custom-theme",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:262",
+      "group": "templateContracts",
+      "method": "deleteCustomTheme",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "generate-theme-prompt",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:269",
+      "group": "templateContracts",
+      "method": "generateThemePrompt",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "generate-theme-from-url",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:275",
+      "group": "templateContracts",
+      "method": "generateThemeFromUrl",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "save-theme-image",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:281",
+      "group": "templateContracts",
+      "method": "saveThemeImage",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "cleanup-theme-images",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/templates.ts:287",
+      "group": "templateContracts",
+      "method": "cleanupThemeImages",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-proposal",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/proposals.ts:113",
+      "group": "proposalContracts",
+      "method": "getProposal",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "approve-proposal",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/proposals.ts:119",
+      "group": "proposalContracts",
+      "method": "approveProposal",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "reject-proposal",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/proposals.ts:125",
+      "group": "proposalContracts",
+      "method": "rejectProposal",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "import-app",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/import.ts:47",
+      "group": "importContracts",
+      "method": "importApp",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "check-ai-rules",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/import.ts:59",
+      "group": "importContracts",
+      "method": "checkAiRules",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "help:chat:cancel",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/help.ts:45",
+      "group": "helpContracts",
+      "method": "cancel",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "is-capacitor",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/capacitor.ts:17",
+      "group": "capacitorContracts",
+      "method": "isCapacitor",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "sync-capacitor",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/capacitor.ts:23",
+      "group": "capacitorContracts",
+      "method": "syncCapacitor",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "open-ios",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/capacitor.ts:29",
+      "group": "capacitorContracts",
+      "method": "openIos",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "open-android",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/capacitor.ts:35",
+      "group": "capacitorContracts",
+      "method": "openAndroid",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-context-paths",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/context.ts:51",
+      "group": "contextContracts",
+      "method": "getContextPaths",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "set-context-paths",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/context.ts:57",
+      "group": "contextContracts",
+      "method": "setContextPaths",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-app-upgrades",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/upgrade.ts:32",
+      "group": "upgradeContracts",
+      "method": "getAppUpgrades",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "execute-app-upgrade",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/upgrade.ts:38",
+      "group": "upgradeContracts",
+      "method": "executeAppUpgrade",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "apply-visual-editing-changes",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/visual-editing.ts:134",
+      "group": "visualEditingContracts",
+      "method": "applyChanges",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "analyze-component",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/visual-editing.ts:140",
+      "group": "visualEditingContracts",
+      "method": "analyzeComponent",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-latest-security-review",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/security.ts:29",
+      "group": "securityContracts",
+      "method": "getLatestSecurityReview",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "portal:migrate-create",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/misc.ts:324",
+      "group": "miscContracts",
+      "method": "portalMigrateCreate",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-env-vars",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/misc.ts:331",
+      "group": "miscContracts",
+      "method": "getEnvVars",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-app-env-vars",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/misc.ts:338",
+      "group": "miscContracts",
+      "method": "getAppEnvVars",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "set-app-env-vars",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/misc.ts:344",
+      "group": "miscContracts",
+      "method": "setAppEnvVars",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "get-session-debug-bundle",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/misc.ts:351",
+      "group": "miscContracts",
+      "method": "getSessionDebugBundle",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "add-log",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/misc.ts:358",
+      "group": "miscContracts",
+      "method": "addLog",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "clear-logs",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/misc.ts:364",
+      "group": "miscContracts",
+      "method": "clearLogs",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "renderer:error-toast-ready",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/misc.ts:370",
+      "group": "miscContracts",
+      "method": "rendererErrorToastReady",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "check-problems",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/misc.ts:377",
+      "group": "miscContracts",
+      "method": "checkProblems",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "chat:add-dep",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/misc.ts:384",
+      "group": "miscContracts",
+      "method": "addDependency",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "free-agent-quota:get-status",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/free_agent_quota.ts:37",
+      "group": "freeAgentQuotaContracts",
+      "method": "getFreeAgentQuotaStatus",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "plan:create",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/plan.ts:115",
+      "group": "planContracts",
+      "method": "createPlan",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "plan:get",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/plan.ts:121",
+      "group": "planContracts",
+      "method": "getPlan",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "plan:get-for-chat",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/plan.ts:127",
+      "group": "planContracts",
+      "method": "getPlanForChat",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "plan:update-plan",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/plan.ts:133",
+      "group": "planContracts",
+      "method": "updatePlan",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "plan:delete",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/plan.ts:139",
+      "group": "planContracts",
+      "method": "deletePlan",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "plan:questionnaire-response",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/plan.ts:145",
+      "group": "planContracts",
+      "method": "respondToQuestionnaire",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "integration:response",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/integration.ts:35",
+      "group": "integrationContracts",
+      "method": "respond",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "pro:transcribe-audio",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/audio.ts:27",
+      "group": "audioContracts",
+      "method": "transcribeAudio",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "list-all-media",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/media.ts:58",
+      "group": "mediaContracts",
+      "method": "listAllMedia",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "rename-media-file",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/media.ts:64",
+      "group": "mediaContracts",
+      "method": "renameMediaFile",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "delete-media-file",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/media.ts:70",
+      "group": "mediaContracts",
+      "method": "deleteMediaFile",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "move-media-file",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/media.ts:76",
+      "group": "mediaContracts",
+      "method": "moveMediaFile",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "generate-image",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/image_generation.ts:61",
+      "group": "imageGenerationContracts",
+      "method": "generateImage",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "cancel-image-generation",
+      "direction": "invoke",
+      "cluster": "integrations",
+      "kind": "contract",
+      "source": "src/ipc/types/image_generation.ts:66",
+      "group": "imageGenerationContracts",
+      "method": "cancelImageGeneration",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app-blueprint:approve",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/app_blueprint.ts:190",
+      "group": "appBlueprintContracts",
+      "method": "approve",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app-blueprint:edit-field",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/app_blueprint.ts:196",
+      "group": "appBlueprintContracts",
+      "method": "editField",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app-blueprint:edit-visual",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/app_blueprint.ts:202",
+      "group": "appBlueprintContracts",
+      "method": "editVisual",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app-blueprint:add-visual",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/app_blueprint.ts:208",
+      "group": "appBlueprintContracts",
+      "method": "addVisual",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app-blueprint:remove-visual",
+      "direction": "invoke",
+      "cluster": "chat/agent",
+      "kind": "contract",
+      "source": "src/ipc/types/app_blueprint.ts:214",
+      "group": "appBlueprintContracts",
+      "method": "removeVisual",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "appCollections:list",
+      "direction": "invoke",
+      "cluster": "shell/read",
+      "kind": "contract",
+      "source": "src/ipc/types/app_collections.ts:49",
+      "group": "appCollectionContracts",
+      "method": "list",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "appCollections:create",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app_collections.ts:55",
+      "group": "appCollectionContracts",
+      "method": "create",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "appCollections:update",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app_collections.ts:61",
+      "group": "appCollectionContracts",
+      "method": "update",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "appCollections:delete",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app_collections.ts:67",
+      "group": "appCollectionContracts",
+      "method": "delete",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "appCollections:assignApps",
+      "direction": "invoke",
+      "cluster": "mutations",
+      "kind": "contract",
+      "source": "src/ipc/types/app_collections.ts:73",
+      "group": "appCollectionContracts",
+      "method": "assignApps",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "terminal:open",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/terminal.ts:60",
+      "group": "terminalContracts",
+      "method": "open",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "terminal:close",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/terminal.ts:66",
+      "group": "terminalContracts",
+      "method": "close",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "terminal:kill",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/terminal.ts:72",
+      "group": "terminalContracts",
+      "method": "kill",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "terminal:write",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/terminal.ts:78",
+      "group": "terminalContracts",
+      "method": "write",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "terminal:resize",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/terminal.ts:84",
+      "group": "terminalContracts",
+      "method": "resize",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "terminal:serialize",
+      "direction": "invoke",
+      "cluster": "runtime/preview",
+      "kind": "contract",
+      "source": "src/ipc/types/terminal.ts:90",
+      "group": "terminalContracts",
+      "method": "serialize",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "test:simulateQuotaTimeElapsed",
+      "direction": "invoke",
+      "cluster": "test-only",
+      "kind": "test-only",
+      "source": "src/ipc/preload/channels.ts",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "test:set-node-mock",
+      "direction": "invoke",
+      "cluster": "test-only",
+      "kind": "test-only",
+      "source": "src/ipc/preload/channels.ts",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "test:set-needs-app-blueprint",
+      "direction": "invoke",
+      "cluster": "test-only",
+      "kind": "test-only",
+      "source": "src/ipc/preload/channels.ts",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    }
+  ],
+  "receiveChannels": [
+    {
+      "channel": "chat:response:chunk",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "stream-event",
+      "source": "src/ipc/types/chat.ts:365",
+      "group": "chatStreamContract",
+      "method": "chunk",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "chat:response:end",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "stream-event",
+      "source": "src/ipc/types/chat.ts:365",
+      "group": "chatStreamContract",
+      "method": "end",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "chat:response:error",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "stream-event",
+      "source": "src/ipc/types/chat.ts:365",
+      "group": "chatStreamContract",
+      "method": "error",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "help:chat:response:chunk",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "stream-event",
+      "source": "src/ipc/types/help.ts:56",
+      "group": "helpStreamContract",
+      "method": "chunk",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "help:chat:response:end",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "stream-event",
+      "source": "src/ipc/types/help.ts:56",
+      "group": "helpStreamContract",
+      "method": "end",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "help:chat:response:error",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "stream-event",
+      "source": "src/ipc/types/help.ts:56",
+      "group": "helpStreamContract",
+      "method": "error",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "agent-tool:consent-request",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/agent.ts:174",
+      "group": "agentEvents",
+      "method": "consentRequest",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "agent-tool:todos-update",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/agent.ts:182",
+      "group": "agentEvents",
+      "method": "todosUpdate",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "agent-tool:problems-update",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/agent.ts:190",
+      "group": "agentEvents",
+      "method": "problemsUpdate",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:flow-update",
+      "direction": "receive",
+      "cluster": "integrations",
+      "kind": "event",
+      "source": "src/ipc/types/github.ts:330",
+      "group": "githubEvents",
+      "method": "flowUpdate",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:flow-success",
+      "direction": "receive",
+      "cluster": "integrations",
+      "kind": "event",
+      "source": "src/ipc/types/github.ts:335",
+      "group": "githubEvents",
+      "method": "flowSuccess",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "github:flow-error",
+      "direction": "receive",
+      "cluster": "integrations",
+      "kind": "event",
+      "source": "src/ipc/types/github.ts:340",
+      "group": "githubEvents",
+      "method": "flowError",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "mcp:tool-consent-request",
+      "direction": "receive",
+      "cluster": "integrations",
+      "kind": "event",
+      "source": "src/ipc/types/mcp.ts:284",
+      "group": "mcpEvents",
+      "method": "consentRequest",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "telemetry:event",
+      "direction": "receive",
+      "cluster": "integrations",
+      "kind": "event",
+      "source": "src/ipc/types/system.ts:306",
+      "group": "systemEvents",
+      "method": "telemetryEvent",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "force-close-detected",
+      "direction": "receive",
+      "cluster": "electron-only/system",
+      "kind": "event",
+      "source": "src/ipc/types/system.ts:311",
+      "group": "systemEvents",
+      "method": "forceCloseDetected",
+      "webReplacement": "No-op or browser navigation state; browser chrome owns window controls"
+    },
+    {
+      "channel": "app:output",
+      "direction": "receive",
+      "cluster": "runtime/preview",
+      "kind": "event",
+      "source": "src/ipc/types/misc.ts:399",
+      "group": "miscEvents",
+      "method": "appOutput",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app:output-batch",
+      "direction": "receive",
+      "cluster": "runtime/preview",
+      "kind": "event",
+      "source": "src/ipc/types/misc.ts:404",
+      "group": "miscEvents",
+      "method": "appOutputBatch",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "deep-link-received",
+      "direction": "receive",
+      "cluster": "electron-only/system",
+      "kind": "event",
+      "source": "src/ipc/types/misc.ts:409",
+      "group": "miscEvents",
+      "method": "deepLinkReceived",
+      "webReplacement": "Loopback callback route/event bridge"
+    },
+    {
+      "channel": "chat:stream:start",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/misc.ts:414",
+      "group": "miscEvents",
+      "method": "chatStreamStart",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "chat:stream:end",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/misc.ts:419",
+      "group": "miscEvents",
+      "method": "chatStreamEnd",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "toast:error",
+      "direction": "receive",
+      "cluster": "electron-only/system",
+      "kind": "event",
+      "source": "src/ipc/types/misc.ts:424",
+      "group": "miscEvents",
+      "method": "errorToast",
+      "webReplacement": "Explicit Web replacement required"
+    },
+    {
+      "channel": "plan:update",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/plan.ts:96",
+      "group": "planEvents",
+      "method": "update",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "plan:exit",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/plan.ts:101",
+      "group": "planEvents",
+      "method": "exit",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "plan:questionnaire",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/plan.ts:106",
+      "group": "planEvents",
+      "method": "questionnaire",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "integration:prompt",
+      "direction": "receive",
+      "cluster": "integrations",
+      "kind": "event",
+      "source": "src/ipc/types/integration.ts:28",
+      "group": "integrationEvents",
+      "method": "prompt",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app-blueprint:update",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/app_blueprint.ts:164",
+      "group": "appBlueprintEvents",
+      "method": "update",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app-blueprint:visuals-update",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/app_blueprint.ts:169",
+      "group": "appBlueprintEvents",
+      "method": "visualsUpdate",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app-blueprint:approved",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/app_blueprint.ts:174",
+      "group": "appBlueprintEvents",
+      "method": "approved",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    },
+    {
+      "channel": "app-blueprint:timeout",
+      "direction": "receive",
+      "cluster": "chat/agent",
+      "kind": "event",
+      "source": "src/ipc/types/app_blueprint.ts:179",
+      "group": "appBlueprintEvents",
+      "method": "timeout",
+      "webReplacement": "HTTP/API or browser event bridge equivalent"
+    }
+  ],
+  "directRendererElectronUsage": [
+    {
+      "file": "src/app/layout.tsx",
+      "line": 75,
+      "match": "bwebFrameb",
+      "text": "webFrame?: {"
+    },
+    {
+      "file": "src/app/layout.tsx",
+      "line": 82,
+      "match": "bwebFrameb",
+      "text": "if (electronApi?.webFrame?.setZoomFactor) {"
+    },
+    {
+      "file": "src/app/layout.tsx",
+      "line": 83,
+      "match": "bwebFrameb",
+      "text": "electronApi.webFrame.setZoomFactor(zoomFactor);"
+    },
+    {
+      "file": "src/app/layout.tsx",
+      "line": 86,
+      "match": "bwebFrameb",
+      "text": "electronApi.webFrame?.setZoomFactor(Number(DEFAULT_ZOOM_LEVEL) / 100);"
+    }
+  ],
+  "backendTopLevelElectronImports": [
+    {
+      "file": "src/backup_manager.ts",
+      "line": 3,
+      "import": "import { app } from \"electron\";",
+      "startupCandidate": false
+    },
+    {
+      "file": "src/ipc/handlers/app_handlers.ts",
+      "line": 1,
+      "import": "import { ipcMain, app, dialog } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/createFromTemplate.ts",
+      "line": 3,
+      "import": "import { app } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/custom_apps_folder_handlers.ts",
+      "line": 1,
+      "import": "import { dialog } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/debug_handlers.ts",
+      "line": 1,
+      "import": "import { BrowserWindow, clipboard } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/git_branch_handlers.ts",
+      "line": 1,
+      "import": "import { IpcMainInvokeEvent } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/import_handlers.ts",
+      "line": 1,
+      "import": "import { dialog } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/language_model_handlers.ts",
+      "line": 22,
+      "import": "import { IpcMainInvokeEvent } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/mcp_handlers.ts",
+      "line": 25,
+      "import": "import { safeStorage } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/node_handlers.ts",
+      "line": 1,
+      "import": "import { dialog, ipcMain } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/session_handlers.ts",
+      "line": 1,
+      "import": "import { session } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/shell_handler.ts",
+      "line": 1,
+      "import": "import { shell } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/terminal_handlers.ts",
+      "line": 1,
+      "import": "import { app } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/vercel_handlers.ts",
+      "line": 1,
+      "import": "import { IpcMainInvokeEvent } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/ipc/handlers/window_handlers.ts",
+      "line": 1,
+      "import": "import { BrowserWindow } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/main.ts",
+      "line": 1,
+      "import": "import { app, BrowserWindow, dialog, Menu, protocol, net, session, crashReporter, } from \"electron\";",
+      "startupCandidate": true
+    },
+    {
+      "file": "src/preload.ts",
+      "line": 4,
+      "import": "import { contextBridge, ipcRenderer, webFrame } from \"electron\";",
+      "startupCandidate": false
+    },
+    {
+      "file": "src/pro/main/ipc/handlers/visual_editing_handlers.ts",
+      "line": 1,
+      "import": "import { ipcMain } from \"electron\";",
+      "startupCandidate": false
+    }
+  ],
+  "validation": {
+    "missingInvokeDefinitions": [],
+    "missingReceiveDefinitions": [],
+    "unclassifiedChannels": [],
+    "duplicateChannelDefinitions": [
+      {
+        "channel": "help:chat:start",
+        "first": {
+          "kind": "contract",
+          "source": "src/ipc/types/help.ts:39"
+        },
+        "duplicate": {
+          "kind": "stream",
+          "source": "src/ipc/types/help.ts:56"
+        }
+      },
+      {
+        "channel": "check-app-name",
+        "first": {
+          "kind": "contract",
+          "source": "src/ipc/types/app.ts:465"
+        },
+        "duplicate": {
+          "kind": "contract",
+          "source": "src/ipc/types/import.ts:53"
+        }
+      }
+    ]
+  }
+}

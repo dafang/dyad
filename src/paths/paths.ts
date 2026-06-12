@@ -2,6 +2,7 @@ import path from "node:path";
 import os from "node:os";
 import fs from "node:fs";
 import { IS_TEST_BUILD } from "../ipc/utils/test_utils";
+import { getElectronModule } from "../ipc/utils/electron_module";
 import { readSettings } from "../main/settings";
 
 // Cached result of getDyadAppsBaseDirectory
@@ -9,11 +10,27 @@ let cachedBaseDirectory: string | null = null;
 let cachedCustomFolderSetting: string | null | undefined;
 // Whether `dyad-apps` has been created
 let defaultDirCreated = false;
+let customAppsFolderSettingReader:
+  | (() => string | null | undefined)
+  | undefined;
+let defaultDyadAppsDirectoryProvider: (() => string) | undefined;
+let typeScriptCachePathProvider: (() => string) | undefined;
+let userDataPathProvider: (() => string) | undefined;
+
+interface ElectronPathsLike {
+  app: {
+    getPath(name: "userData" | "sessionData"): string;
+  };
+}
 
 /**
  * Gets the default path of the base dyad-apps directory (without a specific app subdirectory)
  */
 export function getDefaultDyadAppsDirectory(): string {
+  if (defaultDyadAppsDirectoryProvider) {
+    return defaultDyadAppsDirectoryProvider();
+  }
+
   if (IS_TEST_BUILD) {
     const electron = getElectron();
     return path.join(electron!.app.getPath("userData"), "dyad-apps");
@@ -47,6 +64,24 @@ export function invalidateDyadAppsBaseDirectoryCache(): void {
   cachedCustomFolderSetting = undefined;
 }
 
+export function configureCustomAppsFolderSettingReaderForPathResolution(
+  reader: (() => string | null | undefined) | undefined,
+  defaultAppsDirectoryProvider?: (() => string) | undefined,
+  typeScriptCacheProvider?: (() => string) | undefined,
+): void {
+  customAppsFolderSettingReader = reader;
+  defaultDyadAppsDirectoryProvider = defaultAppsDirectoryProvider;
+  typeScriptCachePathProvider = typeScriptCacheProvider;
+  defaultDirCreated = false;
+  invalidateDyadAppsBaseDirectoryCache();
+}
+
+export function configureUserDataPathProviderForPathResolution(
+  provider: (() => string) | undefined,
+): void {
+  userDataPathProvider = provider;
+}
+
 /**
  * Returns the cached value of the custom folder path
  */
@@ -60,11 +95,19 @@ export function getCustomFolderCache(): string | null | undefined {
 export function getDyadAppsBaseDirectory(): string {
   const appsPath =
     cachedBaseDirectory ??
-    (cachedCustomFolderSetting = readSettings().customAppsFolder) ??
+    (cachedCustomFolderSetting = readCustomAppsFolderSetting()) ??
     resolveDefaultDyadAppsDirectory();
 
   cachedBaseDirectory = appsPath;
   return cachedBaseDirectory;
+}
+
+function readCustomAppsFolderSetting(): string | null | undefined {
+  if (customAppsFolderSettingReader) {
+    return customAppsFolderSettingReader();
+  }
+
+  return readSettings().customAppsFolder;
 }
 
 /**
@@ -101,6 +144,10 @@ export function isAppLocationAccessible(resolvedPath: string): boolean {
 }
 
 export function getTypeScriptCachePath(): string {
+  if (typeScriptCachePathProvider) {
+    return typeScriptCachePathProvider();
+  }
+
   const electron = getElectron();
   return path.join(electron!.app.getPath("sessionData"), "typescript-cache");
 }
@@ -112,6 +159,10 @@ export function getTypeScriptCachePath(): string {
  */
 
 export function getUserDataPath(): string {
+  if (userDataPathProvider) {
+    return userDataPathProvider();
+  }
+
   const electron = getElectron();
 
   // When running in Electron and app is ready
@@ -126,15 +177,6 @@ export function getUserDataPath(): string {
 /**
  * Get a reference to electron in a way that won't break in non-electron environments
  */
-export function getElectron(): typeof import("electron") | undefined {
-  let electron: typeof import("electron") | undefined;
-  try {
-    // Check if we're in an Electron environment
-    if (process.versions.electron) {
-      electron = require("electron");
-    }
-  } catch {
-    // Not in Electron environment
-  }
-  return electron;
+export function getElectron(): ElectronPathsLike | undefined {
+  return getElectronModule<ElectronPathsLike>();
 }
