@@ -6,7 +6,12 @@ import {
   chatInputValueAtom,
 } from "@/atoms/chatAtoms";
 import { selectedAppIdAtom } from "@/atoms/appAtoms";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  getHideChatMenuSearchValue,
+  isChatMenuHiddenSearchValue,
+  type ChatHideMenuSearchValue,
+} from "@/lib/chat_search";
 
 export function useSelectChat() {
   const setSelectedChatId = useSetAtom(selectedChatIdAtom);
@@ -15,6 +20,14 @@ export function useSelectChat() {
   const addSessionOpenedChatId = useSetAtom(addSessionOpenedChatIdAtom);
   const setChatInputValue = useSetAtom(chatInputValueAtom);
   const navigate = useNavigate();
+  const currentHideMenu = useRouterState({
+    select: (state) =>
+      state.location.pathname === "/chat"
+        ? isChatMenuHiddenSearchValue(
+            state.location.search["hide-menu"] as ChatHideMenuSearchValue,
+          )
+        : false,
+  });
 
   return {
     selectChat: ({
@@ -22,11 +35,13 @@ export function useSelectChat() {
       appId,
       preserveTabOrder = false,
       prefillInput,
+      hideMenu,
     }: {
       chatId: number;
       appId: number;
       preserveTabOrder?: boolean;
       prefillInput?: string;
+      hideMenu?: ChatHideMenuSearchValue;
     }) => {
       setSelectedChatId(chatId);
       setSelectedAppId(appId);
@@ -37,7 +52,13 @@ export function useSelectChat() {
       }
       const navigationResult = navigate({
         to: "/chat",
-        search: { id: chatId, appId },
+        search: {
+          id: chatId,
+          appId,
+          "hide-menu": getHideChatMenuSearchValue({
+            hideMenu: hideMenu ?? currentHideMenu,
+          }),
+        },
       });
 
       if (prefillInput !== undefined) {

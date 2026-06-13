@@ -1,16 +1,19 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
 import { selectedChatIdAtom } from "@/atoms/chatAtoms";
 import { selectedAppIdAtom } from "@/atoms/appAtoms";
 import { useStreamChat } from "@/hooks/useStreamChat";
 import { ipc } from "@/ipc/types";
 import { showError } from "@/lib/toast";
+import { getHideChatMenuSearchValue } from "@/lib/chat_search";
 
 export function useSummarizeInNewChat() {
   const chatId = useAtomValue(selectedChatIdAtom);
   const appId = useAtomValue(selectedAppIdAtom);
   const { streamMessage } = useStreamChat();
   const navigate = useNavigate();
+  const { "hide-menu": hideMenu } = useSearch({ from: "/chat" });
+  const hideMenuSearchValue = getHideChatMenuSearchValue({ hideMenu });
 
   const handleSummarize = async () => {
     if (!appId) {
@@ -28,7 +31,10 @@ export function useSummarizeInNewChat() {
         initialChatMode: sourceChat.chatMode ?? undefined,
       });
       // navigate to new chat
-      await navigate({ to: "/chat", search: { id: newChatId } });
+      await navigate({
+        to: "/chat",
+        search: { id: newChatId, "hide-menu": hideMenuSearchValue },
+      });
       await streamMessage({
         prompt: "Summarize from chat-id=" + chatId,
         chatId: newChatId,

@@ -16,6 +16,7 @@ import { selectedAppIdAtom } from "@/atoms/appAtoms";
 import { selectedChatIdAtom } from "@/atoms/chatAtoms";
 import { usePlanImplementation } from "@/hooks/usePlanImplementation";
 import { ipc } from "@/ipc/types";
+import { getHideChatMenuSearchValue } from "@/lib/chat_search";
 
 const DEFAULT_CHAT_PANEL_SIZE = 50;
 const MIN_VISIBLE_CHAT_PANEL_SIZE = 20;
@@ -36,7 +37,14 @@ function useIsMobileChatLayout() {
 }
 
 export default function ChatPage() {
-  const { id: chatId, appId: routeAppId } = useSearch({ from: "/chat" });
+  const {
+    id: chatId,
+    appId: routeAppId,
+    "hide-menu": hideMenu,
+  } = useSearch({
+    from: "/chat",
+  });
+  const hideMenuSearchValue = getHideChatMenuSearchValue({ hideMenu });
   const navigate = useNavigate();
   const [isPreviewOpen, setIsPreviewOpen] = useAtom(isPreviewOpenAtom);
   const [isChatPanelHidden, setIsChatPanelHidden] = useAtom(
@@ -87,7 +95,11 @@ export default function ChatPage() {
       setSelectedAppId(chats[0].appId);
       navigate({
         to: "/chat",
-        search: { id: chats[0].id, appId: chats[0].appId },
+        search: {
+          id: chats[0].id,
+          appId: chats[0].appId,
+          "hide-menu": hideMenuSearchValue,
+        },
         replace: true,
       });
       return;

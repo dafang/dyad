@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { useSetAtom, useStore } from "jotai";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ipc } from "@/ipc/types";
 import {
   selectedChatIdAtom,
@@ -21,6 +21,11 @@ import {
   applyPreviewChunk,
   clearPreviewForChat,
 } from "@/lib/streamingPreviewSync";
+import {
+  getHideChatMenuSearchValue,
+  isChatMenuHiddenSearchValue,
+  type ChatHideMenuSearchValue,
+} from "@/lib/chat_search";
 
 interface UseResolveMergeConflictsWithAIProps {
   appId: number;
@@ -45,6 +50,14 @@ export function useResolveMergeConflictsWithAI({
   const setStreamingPreviewByChatId = useSetAtom(streamingPreviewByChatIdAtom);
   const store = useStore();
   const navigate = useNavigate();
+  const currentHideMenu = useRouterState({
+    select: (state) =>
+      state.location.pathname === "/chat"
+        ? isChatMenuHiddenSearchValue(
+            state.location.search["hide-menu"] as ChatHideMenuSearchValue,
+          )
+        : false,
+  });
   const [isResolving, setIsResolving] = useState(false);
   const isResolvingRef = useRef(false);
   const { invalidateChats } = useChats(appId);
@@ -101,7 +114,12 @@ For each file, review the conflict markers (<<<<<<<, =======, >>>>>>>) and choos
       // Navigate to the chat page
       navigate({
         to: "/chat",
-        search: { id: newChatId },
+        search: {
+          id: newChatId,
+          "hide-menu": getHideChatMenuSearchValue({
+            hideMenu: currentHideMenu,
+          }),
+        },
       });
 
       // Start the stream
@@ -229,6 +247,7 @@ For each file, review the conflict markers (<<<<<<<, =======, >>>>>>>) and choos
     setStreamCountById,
     setStreamingPreviewByChatId,
     navigate,
+    currentHideMenu,
     invalidateChats,
     refreshApp,
     settings,

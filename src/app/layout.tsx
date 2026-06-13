@@ -24,9 +24,21 @@ import { useShortcut } from "@/hooks/useShortcut";
 import { useIsMac } from "@/hooks/useChatModeToggle";
 import { ReleaseNotesDialog } from "@/components/ReleaseNotesDialog";
 import { isLocalWebRuntime } from "@/lib/runtime_client";
+import { useRouterState } from "@tanstack/react-router";
+import {
+  isChatMenuHiddenSearchValue,
+  type ChatHideMenuSearchValue,
+} from "@/lib/chat_search";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const isLocalWeb = isLocalWebRuntime();
+  const hideChatMenu = useRouterState({
+    select: (state) =>
+      state.location.pathname === "/chat" &&
+      isChatMenuHiddenSearchValue(
+        state.location.search["hide-menu"] as ChatHideMenuSearchValue,
+      ),
+  });
   const { refreshAppIframe } = useRunApp();
   // Subscribe to app output events once at the root level to avoid duplicates
   useAppOutputSubscription();
@@ -134,7 +146,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <DeepLinkProvider>
           <SidebarProvider defaultOpen={false}>
             {!isLocalWeb && <TitleBar />}
-            <AppSidebar />
+            {!hideChatMenu && <AppSidebar />}
             <div
               id="layout-main-content-container"
               className={

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/queryKeys";
 import {
@@ -18,6 +18,11 @@ import {
 } from "@/ipc/types/plan";
 import { ipc } from "@/ipc/types";
 import { showError } from "@/lib/toast";
+import {
+  getHideChatMenuSearchValue,
+  isChatMenuHiddenSearchValue,
+  type ChatHideMenuSearchValue,
+} from "@/lib/chat_search";
 
 /**
  * Hook to handle plan mode IPC events.
@@ -34,6 +39,14 @@ export function usePlanEvents() {
   const setSelectedChatId = useSetAtom(selectedChatIdAtom);
   const acceptInNewChatByChatId = useAtomValue(planAcceptInNewChatByChatIdAtom);
   const navigate = useNavigate();
+  const currentHideMenu = useRouterState({
+    select: (state) =>
+      state.location.pathname === "/chat"
+        ? isChatMenuHiddenSearchValue(
+            state.location.search["hide-menu"] as ChatHideMenuSearchValue,
+          )
+        : false,
+  });
   const queryClient = useQueryClient();
 
   // Use refs for values accessed in event handlers to avoid stale closures
@@ -154,7 +167,13 @@ export function usePlanEvents() {
             setSelectedChatId(newChatId);
             navigate({
               to: "/chat",
-              search: { id: newChatId, appId: payload.appId },
+              search: {
+                id: newChatId,
+                appId: payload.appId,
+                "hide-menu": getHideChatMenuSearchValue({
+                  hideMenu: currentHideMenu,
+                }),
+              },
             });
             implementationChatId = newChatId;
           } else {
@@ -212,6 +231,7 @@ export function usePlanEvents() {
     setPendingQuestionnaire,
     setSelectedChatId,
     navigate,
+    currentHideMenu,
     queryClient,
   ]);
 }

@@ -101,7 +101,7 @@ import {
 } from "./ContextLimitBanner";
 import { useCountTokens } from "@/hooks/useCountTokens";
 import { useChats } from "@/hooks/useChats";
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, useSearch } from "@tanstack/react-router";
 import { showError as showErrorToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { useVoiceToText } from "@/hooks/useVoiceToText";
@@ -109,11 +109,14 @@ import { isDyadProEnabled } from "@/lib/schemas";
 import { useChatMode } from "@/hooks/useChatMode";
 import { useInitialChatMode } from "@/hooks/useInitialChatMode";
 import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
+import { getHideChatMenuSearchValue } from "@/lib/chat_search";
 
 const showTokenBarAtom = atom(false);
 
 export function ChatInput({ chatId }: { chatId?: number }) {
   const { t } = useTranslation("chat");
+  const { "hide-menu": hideMenu } = useSearch({ from: "/chat" });
+  const hideMenuSearchValue = getHideChatMenuSearchValue({ hideMenu });
   const posthog = usePostHog();
   const inputValuesById = useAtomValue(chatInputValuesByIdAtom);
   const setInputValuesById = useSetAtom(chatInputValuesByIdAtom);
@@ -546,7 +549,10 @@ export function ChatInput({ chatId }: { chatId?: number }) {
         initialChatMode: "plan",
       });
       setSelectedChatId(newChatId);
-      navigate({ to: "/chat", search: { id: newChatId } });
+      navigate({
+        to: "/chat",
+        search: { id: newChatId, "hide-menu": hideMenuSearchValue },
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.chats.all });
       showInfo("We've switched you to a new chat for a clean context");
 
@@ -646,7 +652,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
         setSelectedChatId(newChatId);
         navigate({
           to: "/chat",
-          search: { id: newChatId },
+          search: { id: newChatId, "hide-menu": hideMenuSearchValue },
         });
         await invalidateChats();
       } catch (err) {
