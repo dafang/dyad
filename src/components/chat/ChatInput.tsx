@@ -108,6 +108,7 @@ import { useVoiceToText } from "@/hooks/useVoiceToText";
 import { isDyadProEnabled } from "@/lib/schemas";
 import { useChatMode } from "@/hooks/useChatMode";
 import { useInitialChatMode } from "@/hooks/useInitialChatMode";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 const showTokenBarAtom = atom(false);
 
@@ -275,6 +276,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
 
   const { userBudget } = useUserBudgetInfo();
   const isProEnabled = settings ? isDyadProEnabled(settings) : false;
+  const hideDyadProUi = shouldHideDyadProUi();
 
   const handleTranscription = useCallback(
     (text: string) => {
@@ -893,7 +895,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
                 }
               }}
             />
-          ) : (
+          ) : hideDyadProUi ? null : (
             selectedComponents.length > 0 && (
               <div className="border-b border-border p-3 bg-muted/30">
                 <Tooltip>
@@ -993,7 +995,7 @@ export function ChatInput({ chatId }: { chatId?: number }) {
                       : t("voiceToText", "Voice to text")}
                 </TooltipContent>
               </Tooltip>
-            ) : (
+            ) : hideDyadProUi ? null : (
               <Tooltip>
                 <TooltipTrigger
                   render={

@@ -13,6 +13,7 @@ import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { hasDyadProKey } from "@/lib/schemas";
 import { useSettings } from "@/hooks/useSettings";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 export function ProBanner() {
   const { settings } = useSettings();
@@ -22,7 +23,7 @@ export function ProBanner() {
     return options[Math.floor(Math.random() * options.length)];
   });
 
-  if (settings && hasDyadProKey(settings)) {
+  if (shouldHideDyadProUi() || (settings && hasDyadProKey(settings))) {
     return null;
   }
 
@@ -73,6 +74,10 @@ export function SetupDyadProButton() {
 
 export function AiAccessBanner() {
   const { t } = useTranslation("home");
+  if (shouldHideDyadProUi()) {
+    return null;
+  }
+
   return (
     <div
       className="w-full py-2 sm:py-2.5 md:py-3 rounded-lg bg-gradient-to-br from-white via-indigo-50 to-sky-100 dark:from-indigo-700 dark:via-indigo-700 dark:to-indigo-900 flex items-center justify-center relative overflow-hidden ring-1 ring-inset ring-black/5 dark:ring-white/10 shadow-sm cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-[1px]"

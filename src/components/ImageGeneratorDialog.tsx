@@ -25,6 +25,7 @@ import { useUserBudgetInfo } from "@/hooks/useUserBudgetInfo";
 import { AiAccessBanner } from "./ProBanner";
 import { AppSearchSelect } from "./AppSearchSelect";
 import type { ImageThemeMode } from "@/ipc/types";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 const THEME_MODES: {
   value: ImageThemeMode;
@@ -77,6 +78,7 @@ export function ImageGeneratorDialog({
   const generateImage = useGenerateImage();
   const { userBudget, isLoadingUserBudget: isBudgetLoading } =
     useUserBudgetInfo();
+  const hideDyadProUi = shouldHideDyadProUi();
 
   // Sync defaultAppId only when dialog opens (not while already open)
   useEffect(() => {
@@ -144,13 +146,17 @@ export function ImageGeneratorDialog({
                   AI Image Generator
                 </h3>
                 <p className="text-sm text-muted-foreground text-center max-w-md">
-                  Generate custom images using AI to use in your apps.
+                  {hideDyadProUi
+                    ? "AI image generation is not available in this web build."
+                    : "Generate custom images using AI to use in your apps."}
                 </p>
-                <p className="text-xs text-muted-foreground/70 mt-2">
-                  Pro-only feature
-                </p>
+                {!hideDyadProUi && (
+                  <p className="text-xs text-muted-foreground/70 mt-2">
+                    Pro-only feature
+                  </p>
+                )}
               </div>
-              <AiAccessBanner />
+              {!hideDyadProUi && <AiAccessBanner />}
             </div>
           ) : (
             <>

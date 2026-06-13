@@ -1,4 +1,5 @@
 import { ipc } from "@/ipc/types";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 import React from "react";
 
 // Types for the message system
@@ -212,10 +213,17 @@ const ALL_MESSAGES = [
   GITHUB_TIP,
 ];
 
+const LOCAL_WEB_MESSAGES = ALL_MESSAGES.filter(
+  (message) =>
+    message !== TURBO_EDITS_PROMO_MESSAGE &&
+    message !== SMART_CONTEXT_PROMO_MESSAGE,
+);
+
 // Main PromoMessage component using the modular system
 export function PromoMessage({ seed }: { seed: number }) {
+  const messages = shouldHideDyadProUi() ? LOCAL_WEB_MESSAGES : ALL_MESSAGES;
   const hashedSeed = hashNumber(seed);
-  const randomMessage = ALL_MESSAGES[hashedSeed % ALL_MESSAGES.length];
+  const randomMessage = messages[hashedSeed % messages.length];
   return <Message {...randomMessage} />;
 }
 

@@ -15,6 +15,7 @@ import { currentAppUrlAtom } from "@/atoms/previewRuntimeAtoms";
 import { useTranslation } from "react-i18next";
 import type { RuntimeMode2 } from "@/lib/schemas";
 import { useState } from "react";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +53,7 @@ export function RuntimeModeSelector() {
   const isDockerMode = settings?.runtimeMode2 === "docker";
   const isCloudMode = settings?.runtimeMode2 === "cloud";
   const hasCloudSandboxAccess = Boolean(userBudget);
+  const hideDyadProUi = shouldHideDyadProUi();
   const showCloudSandboxOption = shouldShowCloudSandboxOption({
     runtimeMode: settings.runtimeMode2 ?? "host",
     cloudSandboxExperimentEnabled: !!settings.experiments?.enableCloudSandbox,
@@ -99,7 +101,7 @@ export function RuntimeModeSelector() {
             <SelectContent>
               <SelectItem value="host">Local (default)</SelectItem>
               <SelectItem value="docker">Docker (experimental)</SelectItem>
-              {showCloudSandboxOption && (
+              {showCloudSandboxOption && !hideDyadProUi && (
                 <SelectItem disabled={!hasCloudSandboxAccess} value="cloud">
                   Cloud Sandbox (Pro)
                 </SelectItem>
@@ -111,7 +113,7 @@ export function RuntimeModeSelector() {
           {t("general.runtimeModeDescription")}
         </div>
       </div>
-      {showCloudSandboxOption && !hasCloudSandboxAccess && (
+      {showCloudSandboxOption && !hideDyadProUi && !hasCloudSandboxAccess && (
         <div className="text-sm text-muted-foreground bg-muted/40 p-2 rounded">
           Cloud sandboxes are a Dyad Pro feature.{" "}
           <button

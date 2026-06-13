@@ -38,6 +38,7 @@ import { useUserBudgetInfo } from "@/hooks/useUserBudgetInfo";
 import { type UserSettings } from "@/lib/schemas";
 import { type UserBudgetInfo } from "@/ipc/types/system";
 import { motion, AnimatePresence } from "framer-motion";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 // =============================================================================
 // Animation constants
@@ -71,19 +72,31 @@ const screenTransition = {
 const GITHUB_ISSUES_BASE =
   "https://github.com/dyad-sh/dyad/issues/new" as const;
 
-function formatSettingsLines(settings: UserSettings | null): string {
+function formatSettingsLines(
+  settings: UserSettings | null,
+  options: { hideDyadProUi?: boolean } = {},
+): string {
   if (!settings) return "Settings not available";
-  return [
+  const lines = [
     `- Selected Model: ${settings.selectedModel?.provider}:${settings.selectedModel?.name}`,
     `- Chat Mode: ${settings.selectedChatMode ?? "default"}`,
     `- Auto Approve Changes: ${settings.autoApproveChanges ?? "n/a"}`,
-    `- Dyad Pro Enabled: ${settings.enableDyadPro ?? "n/a"}`,
     `- Thinking Budget: ${settings.thinkingBudget ?? "n/a"}`,
     `- Runtime Mode: ${settings.runtimeMode2 ?? "n/a"}`,
     `- Release Channel: ${settings.releaseChannel ?? "n/a"}`,
     `- Auto Fix Problems: ${settings.enableAutoFixProblems ?? "n/a"}`,
     `- Native Git: ${settings.enableNativeGit ?? "n/a"}`,
-  ].join("\n");
+  ];
+
+  if (!options.hideDyadProUi) {
+    lines.splice(
+      3,
+      0,
+      `- Dyad Pro Enabled: ${settings.enableDyadPro ?? "n/a"}`,
+    );
+  }
+
+  return lines.join("\n");
 }
 
 function formatSystemInfoSection(
@@ -259,7 +272,9 @@ export function HelpDialog({ isOpen, onClose }: HelpDialogProps) {
   const selectedChatId = useAtomValue(selectedChatIdAtom);
   const { settings } = useSettings();
   const { userBudget } = useUserBudgetInfo();
-  const isDyadProUser = settings?.providerSettings?.["auto"]?.apiKey?.value;
+  const hideDyadProUi = shouldHideDyadProUi();
+  const isDyadProUser =
+    !hideDyadProUi && settings?.providerSettings?.["auto"]?.apiKey?.value;
 
   // ---------------------------------------------------------------------------
   // Navigation
@@ -309,7 +324,7 @@ export function HelpDialog({ isOpen, onClose }: HelpDialogProps) {
 ${formatSystemInfoSection(debugInfo, userBudget ?? undefined)}
 
 ## Settings
-${formatSettingsLines(settings)}
+${formatSettingsLines(settings, { hideDyadProUi })}
 
 ${formatLogsSection(debugInfo)}
 `;
@@ -409,7 +424,7 @@ Pro User ID: ${userBudget?.redactedUserId || "n/a"}
 ${formatSystemInfoSection(debugInfo, userBudget ?? undefined)}
 
 ## Settings
-${formatSettingsLines(settings)}
+${formatSettingsLines(settings, { hideDyadProUi })}
 
 ${formatLogsSection(debugInfo)}
 `;
@@ -485,9 +500,7 @@ ${formatLogsSection(debugInfo)}
           <div className="border rounded-lg p-4 space-y-3 relative">
             <div className="flex items-center gap-2">
               <MessageSquareIcon className="h-4 w-4 text-primary" />
-              <span className="text-sm font-semibold">
-                AI / Dyad Pro issues
-              </span>
+              <span className="text-sm font-semibold">AI issues</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Best for AI quality issues. Uploads your chat session and code for

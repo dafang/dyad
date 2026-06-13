@@ -21,9 +21,14 @@ import {
 import { useSettings } from "@/hooks/useSettings";
 import { ipc } from "@/ipc/types";
 import { hasDyadProKey, type UserSettings } from "@/lib/schemas";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 export function ProModeSelector() {
   const { settings, updateSettings } = useSettings();
+
+  if (shouldHideDyadProUi()) {
+    return null;
+  }
 
   const toggleWebSearch = () => {
     updateSettings({

@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/queryKeys";
 import { useTrialModelRestriction } from "@/hooks/useTrialModelRestriction";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 import {
   Tooltip,
   TooltipContent,
@@ -76,6 +77,7 @@ export function ModelPicker() {
   const { settings, updateSettings } = useSettings();
   const queryClient = useQueryClient();
   const { isTrial } = useTrialModelRestriction();
+  const hideDyadProUi = shouldHideDyadProUi();
   const onModelSelect = (model: LargeLanguageModel) => {
     updateSettings({ selectedModel: model });
     // Invalidate token count when model changes since different models have different context windows
@@ -397,7 +399,7 @@ export function ModelPicker() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[17rem]" align="start">
         {/* Trial user upgrade banner */}
-        {isTrial && (
+        {isTrial && !hideDyadProUi && (
           <>
             <div className="px-2 py-3 bg-gradient-to-r from-indigo-50 to-sky-50 dark:from-indigo-950/50 dark:to-sky-950/50">
               <p className="text-sm text-indigo-700 dark:text-indigo-300 mb-2">

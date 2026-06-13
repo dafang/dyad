@@ -43,6 +43,7 @@ import {
   getWebHostUnsupportedMessage,
   webHostCapabilities,
 } from "@/lib/web_host_capabilities";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 export default function SettingsPage() {
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
@@ -50,6 +51,7 @@ export default function SettingsPage() {
   const appVersion = useAppVersion();
   const { settings, updateSettings } = useSettings();
   const setActiveSettingsSection = useSetAtom(activeSettingsSectionAtom);
+  const hideDyadProUi = shouldHideDyadProUi();
 
   useEffect(() => {
     setActiveSettingsSection(SECTION_IDS.general);
@@ -153,7 +155,7 @@ export default function SettingsPage() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
           >
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              Agent Permissions (Pro)
+              {hideDyadProUi ? "Agent Permissions" : "Agent Permissions (Pro)"}
             </h2>
             <AgentToolsSettings />
           </div>

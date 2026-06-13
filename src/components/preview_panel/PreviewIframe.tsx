@@ -88,6 +88,7 @@ import { resolvePreviewBrowserUrl } from "./previewBrowserUrl";
 import { PreviewToolbar } from "./PreviewToolbar";
 import { PreviewLoadingScreen } from "./PreviewLoadingScreen";
 import { useTranslation } from "react-i18next";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 import {
   getPreviewDisplayPath,
   isPreviewRootUrl,
@@ -251,6 +252,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
   } = useParseRouter(selectedAppId);
   const { restartApp, refreshAppIframe } = useRunApp();
   const { settings, updateSettings } = useSettings();
+  const hideDyadProUi = shouldHideDyadProUi();
   const { userBudget } = useUserBudgetInfo();
   const isProMode = !!userBudget;
   const queryClient = useQueryClient();
@@ -521,20 +523,24 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
         cloudSandboxStatus.lastErrorCode === "sandbox_credits_exhausted" ||
         cloudSandboxStatus.lastErrorCode === "sandbox_billing_unavailable")
     ) {
+      const creditsExhaustedMessage = hideDyadProUi
+        ? "This cloud sandbox was stopped because its usage quota ran out. Check your runtime settings and start it again."
+        : "This cloud sandbox was stopped because your Dyad Pro credits ran out. Add credits and start it again.";
+
       setErrorMessage({
         message: cloudSandboxStatus.lastErrorMessage
           ? cloudSandboxStatus.lastErrorMessage.includes("Dyad stopped")
             ? cloudSandboxStatus.lastErrorMessage
             : cloudSandboxStatus.terminationReason === "credits_exhausted"
-              ? "This cloud sandbox was stopped because your Dyad Pro credits ran out. Add credits and start it again."
+              ? creditsExhaustedMessage
               : "This cloud sandbox was stopped because Dyad could not confirm billing. Please try starting it again."
           : cloudSandboxStatus.terminationReason === "credits_exhausted"
-            ? "This cloud sandbox was stopped because your Dyad Pro credits ran out. Add credits and start it again."
+            ? creditsExhaustedMessage
             : "This cloud sandbox was stopped because Dyad could not confirm billing. Please try starting it again.",
         source: "dyad-app",
       });
     }
-  }, [cloudSandboxStatus, isCloudMode, setErrorMessage]);
+  }, [cloudSandboxStatus, hideDyadProUi, isCloudMode, setErrorMessage]);
 
   useEffect(() => {
     if (!isCloudMode || !cloudSandboxStatus) {

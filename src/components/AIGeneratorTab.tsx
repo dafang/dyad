@@ -14,6 +14,7 @@ import { showError } from "@/lib/toast";
 import { toast } from "sonner";
 import { useUserBudgetInfo } from "@/hooks/useUserBudgetInfo";
 import { AiAccessBanner } from "./ProBanner";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 import type {
   ThemeGenerationMode,
   ThemeGenerationModel,
@@ -73,6 +74,7 @@ export function AIGeneratorTab({
   const isGenerating =
     generatePromptMutation.isPending || generateFromUrlMutation.isPending;
   const { userBudget } = useUserBudgetInfo();
+  const hideDyadProUi = shouldHideDyadProUi();
   const { themeGenerationModelOptions, isLoadingThemeGenerationModelOptions } =
     useThemeGenerationModelOptions();
 
@@ -323,14 +325,17 @@ export function AIGeneratorTab({
             AI Theme Generator
           </h3>
           <p className="text-sm text-muted-foreground text-center max-w-md">
-            Upload screenshots and let AI generate a custom theme prompt
-            tailored to your design style.
+            {hideDyadProUi
+              ? "AI theme generation is not available in this web build."
+              : "Upload screenshots and let AI generate a custom theme prompt tailored to your design style."}
           </p>
-          <p className="text-xs text-muted-foreground/70 mt-2">
-            Pro-only feature
-          </p>
+          {!hideDyadProUi && (
+            <p className="text-xs text-muted-foreground/70 mt-2">
+              Pro-only feature
+            </p>
+          )}
         </div>
-        <AiAccessBanner />
+        {!hideDyadProUi && <AiAccessBanner />}
       </div>
     );
   }

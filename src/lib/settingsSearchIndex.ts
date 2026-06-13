@@ -501,3 +501,17 @@ export const SETTINGS_SEARCH_INDEX: SearchableSettingItem[] = [
     sectionLabel: "Danger Zone",
   },
 ];
+
+export function getVisibleSettingsSearchIndex({
+  hideDyadProUi = false,
+}: {
+  hideDyadProUi?: boolean;
+} = {}): SearchableSettingItem[] {
+  if (!hideDyadProUi) {
+    return SETTINGS_SEARCH_INDEX;
+  }
+
+  return SETTINGS_SEARCH_INDEX.filter(
+    (item) => item.id !== SETTING_IDS.enableCloudSandbox,
+  );
+}

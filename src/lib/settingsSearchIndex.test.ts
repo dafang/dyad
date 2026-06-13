@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getVisibleSettingsSearchIndex,
   SECTION_IDS,
   SETTING_IDS,
   SETTINGS_SEARCH_INDEX,
@@ -28,6 +29,14 @@ describe("SETTINGS_SEARCH_INDEX", () => {
       sectionId: SECTION_IDS.experiments,
       sectionLabel: "Experiments",
     });
+  });
+
+  it("hides the cloud sandbox experiment from local Web search results", () => {
+    expect(
+      getVisibleSettingsSearchIndex({ hideDyadProUi: true }).some(
+        (item) => item.id === SETTING_IDS.enableCloudSandbox,
+      ),
+    ).toBe(false);
   });
 
   it("includes the block unsafe npm packages experiment", () => {

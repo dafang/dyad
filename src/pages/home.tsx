@@ -37,6 +37,7 @@ import { hasDyadProKey, getEffectiveDefaultChatMode } from "@/lib/schemas";
 import { useFreeAgentQuota } from "@/hooks/useFreeAgentQuota";
 import { useInitialChatMode } from "@/hooks/useInitialChatMode";
 import { isLocalWebRuntime } from "@/lib/runtime_client";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 // Adding an export for attachments
 export interface HomeSubmitOptions {
@@ -54,6 +55,7 @@ export default function HomePage() {
   const { isQuotaExceeded, isLoading: isQuotaLoading } = useFreeAgentQuota();
   const initialChatMode = useInitialChatMode();
   const isLocalWeb = isLocalWebRuntime();
+  const hideDyadProUi = shouldHideDyadProUi();
 
   const setIsPreviewOpen = useSetAtom(isPreviewOpenAtom);
   const { selectChat } = useSelectChat();
@@ -242,13 +244,15 @@ export default function HomePage() {
   return (
     <div className="flex flex-col w-full">
       <div className="flex flex-col items-center justify-center max-w-3xl w-full m-auto p-8 relative">
-        <div className="fixed top-16 right-8 z-50">
-          {settings && hasDyadProKey(settings) ? (
-            <ManageDyadProButton className="mt-0 w-auto h-9 px-3 text-base shadow-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800" />
-          ) : (
-            <SetupDyadProButton />
-          )}
-        </div>
+        {!hideDyadProUi && (
+          <div className="fixed top-16 right-8 z-50">
+            {settings && hasDyadProKey(settings) ? (
+              <ManageDyadProButton className="mt-0 w-auto h-9 px-3 text-base shadow-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800" />
+            ) : (
+              <SetupDyadProButton />
+            )}
+          </div>
+        )}
         <ForceCloseDialog
           isOpen={forceCloseDialogOpen}
           onClose={() => setForceCloseDialogOpen(false)}
@@ -318,7 +322,7 @@ export default function HomePage() {
               </span>
             </button>
           </div>
-          <ProBanner />
+          {!hideDyadProUi && <ProBanner />}
         </div>
         <PrivacyBanner />
       </div>

@@ -39,6 +39,7 @@ import { showError } from "@/lib/toast";
 import { useSettings } from "@/hooks/useSettings";
 import { DyadProTrialDialog } from "./DyadProTrialDialog";
 import { HttpInvokeAbortError } from "@/ipc/contracts/core";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 type NodeInstallStep =
   | "install"
@@ -82,6 +83,7 @@ export function SetupBanner() {
   const [isSelectingPath, setIsSelectingPath] = useState(false);
   const [showDyadProTrialDialog, setShowDyadProTrialDialog] = useState(false);
   const { updateSettings } = useSettings();
+  const hideDyadProUi = shouldHideDyadProUi();
 
   // Add handler for manual path selection
   const handleManualNodeConfig = useCallback(async () => {
@@ -337,17 +339,23 @@ export function SetupBanner() {
                 Not sure what to do? Watch the Get Started video above ☝️
               </p>
 
-              <SetupProviderCard
-                variant="dyad"
-                onClick={handleDyadProSetupClick}
-                tabIndex={isNodeSetupComplete ? 0 : -1}
-                leadingIcon={
-                  <img src={logo} alt="Dyad Logo" className="w-6 h-6 mr-0.5" />
-                }
-                title="Start with Dyad Pro free trial"
-                subtitle="Unlock the full power of Dyad"
-                chip={<>Recommended</>}
-              />
+              {!hideDyadProUi && (
+                <SetupProviderCard
+                  variant="dyad"
+                  onClick={handleDyadProSetupClick}
+                  tabIndex={isNodeSetupComplete ? 0 : -1}
+                  leadingIcon={
+                    <img
+                      src={logo}
+                      alt="Dyad Logo"
+                      className="w-6 h-6 mr-0.5"
+                    />
+                  }
+                  title="Start with Dyad Pro free trial"
+                  subtitle="Unlock the full power of Dyad"
+                  chip={<>Recommended</>}
+                />
+              )}
               <div className="mt-2 flex gap-2">
                 <SetupProviderCard
                   className="flex-1"

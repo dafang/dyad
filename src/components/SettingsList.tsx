@@ -4,7 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useScrollAndNavigateTo } from "@/hooks/useScrollAndNavigateTo";
 import { useAtom } from "jotai";
 import { activeSettingsSectionAtom } from "@/atoms/viewAtoms";
-import { SECTION_IDS, SETTINGS_SEARCH_INDEX } from "@/lib/settingsSearchIndex";
+import {
+  SECTION_IDS,
+  getVisibleSettingsSearchIndex,
+} from "@/lib/settingsSearchIndex";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 import Fuse from "fuse.js";
 import { SearchIcon, XIcon } from "lucide-react";
 
@@ -27,7 +31,7 @@ const SETTINGS_SECTIONS: SettingsSection[] = [
   { id: SECTION_IDS.dangerZone, label: "Danger Zone" },
 ];
 
-const fuse = new Fuse(SETTINGS_SEARCH_INDEX, {
+const fuseOptions = {
   keys: [
     { name: "label", weight: 2 },
     { name: "description", weight: 1 },
@@ -37,12 +41,21 @@ const fuse = new Fuse(SETTINGS_SEARCH_INDEX, {
   threshold: 0.4,
   includeScore: true,
   ignoreLocation: true,
-});
+};
 
 export function SettingsList({ show }: { show: boolean }) {
   const [activeSection, setActiveSection] = useAtom(activeSettingsSectionAtom);
   const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const hideDyadProUi = shouldHideDyadProUi();
+  const settingsSearchIndex = useMemo(
+    () => getVisibleSettingsSearchIndex({ hideDyadProUi }),
+    [hideDyadProUi],
+  );
+  const fuse = useMemo(
+    () => new Fuse(settingsSearchIndex, fuseOptions),
+    [settingsSearchIndex],
+  );
 
   const scrollAndNavigateTo = useScrollAndNavigateTo("/settings", {
     behavior: "smooth",

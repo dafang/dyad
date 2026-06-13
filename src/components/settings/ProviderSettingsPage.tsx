@@ -27,6 +27,7 @@ import {
 import { ProviderSettingsHeader } from "./ProviderSettingsHeader";
 import { ApiKeyConfiguration } from "./ApiKeyConfiguration";
 import { ModelsSection } from "./ModelsSection";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 interface ProviderSettingsPageProps {
   provider: string;
@@ -63,6 +64,7 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
     providerData?.type === "custom" || providerData?.type === "cloud";
 
   const isDyad = provider === "auto";
+  const hideDyadProUi = shouldHideDyadProUi();
 
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -106,8 +108,8 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
     | undefined;
   const isVertexConfigured = Boolean(
     vertexSettings?.projectId &&
-    vertexSettings?.location &&
-    vertexSettings?.serviceAccountKey?.value,
+      vertexSettings?.location &&
+      vertexSettings?.serviceAccountKey?.value,
   );
 
   const isAzureConfigured =
@@ -322,7 +324,7 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
           />
         )}
 
-        {isDyad && !settingsLoading && (
+        {isDyad && !hideDyadProUi && !settingsLoading && (
           <div className="mt-6 flex items-center justify-between p-4 bg-(--background-lightest) rounded-lg border">
             <div>
               <h3 className="font-medium">Enable Dyad Pro</h3>

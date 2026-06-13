@@ -1,11 +1,17 @@
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useSettings } from "@/hooks/useSettings";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 export function CloudSandboxExperimentSwitch() {
   const { settings, updateSettings } = useSettings();
+  const hideDyadProUi = shouldHideDyadProUi();
   const isEnabled = !!settings?.experiments?.enableCloudSandbox;
   const isCloudModeActive = settings?.runtimeMode2 === "cloud";
+
+  if (hideDyadProUi) {
+    return null;
+  }
 
   return (
     <div className="space-y-1">

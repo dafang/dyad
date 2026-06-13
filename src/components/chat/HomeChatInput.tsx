@@ -38,6 +38,7 @@ import { useUserBudgetInfo } from "@/hooks/useUserBudgetInfo";
 import { ipc } from "@/ipc/types";
 import { useCallback, useEffect } from "react";
 import { showError } from "@/lib/toast";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 export function HomeChatInput({
   onSubmit,
@@ -54,6 +55,7 @@ export function HomeChatInput({
   useChatModeToggle();
   const { userBudget } = useUserBudgetInfo();
   const isProEnabled = !!userBudget && !!settings?.enableDyadPro;
+  const hideDyadProUi = shouldHideDyadProUi();
 
   const handleTranscription = useCallback(
     (text: string) => {
@@ -227,7 +229,7 @@ export function HomeChatInput({
                       : "Voice to text"}
                 </TooltipContent>
               </Tooltip>
-            ) : (
+            ) : hideDyadProUi ? null : (
               <Tooltip>
                 <TooltipTrigger
                   render={

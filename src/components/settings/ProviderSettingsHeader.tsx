@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {} from "react";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 interface ProviderSettingsHeaderProps {
   providerDisplayName: string;
@@ -33,6 +34,9 @@ function getKeyButtonText({
   isDyad: boolean;
 }) {
   if (isDyad) {
+    if (shouldHideDyadProUi()) {
+      return isConfigured ? "Manage API Key" : "Setup API Key";
+    }
     return isConfigured
       ? "Manage Dyad Pro Subscription"
       : "Setup Dyad Pro Subscription";

@@ -17,6 +17,7 @@ import { chatInputValueAtom } from "@/atoms/chatAtoms";
 import { useAtom } from "jotai";
 import { useSettings } from "@/hooks/useSettings";
 import { ipc } from "@/ipc/types";
+import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 
 interface TokenBarProps {
   chatId?: number;
@@ -26,6 +27,7 @@ export function TokenBar({ chatId }: TokenBarProps) {
   const [inputValue] = useAtom(chatInputValueAtom);
   const { settings } = useSettings();
   const { result, error } = useCountTokens(chatId ?? null, inputValue);
+  const hideDyadProUi = shouldHideDyadProUi();
 
   if (!chatId || !result) {
     return null;
@@ -129,24 +131,25 @@ export function TokenBar({ chatId }: TokenBarProps) {
       {error && (
         <div className="text-red-500 text-xs mt-1">Failed to count tokens</div>
       )}
-      {(!settings?.enableProSmartFilesContextMode ||
-        !settings?.enableDyadPro) && (
-        <div className="text-xs text-center text-muted-foreground mt-2">
-          Optimize your tokens with{" "}
-          <a
-            onClick={() =>
-              settings?.enableDyadPro
-                ? ipc.system.openExternalUrl(
-                    "https://www.dyad.sh/docs/guides/ai-models/pro-modes#smart-context",
-                  )
-                : ipc.system.openExternalUrl("https://dyad.sh/pro#ai")
-            }
-            className="text-blue-500 dark:text-blue-400 cursor-pointer hover:underline"
-          >
-            Dyad Pro's Smart Context
-          </a>
-        </div>
-      )}
+      {!hideDyadProUi &&
+        (!settings?.enableProSmartFilesContextMode ||
+          !settings?.enableDyadPro) && (
+          <div className="text-xs text-center text-muted-foreground mt-2">
+            Optimize your tokens with{" "}
+            <a
+              onClick={() =>
+                settings?.enableDyadPro
+                  ? ipc.system.openExternalUrl(
+                      "https://www.dyad.sh/docs/guides/ai-models/pro-modes#smart-context",
+                    )
+                  : ipc.system.openExternalUrl("https://dyad.sh/pro#ai")
+              }
+              className="text-blue-500 dark:text-blue-400 cursor-pointer hover:underline"
+            >
+              Dyad Pro's Smart Context
+            </a>
+          </div>
+        )}
     </div>
   );
 }
