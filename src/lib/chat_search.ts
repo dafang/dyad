@@ -12,6 +12,6 @@ export function getHideChatMenuSearchValue({
   hideMenu,
 }: {
   hideMenu?: ChatHideMenuSearchValue;
-}): "1" | undefined {
-  return isChatMenuHiddenSearchValue(hideMenu) ? "1" : undefined;
+}): 1 | undefined {
+  return isChatMenuHiddenSearchValue(hideMenu) ? 1 : undefined;
 }

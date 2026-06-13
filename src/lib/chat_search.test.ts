@@ -15,8 +15,8 @@ describe("chat search helpers", () => {
   });
 
   it("serializes hidden chat menu state for router search objects", () => {
-    expect(getHideChatMenuSearchValue({ hideMenu: "1" })).toBe("1");
-    expect(getHideChatMenuSearchValue({ hideMenu: true })).toBe("1");
+    expect(getHideChatMenuSearchValue({ hideMenu: "1" })).toBe(1);
+    expect(getHideChatMenuSearchValue({ hideMenu: true })).toBe(1);
     expect(getHideChatMenuSearchValue({ hideMenu: false })).toBeUndefined();
     expect(getHideChatMenuSearchValue({})).toBeUndefined();
   });
