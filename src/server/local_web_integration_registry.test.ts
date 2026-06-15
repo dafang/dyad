@@ -21,6 +21,7 @@ import {
   registerLocalWebRpcHandlers,
   type LocalWebRpcService,
 } from "./local_web_rpc_registry";
+import { createLocalWebIpcEvent } from "./local_web_ipc_event";
 import { createLocalRpcServer, type LocalRpcServer } from "./local_rpc_server";
 
 const origin = "http://localhost:5173";
@@ -40,17 +41,12 @@ describe("local Web integration registry", () => {
   it("exposes Web integration channels for provider, source control, MCP, and explicit fallback surfaces", () => {
     expect(LOCAL_WEB_RPC_ALLOWLIST).toEqual(
       expect.arrayContaining([
-        githubContracts.startFlow.channel,
-        githubContracts.listRepos.channel,
-        githubContracts.isRepoAvailable.channel,
-        githubContracts.listLocalBranches.channel,
+        ...contractChannels(githubContracts),
         gitContracts.getUncommittedFiles.channel,
         vercelContracts.saveToken.channel,
         vercelContracts.listProjects.channel,
-        supabaseContracts.listOrganizations.channel,
-        supabaseContracts.setAppProject.channel,
-        neonContracts.listProjects.channel,
-        neonContracts.setSelectedDatabaseBranchType.channel,
+        ...contractChannels(supabaseContracts),
+        ...contractChannels(neonContracts),
         mcpContracts.createServer.channel,
         mcpContracts.updateServer.channel,
         mcpContracts.deleteServer.channel,
@@ -71,6 +67,44 @@ describe("local Web integration registry", () => {
         systemContracts.installPnpm.channel,
       ]),
     );
+  });
+
+  it("publishes GitHub device-flow events through the Local Web event bridge", () => {
+    const published: Array<{ channel: string; payload: unknown }> = [];
+    const event = createLocalWebIpcEvent({
+      publish: (channel, payload) => {
+        published.push({ channel, payload });
+      },
+    });
+
+    event.sender.send("github:flow-update", {
+      userCode: "ABCD-EFGH",
+      verificationUri: "https://github.com/login/device",
+    });
+    event.sender.send("github:flow-success", {
+      message: "GitHub connected",
+    });
+    event.sender.send("github:flow-error", {
+      error: "authorization_pending",
+    });
+
+    expect(published).toEqual([
+      {
+        channel: "github:flow-update",
+        payload: {
+          userCode: "ABCD-EFGH",
+          verificationUri: "https://github.com/login/device",
+        },
+      },
+      {
+        channel: "github:flow-success",
+        payload: { message: "GitHub connected" },
+      },
+      {
+        channel: "github:flow-error",
+        payload: { error: "authorization_pending" },
+      },
+    ]);
   });
 
   it("serves representative integration success and fallback flows over authenticated HTTP", async () => {
@@ -111,6 +145,11 @@ describe("local Web integration registry", () => {
       ],
     });
     await expect(
+      transport.invoke(neonContracts.saveApiKey.channel, {
+        apiKey: "neon-api-key",
+      }),
+    ).resolves.toBeUndefined();
+    await expect(
       transport.invoke(mcpContracts.createServer.channel, {
         name: "Local Docs",
         transport: "http",
@@ -141,6 +180,9 @@ describe("local Web integration registry", () => {
       token: "vercel-token",
     });
     expect(service.setSupabaseAppProject).toHaveBeenCalledOnce();
+    expect(service.saveNeonApiKey).toHaveBeenCalledWith({
+      apiKey: "neon-api-key",
+    });
     expect(service.createMcpServer).toHaveBeenCalledOnce();
   });
 
@@ -161,6 +203,27 @@ describe("local Web integration registry", () => {
       startGithubFlow: vi.fn(async () => {
         throw new DyadError(
           "GitHub device flow is not available in Local Web mode yet.",
+          DyadErrorKind.Precondition,
+        );
+      }),
+      listSupabaseProjects: vi.fn(async () => {
+        throw new DyadError(
+          "Not authenticated with Supabase.",
+          DyadErrorKind.Auth,
+        );
+      }),
+      setSupabaseAppProject: vi.fn(async () => {
+        throw new DyadError(
+          "Supabase project linking is not available in Local Web mode yet.",
+          DyadErrorKind.Precondition,
+        );
+      }),
+      listNeonProjects: vi.fn(async () => {
+        throw new DyadError("Not authenticated with Neon.", DyadErrorKind.Auth);
+      }),
+      setNeonAppProject: vi.fn(async () => {
+        throw new DyadError(
+          "Neon project linking is not available in Local Web mode yet.",
           DyadErrorKind.Precondition,
         );
       }),
@@ -207,6 +270,54 @@ describe("local Web integration registry", () => {
       body: {
         ok: false,
         error: "GitHub device flow is not available in Local Web mode yet.",
+        kind: "precondition",
+      },
+    });
+    await expect(
+      rpc(supabaseContracts.listAllProjects.channel, undefined),
+    ).resolves.toEqual({
+      status: 401,
+      body: {
+        ok: false,
+        error: "Not authenticated with Supabase.",
+        kind: "auth",
+      },
+    });
+    await expect(
+      rpc(supabaseContracts.setAppProject.channel, {
+        appId: 1,
+        projectId: "project-id",
+        organizationSlug: "org",
+      }),
+    ).resolves.toEqual({
+      status: 409,
+      body: {
+        ok: false,
+        error:
+          "Supabase project linking is not available in Local Web mode yet.",
+        kind: "precondition",
+      },
+    });
+    await expect(
+      rpc(neonContracts.listProjects.channel, undefined),
+    ).resolves.toEqual({
+      status: 401,
+      body: {
+        ok: false,
+        error: "Not authenticated with Neon.",
+        kind: "auth",
+      },
+    });
+    await expect(
+      rpc(neonContracts.setAppProject.channel, {
+        appId: 1,
+        projectId: "project-id",
+      }),
+    ).resolves.toEqual({
+      status: 409,
+      body: {
+        ok: false,
+        error: "Neon project linking is not available in Local Web mode yet.",
         kind: "precondition",
       },
     });
@@ -258,6 +369,12 @@ function createTransport(baseUrl: string) {
     fetch: nodeFetch,
     headers: { origin },
   });
+}
+
+function contractChannels(
+  contracts: Record<string, { channel: string }>,
+): string[] {
+  return Object.values(contracts).map((contract) => contract.channel);
 }
 
 function createIntegrationService(
@@ -340,6 +457,7 @@ function createIntegrationService(
     setSupabaseAppProject: vi.fn(async () => undefined),
     unsetSupabaseAppProject: vi.fn(async () => undefined),
     fakeConnectSupabaseProject: vi.fn(async () => undefined),
+    saveNeonApiKey: vi.fn(async () => undefined),
     createNeonProject: vi.fn(async () => ({
       id: "neon-project",
       name: "Neon Project",

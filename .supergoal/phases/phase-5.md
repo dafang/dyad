@@ -1,62 +1,63 @@
 SUPERGOAL_PHASE_START
 Phase: 5 of 5 — Polish & Harden
-Task: Harden the responsive Web UI with desktop/mobile E2E coverage, accessibility/overflow checks, and final regression commands.
-Type: brownfield, ui, responsive, web-parity
-Mandatory commands: npm run fmt:check, npm run lint, npm run ts, npm run build:web, npm test -- src/components/app-sidebar-state.test.ts src/components/preview_panel/PreviewPanel.test.tsx src/components/preview_panel/previewBrowserUrl.test.ts src/components/preview_panel/previewUrl.test.ts src/components/chat/ChatTabs.test.ts src/components/chat/DyadAppBlueprintCard.test.ts src/components/chat/DyadAppBlueprintCard.approve.test.ts, PLAYWRIGHT_HTML_OPEN=never npm run e2e -- e2e-tests/web_portal.spec.ts
-Acceptance criteria: 7
-Evidence required: UX/states/a11y/security/perf/diff review paragraphs, screenshot list, command summary, git diff stat
-Depends on phases: 1, 2, 3, 4
+Task: Verify Local Web integration UX end to end, harden secrets/errors/i18n, and run final regression checks.
+Mandatory commands:
 
-## Why
-
-Cross-device UI changes can pass focused checks while still leaving overflow, accessibility, runtime, or desktop regressions; this phase closes that gap.
+- npm run fmt:check
+- npm run lint
+- npm run ts
+- npm run build:web
+- npm test -- src/server/local_web_integration_registry.test.ts
+- npm test -- src/ipc/services/default_local_web_integration_service.test.ts
+  Acceptance criteria: 10
+  Evidence required:
+- Command output excerpts for all mandatory commands.
+- Browser smoke screenshots or transcript paths for GitHub, Supabase, and Neon panels.
+- Secret scan evidence showing no provider tokens in committed files or Supergoal artifacts.
+- Final diff review summary and memory writeback path.
+  Depends on phases: 1, 2, 3, 4
 
 ## Work
 
-- Extend `e2e-tests/web_portal.spec.ts` or add a focused adjacent Web portal mobile spec/helper that runs against Local Web and validates both desktop and mobile viewports.
-- Keep the real-provider requirement for meaningful chat verification where possible; if the environment lacks provider config, fail with an actionable message rather than silently faking the flow.
-- Add DOM checks for horizontal overflow on mobile routes.
-- Capture desktop and mobile screenshots for the final evidence set.
-- Check keyboard/focus or accessible-name coverage for mobile navigation, chat send/cancel controls, and preview switch controls.
-- Review final diff for debug logs, TODOs from this run, fake-only shortcuts, unrelated churn, and tunnel-specific product branches.
-- Run all mandatory commands and classify any environmental failure with concrete evidence.
+Run a final Local Web integration QA pass across the app details/publish/configure surfaces:
 
-## Acceptance criteria (all must pass — verify each in transcript)
+- GitHub connect/device flow progress and error states.
+- Supabase credential entry, organization/project/branch listing, project set/unset.
+- Neon credential entry, project list, create/link/unlink, branch switching, env vars, email config.
+- Settings pages that display connected provider status.
+- Chinese and English copy for all new UI strings.
 
-- A Web E2E/browser flow verifies desktop and mobile viewports for home/apps/chat/preview/settings or a documented equivalent route set.
-- The mobile flow sends or observes a real chat response through the Local Web path, then switches to preview and verifies iframe content.
-- The final browser run records zero unexpected console errors, zero failed Local Web RPC/event responses, and zero blank main surfaces.
-- DOM checks prove `document.documentElement.scrollWidth <= window.innerWidth + 1` for the tested mobile routes.
-- Keyboard/focus or accessible-name checks cover the mobile navigation, chat send button, and preview switch controls.
-- Final diff review finds no stray debug logs, temporary TODOs, fake-only testing shortcuts, or tunnel-specific product branches.
-- Formatting, lint, typecheck, Web build, targeted unit tests, and Web E2E all pass or any environmental failure is clearly classified with reproduction evidence.
+Create or update a `.supergoal/local-web-provider-smoke.mjs` script when practical. It must use the real Local Web dev server and real provider credentials only when present in environment variables or existing local settings. It must not fake provider success.
 
-## Mandatory commands (run each, surface last ~10 lines + exit code)
+## Acceptance criteria
+
+1. GitHub, Supabase, and Neon panels have visible loading, success, empty, auth error, and external API error states.
+2. Browser smoke verifies buttons do not dead-click in Local Web.
+3. Real GitHub smoke runs when `DYAD_TEST_GITHUB_TOKEN` or an existing local token is available; otherwise skip is recorded as credential-gated.
+4. Real Supabase smoke runs when `DYAD_TEST_SUPABASE_TOKEN` or an existing local token is available; otherwise skip is recorded as credential-gated.
+5. Real Neon smoke runs when `DYAD_TEST_NEON_API_KEY` or an existing local token is available; otherwise skip is recorded as credential-gated.
+6. New visible strings have English and zh-CN translations.
+7. No provider token value appears in source, Supergoal artifacts, command logs, screenshots, or final transcript.
+8. Final diff contains no session debug prints, commented-out code, or accidental fake-only production paths.
+9. Mandatory commands exit 0.
+10. A new `.supergoal/memory/project_local_web_provider_integrations.md` memory records durable implementation and verification notes without secrets.
+
+## Mandatory commands
 
 - `npm run fmt:check`
 - `npm run lint`
 - `npm run ts`
 - `npm run build:web`
-- `npm test -- src/components/app-sidebar-state.test.ts src/components/preview_panel/PreviewPanel.test.tsx src/components/preview_panel/previewBrowserUrl.test.ts src/components/preview_panel/previewUrl.test.ts src/components/chat/ChatTabs.test.ts src/components/chat/DyadAppBlueprintCard.test.ts src/components/chat/DyadAppBlueprintCard.approve.test.ts`
-- `PLAYWRIGHT_HTML_OPEN=never npm run e2e -- e2e-tests/web_portal.spec.ts`
+- `npm test -- src/server/local_web_integration_registry.test.ts`
+- `npm test -- src/ipc/services/default_local_web_integration_service.test.ts`
 
-## Evidence required in transcript
+## Evidence required
 
-- One paragraph each for UX/copy, states, accessibility, security/runtime, performance, and diff review.
-- Final desktop and mobile screenshot list.
-- Final command summary with exit codes.
-- Final `git diff --stat` summary.
+- Command output excerpts for all mandatory commands.
+- Browser smoke screenshots or transcript paths for GitHub, Supabase, and Neon panels.
+- Secret scan evidence showing no provider tokens in committed files or Supergoal artifacts.
+- Final diff review summary and memory writeback path.
 
-## Notes
+## Verification Notes
 
-- Read `rules/e2e-testing.md` before editing or running E2E tests.
-- Do not use Playwright `:visible` as a literal CSS selector in app code or scripts; prefer role/test id locators or Playwright visibility filters.
-- If Web E2E takes over an existing server, ensure cleanup does not kill unrelated user processes. Prefer test-owned Local Web processes for automated runs.
-
----
-
-The agent will, during execution, print SUPERGOAL_PHASE_START (above),
-do the work, then print SUPERGOAL_PHASE_VERIFY, MEMORY_SAVED, and
-SUPERGOAL_PHASE_DONE in order. On failure, the agent follows the
-3-strike recovery protocol in .supergoal/PROTOCOL.md without further
-instruction needed here.
+Print `SUPERGOAL_PHASE_VERIFY` with pass/fail for each criterion and command summaries, then update `.supergoal/STATE.md`, write memory if useful, and print `SUPERGOAL_PHASE_DONE`.

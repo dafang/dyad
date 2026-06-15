@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
@@ -48,6 +48,8 @@ import {
 } from "@/components/ui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { isSupabaseConnected } from "@/lib/schemas";
+import { isLocalWebRuntime } from "@/lib/runtime_client";
+import { Input } from "@/components/ui/input";
 
 export function SupabaseConnector({ appId }: { appId: number }) {
   const { t } = useTranslation(["home", "common"]);
@@ -55,6 +57,10 @@ export function SupabaseConnector({ appId }: { appId: number }) {
   const { app, refreshApp } = useLoadApp(appId);
   const { lastDeepLink, clearLastDeepLink } = useDeepLink();
   const { isDarkMode } = useTheme();
+  const isLocalWeb = isLocalWebRuntime();
+  const [manualOrganizationSlug, setManualOrganizationSlug] = useState("");
+  const [manualAccessToken, setManualAccessToken] = useState("");
+  const [isSavingManualToken, setIsSavingManualToken] = useState(false);
 
   // Check if there are any connected organizations
   const isConnected = isSupabaseConnected(settings);
@@ -153,6 +159,36 @@ export function SupabaseConnector({ appId }: { appId: number }) {
       await ipc.system.openExternalUrl(
         "https://supabase-oauth.dyad.sh/api/connect-supabase/login",
       );
+    }
+  };
+
+  const handleSaveManualToken = async () => {
+    const organizationSlug = manualOrganizationSlug.trim();
+    const accessToken = manualAccessToken.trim();
+    if (!organizationSlug || !accessToken) {
+      toast.error(t("integrations.supabase.manualTokenRequired"));
+      return;
+    }
+
+    setIsSavingManualToken(true);
+    try {
+      await ipc.supabase.saveOrganizationToken({
+        organizationSlug,
+        accessToken,
+      });
+      setManualAccessToken("");
+      toast.success(t("integrations.supabase.manualTokenSaved"));
+      await refreshSettings();
+      await refetchOrganizations();
+      await refetchProjects();
+    } catch (error) {
+      toast.error(
+        t("integrations.supabase.failedSaveManualToken", {
+          error: getErrorMessage(error),
+        }),
+      );
+    } finally {
+      setIsSavingManualToken(false);
     }
   };
 
@@ -323,8 +359,9 @@ export function SupabaseConnector({ appId }: { appId: number }) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleAddAccount}
+                onClick={isLocalWeb ? handleSaveManualToken : handleAddAccount}
                 className="gap-1"
+                disabled={isSavingManualToken}
               >
                 <Plus className="h-4 w-4" />
                 {t("integrations.supabase.addOrganization")}
@@ -336,6 +373,45 @@ export function SupabaseConnector({ appId }: { appId: number }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {isLocalWeb && (
+            <div className="mb-4 space-y-3 rounded-md border p-3">
+              <div className="space-y-1">
+                <Label htmlFor="supabase-org-slug">
+                  {t("integrations.supabase.organizationSlug")}
+                </Label>
+                <Input
+                  id="supabase-org-slug"
+                  value={manualOrganizationSlug}
+                  onChange={(event) =>
+                    setManualOrganizationSlug(event.target.value)
+                  }
+                  placeholder={t(
+                    "integrations.supabase.organizationSlugPlaceholder",
+                  )}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="supabase-access-token">
+                  {t("integrations.supabase.accessToken")}
+                </Label>
+                <Input
+                  id="supabase-access-token"
+                  type="password"
+                  value={manualAccessToken}
+                  onChange={(event) => setManualAccessToken(event.target.value)}
+                  placeholder={t(
+                    "integrations.supabase.accessTokenPlaceholder",
+                  )}
+                />
+              </div>
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  {t("integrations.supabase.localWebManualTokenHelp")}
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
           {isLoadingProjects || isFetchingProjects ? (
             <div className="space-y-2">
               <Skeleton className="h-4 w-full" />
@@ -449,15 +525,59 @@ export function SupabaseConnector({ appId }: { appId: number }) {
   // No accounts connected, show connect button
   return (
     <div className="flex flex-col space-y-4 p-4 border rounded-md">
-      <div className="flex flex-col md:flex-row items-center justify-between">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <h2 className="text-lg font-medium">Integrations</h2>
-        <img
-          onClick={handleAddAccount}
-          src={isDarkMode ? connectSupabaseDark : connectSupabaseLight}
-          alt="Connect to Supabase"
-          className="w-full h-10 min-h-8 min-w-20 cursor-pointer"
-          data-testid="connect-supabase-button"
-        />
+        {isLocalWeb ? (
+          <div className="w-full space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="supabase-org-slug-empty">
+                {t("integrations.supabase.organizationSlug")}
+              </Label>
+              <Input
+                id="supabase-org-slug-empty"
+                value={manualOrganizationSlug}
+                onChange={(event) =>
+                  setManualOrganizationSlug(event.target.value)
+                }
+                placeholder={t(
+                  "integrations.supabase.organizationSlugPlaceholder",
+                )}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="supabase-access-token-empty">
+                {t("integrations.supabase.accessToken")}
+              </Label>
+              <Input
+                id="supabase-access-token-empty"
+                type="password"
+                value={manualAccessToken}
+                onChange={(event) => setManualAccessToken(event.target.value)}
+                placeholder={t("integrations.supabase.accessTokenPlaceholder")}
+              />
+            </div>
+            <Button
+              onClick={handleSaveManualToken}
+              disabled={isSavingManualToken}
+              data-testid="connect-supabase-button"
+            >
+              {isSavingManualToken
+                ? t("common:saving")
+                : t("integrations.supabase.saveManualToken")}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              {t("integrations.supabase.localWebManualTokenHelp")}
+            </p>
+          </div>
+        ) : (
+          <img
+            onClick={handleAddAccount}
+            src={isDarkMode ? connectSupabaseDark : connectSupabaseLight}
+            alt="Connect to Supabase"
+            className="w-full h-10 min-h-8 min-w-20 cursor-pointer"
+            data-testid="connect-supabase-button"
+          />
+        )}
       </div>
     </div>
   );

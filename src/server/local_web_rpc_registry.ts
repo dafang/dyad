@@ -249,6 +249,9 @@ interface LocalWebIntegrationService {
   listSupabaseOrganizations(): MaybePromise<
     RpcOutput<typeof supabaseContracts.listOrganizations>
   >;
+  saveSupabaseOrganizationToken(
+    params: RpcInput<typeof supabaseContracts.saveOrganizationToken>,
+  ): MaybePromise<RpcOutput<typeof supabaseContracts.saveOrganizationToken>>;
   deleteSupabaseOrganization(
     params: RpcInput<typeof supabaseContracts.deleteOrganization>,
   ): MaybePromise<RpcOutput<typeof supabaseContracts.deleteOrganization>>;
@@ -273,6 +276,9 @@ interface LocalWebIntegrationService {
   createNeonProject(
     params: RpcInput<typeof neonContracts.createProject>,
   ): MaybePromise<RpcOutput<typeof neonContracts.createProject>>;
+  saveNeonApiKey(
+    params: RpcInput<typeof neonContracts.saveApiKey>,
+  ): MaybePromise<RpcOutput<typeof neonContracts.saveApiKey>>;
   getNeonProject(
     params: RpcInput<typeof neonContracts.getProject>,
   ): MaybePromise<RpcOutput<typeof neonContracts.getProject>>;
@@ -737,6 +743,7 @@ export const LOCAL_WEB_RPC_ALLOWLIST = [
   vercelContracts.getSyncPreview.channel,
   vercelContracts.syncNeonConfig.channel,
   vercelContracts.removeNeonEnvVars.channel,
+  supabaseContracts.saveOrganizationToken.channel,
   supabaseContracts.listOrganizations.channel,
   supabaseContracts.deleteOrganization.channel,
   supabaseContracts.listAllProjects.channel,
@@ -745,6 +752,7 @@ export const LOCAL_WEB_RPC_ALLOWLIST = [
   supabaseContracts.setAppProject.channel,
   supabaseContracts.unsetAppProject.channel,
   supabaseContracts.fakeConnectAndSetProject.channel,
+  neonContracts.saveApiKey.channel,
   neonContracts.createProject.channel,
   neonContracts.getProject.channel,
   neonContracts.listProjects.channel,
@@ -1297,6 +1305,10 @@ export async function registerLocalWebRpcHandlers(
   registry.register(vercelContracts.removeNeonEnvVars, (_context, params) =>
     resolvedService.removeNeonEnvVarsFromVercel(params),
   );
+  registry.register(
+    supabaseContracts.saveOrganizationToken,
+    (_context, params) => resolvedService.saveSupabaseOrganizationToken(params),
+  );
   registry.register(supabaseContracts.listOrganizations, () =>
     resolvedService.listSupabaseOrganizations(),
   );
@@ -1324,6 +1336,9 @@ export async function registerLocalWebRpcHandlers(
   );
   registry.register(neonContracts.createProject, (_context, params) =>
     resolvedService.createNeonProject(params),
+  );
+  registry.register(neonContracts.saveApiKey, (_context, params) =>
+    resolvedService.saveNeonApiKey(params),
   );
   registry.register(neonContracts.getProject, (_context, params) =>
     resolvedService.getNeonProject(params),
@@ -1483,8 +1498,11 @@ async function createDefaultService(): Promise<LocalWebRpcService> {
   const { createLocalWebSettingsStore } = await import("./local_web_settings");
   const { createLocalWebPathResolver, getDefaultLocalWebUserDataPath } =
     await import("./local_web_paths");
-  const { configureCustomAppsFolderSettingReaderForPathResolution } =
-    await import("@/paths/paths");
+  const {
+    configureCustomAppsFolderSettingReaderForPathResolution,
+    configureUserDataPathProviderForPathResolution,
+  } = await import("@/paths/paths");
+  const { configureLocalWebSettingsStore } = await import("@/main/settings");
   const userDataPath = getDefaultLocalWebUserDataPath();
   const settingsStore = createLocalWebSettingsStore({ userDataPath });
   const pathResolver = createLocalWebPathResolver({
@@ -1496,6 +1514,8 @@ async function createDefaultService(): Promise<LocalWebRpcService> {
     () => pathResolver.defaultAppsDirectory,
     () => pathResolver.getTypeScriptCachePath(),
   );
+  configureUserDataPathProviderForPathResolution(() => userDataPath);
+  configureLocalWebSettingsStore(settingsStore);
   const events = createLocalEventStream();
   return composeLocalWebRpcService(
     createDefaultLocalWebCoreService({

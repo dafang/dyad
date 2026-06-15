@@ -136,11 +136,21 @@ export type GetNeonBranchEnvVarsResponse = z.infer<
   typeof GetNeonBranchEnvVarsResponseSchema
 >;
 
+export const SaveNeonApiKeyParamsSchema = z.object({
+  apiKey: z.string().min(1),
+});
+
 // =============================================================================
 // Neon Contracts
 // =============================================================================
 
 export const neonContracts = {
+  saveApiKey: defineContract({
+    channel: "neon:save-api-key",
+    input: SaveNeonApiKeyParamsSchema,
+    output: z.void(),
+  }),
+
   createProject: defineContract({
     channel: "neon:create-project",
     input: CreateNeonProjectParamsSchema,

@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
 import { db } from "@/db";
 import {
@@ -20,12 +23,17 @@ import {
   type LocalWebPathResolver,
 } from "@/server/local_web_paths";
 import type { LocalWebRpcService } from "@/server/local_web_rpc_registry";
+import type { IpcInvokeEventLike } from "@/ipc/utils/ipc_event";
 import {
   analyzeVisualEditingComponent,
   applyVisualEditingChanges,
 } from "@/pro/main/ipc/services/visual_editing_service";
 import { and, eq } from "drizzle-orm";
 import { apps } from "@/db/schema";
+import { GithubService } from "./github_service";
+import { IS_TEST_BUILD } from "@/ipc/utils/test_utils";
+import { SupabaseService } from "./supabase_service";
+import { NeonService } from "./neon_service";
 
 export interface DefaultLocalWebIntegrationServiceOptions {
   settingsStore?: LocalWebSettingsStore;
@@ -61,58 +69,47 @@ export function createDefaultLocalWebIntegrationService(
       DyadErrorKind.Auth,
     );
   };
+  const githubService = createGithubService(settingsStore, pathResolver);
+  const supabaseService = new SupabaseService({ settings: settingsStore });
+  const neonService = new NeonService({ settings: settingsStore });
 
   return {
-    startGithubFlow: () => unsupported("GitHub device flow"),
-    listGithubRepos: async () => {
-      if (!settingsStore.readSettings().githubAccessToken?.value) {
-        authRequired("GitHub");
-      }
-      return [];
-    },
-    getGithubRepoBranches: async () => {
-      if (!settingsStore.readSettings().githubAccessToken?.value) {
-        authRequired("GitHub");
-      }
-      return [];
-    },
-    isGithubRepoAvailable: async () => ({ available: true }),
-    createGithubRepo: () => unsupported("GitHub repository creation"),
-    connectExistingGithubRepo: () => unsupported("GitHub repository linking"),
-    pushGithub: () => unsupported("GitHub push"),
-    fetchGithub: () => unsupported("GitHub fetch"),
-    pullGithub: () => unsupported("GitHub pull"),
-    rebaseGithub: () => unsupported("GitHub rebase"),
-    abortGithubRebase: () => unsupported("GitHub rebase abort"),
-    abortGithubMerge: () => unsupported("GitHub merge abort"),
-    continueGithubRebase: () => unsupported("GitHub rebase continue"),
-    listLocalGitBranches: async () => ({ branches: [], current: null }),
-    listRemoteGitBranches: async () => [],
-    createGitBranch: () => unsupported("Git branch creation"),
-    switchGitBranch: () => unsupported("Git branch switching"),
-    deleteGitBranch: () => unsupported("Git branch deletion"),
-    renameGitBranch: () => unsupported("Git branch rename"),
-    mergeGitBranch: () => unsupported("Git branch merge"),
-    getGitConflicts: async () => [],
-    getGitState: async () => ({
-      mergeInProgress: false,
-      rebaseInProgress: false,
-    }),
-    disconnectGithubRepo: () => unsupported("GitHub disconnect"),
-    listGithubCollaborators: async () => {
-      if (!settingsStore.readSettings().githubAccessToken?.value) {
-        authRequired("GitHub");
-      }
-      return [];
-    },
-    inviteGithubCollaborator: () => unsupported("GitHub collaborator invite"),
-    removeGithubCollaborator: () => unsupported("GitHub collaborator removal"),
-    cloneGithubRepoFromUrl: async () => ({
-      error: "Clone from GitHub URL is not available in Local Web mode yet.",
-    }),
-    getGitUncommittedFiles: async () => [],
-    commitGitChanges: () => unsupported("Git commit"),
-    discardGitChanges: () => unsupported("Git discard changes"),
+    startGithubFlow: (event: IpcInvokeEventLike) =>
+      githubService.startFlow(event),
+    listGithubRepos: () => githubService.listRepos(),
+    getGithubRepoBranches: (params) => githubService.getRepoBranches(params),
+    isGithubRepoAvailable: (params) => githubService.isRepoAvailable(params),
+    createGithubRepo: (params) => githubService.createRepo(params),
+    connectExistingGithubRepo: (params) =>
+      githubService.connectExistingRepo(params),
+    pushGithub: (params) => githubService.push(params),
+    fetchGithub: (params) => githubService.fetchFromGithub(params),
+    pullGithub: (params) => githubService.pullFromGithub(params),
+    rebaseGithub: (params) => githubService.rebase(params),
+    abortGithubRebase: (params) => githubService.abortRebase(params),
+    abortGithubMerge: (params) => githubService.abortMerge(params),
+    continueGithubRebase: (params) => githubService.continueRebase(params),
+    listLocalGitBranches: (params) => githubService.listLocalBranches(params),
+    listRemoteGitBranches: (params) => githubService.listRemoteBranches(params),
+    createGitBranch: (params) => githubService.createBranch(params),
+    switchGitBranch: (params) => githubService.switchBranch(params),
+    deleteGitBranch: (params) => githubService.deleteBranch(params),
+    renameGitBranch: (params) => githubService.renameBranch(params),
+    mergeGitBranch: (params) => githubService.mergeBranch(params),
+    getGitConflicts: (params) => githubService.getConflicts(params),
+    getGitState: (params) => githubService.getGitState(params),
+    disconnectGithubRepo: (params) => githubService.disconnectRepo(params),
+    listGithubCollaborators: (params) =>
+      githubService.listCollaborators(params),
+    inviteGithubCollaborator: (params) =>
+      githubService.inviteCollaborator(params),
+    removeGithubCollaborator: (params) =>
+      githubService.removeCollaborator(params),
+    cloneGithubRepoFromUrl: (params) => githubService.cloneRepoFromUrl(params),
+    getGitUncommittedFiles: (params) =>
+      githubService.getUncommittedFiles(params),
+    commitGitChanges: (params) => githubService.commitChanges(params),
+    discardGitChanges: (params) => githubService.discardChanges(params),
 
     saveVercelToken: async ({ token }: { token: string }) => {
       settingsStore.writeSettings({
@@ -146,27 +143,34 @@ export function createDefaultLocalWebIntegrationService(
     }),
     removeNeonEnvVarsFromVercel: async () => ({ removedKeys: [] }),
 
-    listSupabaseOrganizations: async () => [],
-    deleteSupabaseOrganization: () =>
-      unsupported("Supabase organization delete"),
-    listSupabaseProjects: async () => [],
-    listSupabaseBranches: async () => [],
-    getSupabaseEdgeLogs: async () => [],
-    setSupabaseAppProject: () => unsupported("Supabase project linking"),
-    unsetSupabaseAppProject: () => unsupported("Supabase project unlinking"),
+    saveSupabaseOrganizationToken: (params) =>
+      supabaseService.saveOrganizationToken(params),
+    listSupabaseOrganizations: () => supabaseService.listOrganizations(),
+    deleteSupabaseOrganization: (params) =>
+      supabaseService.deleteOrganization(params),
+    listSupabaseProjects: () => supabaseService.listProjects(),
+    listSupabaseBranches: (params) => supabaseService.listBranches(params),
+    getSupabaseEdgeLogs: (params) => supabaseService.getEdgeLogs(params),
+    setSupabaseAppProject: (params) => supabaseService.setAppProject(params),
+    unsetSupabaseAppProject: (params) =>
+      supabaseService.unsetAppProject(params),
     fakeConnectSupabaseProject: () => unsupported("Supabase fake connect"),
 
-    createNeonProject: () => unsupported("Neon project creation"),
-    getNeonProject: () => unsupported("Neon project lookup"),
-    listNeonProjects: async () => ({ projects: [] }),
-    setNeonAppProject: () => unsupported("Neon project linking"),
-    unsetNeonAppProject: async () => ({ success: true }),
-    setNeonActiveBranch: () => unsupported("Neon active branch selection"),
-    getNeonEmailPasswordConfig: () => unsupported("Neon auth config"),
-    updateNeonEmailVerification: () => unsupported("Neon auth config update"),
+    saveNeonApiKey: (params) => neonService.saveApiKey(params),
+    createNeonProject: (params) => neonService.createProject(params),
+    getNeonProject: (params) => neonService.getProject(params),
+    listNeonProjects: () => neonService.listProjects(),
+    setNeonAppProject: (params) => neonService.setAppProject(params),
+    unsetNeonAppProject: (params) => neonService.unsetAppProject(params),
+    setNeonActiveBranch: (params) => neonService.setActiveBranch(params),
+    getNeonEmailPasswordConfig: (params) =>
+      neonService.getEmailPasswordConfig(params),
+    updateNeonEmailVerification: (params) =>
+      neonService.updateEmailVerification(params),
     fakeConnectNeon: () => unsupported("Neon fake connect"),
-    getNeonBranchEnvVars: () => unsupported("Neon branch env vars"),
-    setSelectedDatabaseBranchType: async () => ({ success: true }),
+    getNeonBranchEnvVars: (params) => neonService.getBranchEnvVars(params),
+    setSelectedDatabaseBranchType: (params) =>
+      neonService.setSelectedDatabaseBranchType(params),
 
     createMcpServer: async (params: any) => {
       parseJsonField(params.args, "args");
@@ -258,6 +262,63 @@ export function createDefaultLocalWebIntegrationService(
 async function findAppById(appId: number) {
   return db.query.apps.findFirst({
     where: eq(apps.id, appId),
+  });
+}
+
+function createGithubService(
+  settingsStore: LocalWebSettingsStore,
+  pathResolver: LocalWebPathResolver,
+): GithubService {
+  return new GithubService({
+    settings: settingsStore,
+    findAppById,
+    findAppByName: (name) =>
+      db.query.apps.findFirst({
+        where: eq(apps.name, name),
+      }),
+    createApp: async (input) => {
+      const [app] = await db
+        .insert(apps)
+        .values({
+          name: input.name,
+          path: input.path,
+          githubOrg: input.githubOrg,
+          githubRepo: input.githubRepo,
+          githubBranch: input.githubBranch,
+          installCommand: input.installCommand ?? null,
+          startCommand: input.startCommand ?? null,
+        })
+        .returning();
+      return {
+        ...app,
+        files: [],
+        supabaseProjectName: null,
+        vercelTeamSlug: null,
+      };
+    },
+    updateAppGithubRepo: async ({ appId, org, repo, branch }) => {
+      await db
+        .update(apps)
+        .set({
+          githubOrg: org ?? null,
+          githubRepo: repo ?? null,
+          githubBranch: branch ?? (repo ? "main" : null),
+        })
+        .where(eq(apps.id, appId));
+    },
+    resolveAppPath: (appPath) => pathResolver.getDyadAppPath(appPath),
+    isAppLocationAccessible: (resolvedPath) => {
+      const containingFolder = path.dirname(resolvedPath);
+      try {
+        fs.mkdirSync(containingFolder, { recursive: true });
+        fs.accessSync(containingFolder, fs.constants.R_OK | fs.constants.W_OK);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    fetch: (input, init) => globalThis.fetch(input, init),
+    isTestBuild: IS_TEST_BUILD,
   });
 }
 

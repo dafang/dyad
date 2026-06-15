@@ -1,6 +1,6 @@
 # Stack context
 
-_Generated 2026-06-12 19:51:56_
+_Generated 2026-06-15 17:25:37_
 
 ## Language signals
 
@@ -44,9 +44,9 @@ From package.json scripts:
 
 ## Git
 
-- Branch: `main`
+- Branch: `feature/web-portal`
 - Remote: https://ghfast.top/https://github.com/dyad-sh/dyad.git
-- Working tree: 171 files changed
+- Working tree: 25 files changed
 
 ## Test / lint heuristics
 

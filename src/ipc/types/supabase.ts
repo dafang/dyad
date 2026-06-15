@@ -81,6 +81,15 @@ export type SetSupabaseAppProjectParams = z.infer<
 // =============================================================================
 
 export const supabaseContracts = {
+  saveOrganizationToken: defineContract({
+    channel: "supabase:save-organization-token",
+    input: z.object({
+      organizationSlug: z.string().min(1),
+      accessToken: z.string().min(1),
+    }),
+    output: z.void(),
+  }),
+
   listOrganizations: defineContract({
     channel: "supabase:list-organizations",
     input: z.void(),

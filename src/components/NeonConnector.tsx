@@ -40,6 +40,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/queryKeys";
 import { isNeonSupportedFramework } from "@/lib/framework_constants";
 import { getErrorMessage } from "@/lib/errors";
+import { isLocalWebRuntime } from "@/lib/runtime_client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,6 +60,7 @@ export function NeonConnector({ appId }: { appId: number }) {
   const { lastDeepLink, clearLastDeepLink } = useDeepLink();
   const queryClient = useQueryClient();
   const { isDarkMode } = useTheme();
+  const isLocalWeb = isLocalWebRuntime();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
@@ -77,6 +79,8 @@ export function NeonConnector({ appId }: { appId: number }) {
   const [removeFromVercel, setRemoveFromVercel] = useState(true);
   const [isDisconnectAccountDialogOpen, setIsDisconnectAccountDialogOpen] =
     useState(false);
+  const [manualApiKey, setManualApiKey] = useState("");
+  const [isSavingManualApiKey, setIsSavingManualApiKey] = useState(false);
   const oauthTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const formatToastError = (error: unknown) => getErrorMessage(error);
   const projectDateFormatter = new Intl.DateTimeFormat(undefined, {
@@ -126,6 +130,31 @@ export function NeonConnector({ appId }: { appId: number }) {
   }, []);
 
   const handleConnect = async () => {
+    if (isLocalWeb) {
+      const apiKey = manualApiKey.trim();
+      if (!apiKey) {
+        toast.error(t("integrations.neon.manualApiKeyRequired"));
+        return;
+      }
+      setIsSavingManualApiKey(true);
+      try {
+        await ipc.neon.saveApiKey({ apiKey });
+        setManualApiKey("");
+        await refreshSettings();
+        await refetchProjects();
+        toast.success(t("integrations.neon.manualApiKeySaved"));
+      } catch (error) {
+        toast.error(
+          t("integrations.neon.failedSaveManualApiKey", {
+            error: formatToastError(error),
+          }),
+        );
+      } finally {
+        setIsSavingManualApiKey(false);
+      }
+      return;
+    }
+
     try {
       setIsOpeningOauth(true);
       if (settings?.isTestMode) {
@@ -837,22 +866,46 @@ export function NeonConnector({ appId }: { appId: number }) {
     <Card className="mt-1">
       <CardHeader>
         <CardTitle>{t("integrations.neon.database")}</CardTitle>
-        <CardDescription>{t("integrations.neon.freeTier")}</CardDescription>
+        <CardDescription>
+          {isLocalWeb
+            ? t("integrations.neon.localWebManualApiKeyHelp")
+            : t("integrations.neon.freeTier")}
+        </CardDescription>
       </CardHeader>
       <CardContent>
+        {isLocalWeb && (
+          <div className="mb-3 space-y-2">
+            <Label htmlFor="neon-api-key">
+              {t("integrations.neon.apiKey")}
+            </Label>
+            <Input
+              id="neon-api-key"
+              type="password"
+              value={manualApiKey}
+              onChange={(event) => setManualApiKey(event.target.value)}
+              placeholder={t("integrations.neon.apiKeyPlaceholder")}
+            />
+          </div>
+        )}
         <Button
           variant="outline"
           onClick={handleConnect}
-          disabled={isOpeningOauth}
+          disabled={isOpeningOauth || isSavingManualApiKey}
           className="w-auto h-10 flex items-center justify-center px-4 py-2 border-2 transition-colors font-medium text-sm dark:bg-gray-900 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
           data-testid="connect-neon-button"
           aria-label={t("integrations.neon.connectTo") + " Neon"}
         >
-          {isOpeningOauth ? (
+          {isOpeningOauth || isSavingManualApiKey ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              <span>{t("integrations.neon.completingSignIn")}</span>
+              <span>
+                {isSavingManualApiKey
+                  ? t("integrations.neon.savingApiKey")
+                  : t("integrations.neon.completingSignIn")}
+              </span>
             </>
+          ) : isLocalWeb ? (
+            <>{t("integrations.neon.saveApiKey")}</>
           ) : (
             <>
               <span className="mr-2">{t("integrations.neon.connectTo")}</span>

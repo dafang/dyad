@@ -1,56 +1,55 @@
 SUPERGOAL_PHASE_START
-Phase: 1 of 5 — Capture Mobile Baseline
-Task: Audit the current Local Web UI at desktop and mobile widths before making responsive changes.
-Type: brownfield, ui, responsive, web-parity
-Mandatory commands: npm test -- src/components/app-sidebar-state.test.ts src/components/preview_panel/previewBrowserUrl.test.ts src/components/preview_panel/previewUrl.test.ts
-Acceptance criteria: 6
-Evidence required: Local Web URL/API URL, screenshot filenames, issue inventory, targeted test output
-Depends on phases: none
+Phase: 1 of 5 — Characterize Integration Gaps
+Task: Add failing/characterization coverage for Local Web GitHub, Supabase, and Neon integration surfaces.
+Mandatory commands:
 
-## Why
-
-Establish factual desktop/mobile evidence before changing layout, so later fixes target real failures and preserve current desktop behavior.
+- npm test -- src/server/local_web_integration_registry.test.ts
+- npm test -- src/server/local_web_rpc_registry.test.ts
+  Acceptance criteria: 6
+  Evidence required:
+- Test output excerpts for both mandatory commands.
+- Inventory excerpt showing unsupported/current Local Web provider methods and target shared service owners.
+- Diff snippet for the key characterization assertions.
+  Depends on phases: none
 
 ## Work
 
-- Start or reuse a Local Web server from this repository. Record the Web URL, API URL, token source if applicable, and whether it is local or tunneled.
-- Use browser automation with at least two viewport sizes: desktop 1440x900 and mobile 390x844.
-- Visit home/apps/chat/preview/settings. If a test app/chat is needed, create it through the existing Local Web RPC path rather than hardcoding database state.
-- Capture screenshots under `.supergoal/mobile-web-audit/` using stable names such as `phase1-mobile-chat.png` and `phase1-desktop-preview.png`.
-- Measure document overflow on each route with a DOM expression equivalent to `document.documentElement.scrollWidth <= window.innerWidth + 1`.
-- Capture unexpected console errors, page errors, failed `/api/rpc/*` responses, and failed `/api/events` responses.
-- Map each mobile issue to likely owning components/files, especially shell/sidebar, chat, and preview modules.
+Audit the Local Web integration boundary and add characterization tests before changing provider behavior. Focus on:
 
-## Acceptance criteria (all must pass — verify each in transcript)
+- `src/server/local_web_rpc_registry.ts`
+- `src/server/local_web_integration_registry.test.ts`
+- `src/server/local_web_rpc_registry.test.ts`
+- `src/server/local_web_ipc_event.ts`
+- `src/ipc/services/default_local_web_integration_service.ts`
+- Electron handlers for GitHub, Supabase, and Neon
 
-- A real Local Web server is launched from this repo, or an existing live Local Web server is reused with its URL/token recorded.
-- Desktop viewport evidence at 1440x900 covers home/apps/chat/preview/settings with screenshots.
-- Mobile viewport evidence at 390x844 covers home/apps/chat/preview/settings with screenshots.
-- The audit records whether each tested route has horizontal document overflow, unreachable primary controls, console errors, failed Local Web RPC/event requests, or blank content.
-- The audit identifies the exact component/file owners for each mobile issue that must be fixed in phases 2-4.
-- The audit confirms the desktop baseline is currently usable before layout changes, or records existing desktop failures separately from mobile-specific failures.
+Write or update `.supergoal/local-web-provider-integration-inventory.md` with:
 
-## Mandatory commands (run each, surface last ~10 lines + exit code)
+- Every GitHub/Supabase/Neon method exposed in Local Web.
+- Whether it is implemented, stubbed, or unsupported today.
+- The intended shared service or dependency needed to make it real.
+- Whether the method touches credentials, app DB rows, app files, or external network.
 
-- `npm test -- src/components/app-sidebar-state.test.ts src/components/preview_panel/previewBrowserUrl.test.ts src/components/preview_panel/previewUrl.test.ts`
+## Acceptance criteria
 
-## Evidence required in transcript
+1. `LOCAL_WEB_RPC_ALLOWLIST` coverage for GitHub, Supabase, and Neon is asserted in tests.
+2. A test proves `createLocalWebIpcEvent` can publish `github:flow-update`, `github:flow-success`, and `github:flow-error` payloads to the Local Web event stream shape.
+3. Tests distinguish auth/precondition failures from silent stub success for unauthenticated GitHub, Supabase, and Neon operations.
+4. Inventory file lists all provider methods currently stubbed in `default_local_web_integration_service.ts`.
+5. No fake connect behavior is marked as production success in tests or inventory.
+6. Mandatory commands exit 0 after characterization updates.
 
-- Local Web URL/API URL source used for audit.
-- Desktop and mobile screenshot filenames.
-- Concise issue inventory grouped by shell, chat, and preview.
-- Targeted test exit code and last ~10 lines.
+## Mandatory commands
 
-## Notes
+- `npm test -- src/server/local_web_integration_registry.test.ts`
+- `npm test -- src/server/local_web_rpc_registry.test.ts`
 
-- Prefer extending or reusing existing Web portal audit helpers before creating large one-off scripts.
-- Do not fix product code in this phase unless required only to make the audit runnable; if that happens, record it as a deviation.
-- Keep provider/runtime debugging out of scope unless it blocks loading the audited routes.
+## Evidence required
 
----
+- Test output excerpts for both mandatory commands.
+- Inventory excerpt showing unsupported/current Local Web provider methods and target shared service owners.
+- Diff snippet for the key characterization assertions.
 
-The agent will, during execution, print SUPERGOAL_PHASE_START (above),
-do the work, then print SUPERGOAL_PHASE_VERIFY, MEMORY_SAVED, and
-SUPERGOAL_PHASE_DONE in order. On failure, the agent follows the
-3-strike recovery protocol in .supergoal/PROTOCOL.md without further
-instruction needed here.
+## Verification Notes
+
+Print `SUPERGOAL_PHASE_VERIFY` with pass/fail for each criterion and command summaries, then update `.supergoal/STATE.md` and print `SUPERGOAL_PHASE_DONE`.

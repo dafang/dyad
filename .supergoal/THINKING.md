@@ -1,57 +1,54 @@
-# Thinking: Web Mobile + PC Access
+# Local Web GitHub, Supabase, and Neon Parity Thinking
 
 ## Goals
 
-- Make the Local Web UI usable from both desktop and mobile browsers without changing the Electron-first architecture.
-- On mobile widths, users can navigate core routes, chat comfortably, watch streamed responses appear in the message list, and reach common chat controls.
-- On mobile widths, users can switch between chat and preview, see the preview iframe fill the available area, and access refresh/restart/open/mode controls without overlap.
-- Preserve current desktop split-pane behavior, existing Electron IPC semantics, and the Local Web HTTP/RPC/SSE runtime boundary.
-- Add durable browser validation for desktop and mobile viewports using real Local Web server flows; key chat/preview checks should not rely only on fake provider paths.
+- Make Local Web integration buttons and panels usable for GitHub, Supabase, and Neon without depending on Electron deep-link-only behavior.
+- Preserve Electron behavior by moving reusable logic into shared services and keeping Electron handlers as thin wrappers.
+- Use real provider APIs and local credentials for verification where available; do not introduce fake-only success paths that hide broken wiring.
+- Keep secrets out of source, logs, screenshots, and test artifacts.
 
 ## Constraints
 
-- Dyad is still an Electron app with a secure IPC boundary; Web support must stay behind the current client adapter and Local Web server rather than rewriting main-process contracts.
-- Existing Local Web runtime, provider configuration, preview path proxy, multiplexed SSE, and real-provider Web E2E from the prior parity run should be treated as baseline.
-- The UI is desktop-first today: `src/pages/chat.tsx` uses a horizontal `react-resizable-panels` split; `src/components/app-sidebar.tsx` uses hover-expanded sidebar behavior; preview toolbar and iframe controls have many fixed desktop affordances.
-- Use Base UI primitives and existing UI components; do not introduce Radix or a new design system.
-- Keep the experience utilitarian and app-like. Avoid marketing layouts or decorative redesign.
-- Repository is dirty from ongoing Web migration work; do not revert unrelated changes.
+- Current branch is `feature/web-portal`; keep work on this branch.
+- Existing app is Electron-first with contract-driven IPC under `src/ipc/types/*`; Local Web bridges the same contracts over HTTP RPC and SSE.
+- Local Web settings store persists secrets as plaintext locally by design, while Electron settings may use `safeStorage`; shared code must be careful about settings write merges.
+- Supabase and Neon OAuth return handlers currently assume Electron/deep-link behavior; Local Web v1 should provide a browser-friendly/manual credential path instead of requiring deep links.
+- Neon project creation/linking mutates app files (`.env.local`, Nitro setup) and app DB rows, so rollback and path resolution are part of correctness.
 
 ## Risks
 
-1. **Desktop split-pane assumptions break mobile.** Chat and preview currently share a horizontal resizable layout that can collapse into unusable slivers on narrow screens. Mitigation: introduce a mobile-specific view mode/switching path while preserving desktop `PanelGroup`.
-2. **Navigation/sidebar hover behavior is inaccessible on touch.** The sidebar relies on hover expansion and wide contextual lists. Mitigation: audit all primary routes at mobile width, then add touch-friendly shell navigation or drawer behavior with explicit buttons.
-3. **Preview toolbar and iframe controls overflow.** The preview header has many actions and device controls; mobile can hide key actions or produce horizontal scroll. Mitigation: compact toolbars with overflow menus, stable dimensions, and screenshot checks at 390px width.
+1. **GitHub connect appears idle because device-flow events never reach the browser.** Mitigation: implement Local Web GitHub service with `createLocalWebIpcEvent`/SSE event emissions and add tests proving `github:flow-update|success|error` publish.
+2. **Manual Supabase/Neon credentials break refresh assumptions.** Mitigation: explicitly support non-refreshable local tokens/API keys and classify expired/missing refresh token paths as auth/precondition errors with actionable UI copy.
+3. **Extracting Neon/GitHub logic can regress Electron.** Mitigation: keep Electron handler contracts intact, add service-level unit tests, and run targeted existing handler/service tests plus `npm run ts`/`npm run build:web`.
 
 ## Dependencies
 
-- Phase 1 must capture current desktop/mobile evidence before redesigning. This prevents accidental desktop regressions and tells later phases which elements overflow.
-- Shell navigation must be fixed before chat and preview polish, because mobile users need a reliable way to reach `/chat`, `/apps`, `/settings`, and library routes.
-- Mobile chat must land before preview switching, since preview switching depends on the selected chat/app state and the chat header affordance.
-- E2E hardening comes last, after selectors and layout contracts settle.
+- Phase 1 must characterize current gaps before extraction so tests fail for the right reasons.
+- GitHub service extraction should land before UI smoke because GitHub's existing device flow depends on events, not just invoke/response.
+- Supabase and Neon credential UX can reuse settings persistence, but may require small dedicated RPC helpers if raw `settings.setUserSettings` is too broad for good UX.
+- Neon Local Web implementation depends on `LocalWebPathResolver.getDyadAppPath` so file mutations hit the correct app directory.
 
 ## Open Questions Already Assumed
 
-- The target mobile baseline is modern mobile Safari/Chrome sized around 390x844 CSS pixels, with desktop baseline around 1440x900.
-- Mobile Web does not need every desktop power-user control visible at once; compact menus are acceptable if the core action remains reachable.
-- The preview can be a full-screen or tabbed mobile panel rather than a simultaneous side-by-side pane.
-- Real-provider checks may use the existing Codex/OpenAI-compatible configuration when present; tests should clearly fail or skip with an actionable message if no real provider is configured.
+- Local Web v1 can use manual Supabase token/PAT and Neon API key/access token entry instead of full hosted OAuth callback.
+- GitHub should use device flow because it is browser/local-server friendly and already matches the UI model.
+- We should not add cloud portal multi-tenant account sync in this task.
 
 ## Memory Hits Applied
 
-- `project_dyad_local_web_runtime`: preserve the local server + IPC adapter boundary and existing HTTP/RPC/SSE contracts.
-- `project_dyad_local_web_e2e`: extend the Web E2E harness with browser viewport coverage instead of relying only on unit tests.
-- `project_local_web_parity`: build on the stabilized chat/preview/runtime/provider parity baseline and avoid re-solving provider or runtime issues.
+- `project_local_web_parity`: favor real E2E/smoke when credentials exist; fake-only tests are insufficient.
+- `project_local_web_visual_editing_adapter`: extract Electron-free service and inject dependencies from Electron/Local Web wrappers.
+- `project_local_web_theme_generation`: Local Web services should return typed `DyadError` failures and should avoid committing provider secrets.
 
-## Tools / Skills Relied On
+## Tools And Skills Relied On
 
-- `supergoal` for auditable phased execution and final audit.
-- `agent-browser` or Playwright browser automation for desktop/mobile screenshots and interaction evidence.
-- Repo rules: `e2e-testing`, `ui-styling`, `base-ui-components`, `jotai-state`; add `electron-ipc` only if implementation changes RPC/IPC contracts.
+- Supergoal planning workflow.
+- Local repository source, tests, and shell commands.
+- No current-doc MCP was detected; implementation should verify provider behavior with real API calls when credentials are provided via environment/local settings.
 
 ## Best Practices Applied
 
-- Use responsive layout switches at component boundaries instead of global CSS hacks.
-- Keep entity-specific UI state keyed by app/chat id where state survives unmounts.
-- Prefer compact icon controls with tooltips/labels and Base UI menus for mobile overflow.
-- Verify visual behavior with screenshots plus DOM assertions: no horizontal overflow, visible chat input, visible messages, visible preview iframe content, no console/RPC failures.
+- Preserve existing IPC contracts unless a new contract is materially better than overloading settings writes.
+- Use TanStack Query invalidation patterns already present in `useSupabase` and `useNeon`.
+- Treat user/environment failures as `DyadErrorKind.Auth`, `Precondition`, `Validation`, or `External` rather than generic bugs.
+- Avoid logging credentials; smoke scripts may print only host/model/provider/token-present metadata.

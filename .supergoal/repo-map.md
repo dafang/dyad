@@ -1,6 +1,6 @@
 # Repo map
 
-_Generated 2026-06-12 19:51:56_
+_Generated 2026-06-15 17:25:37_
 
 ## Top-level layout
 
@@ -94,16 +94,16 @@ _Generated 2026-06-12 19:51:56_
 
 ## File counts (top extensions)
 
-- `.ts`: 866 files
-- `.tsx`: 379 files
-- `.md`: 169 files
+- `.ts`: 943 files
+- `.tsx`: 383 files
+- `.md`: 205 files
+- `.json`: 188 files
 - `.yml`: 161 files
-- `.txt`: 135 files
-- `.json`: 111 files
+- `.txt`: 136 files
+- `.png`: 104 files
 - `.sql`: 34 files
+- `.mjs`: 24 files
 - `.js`: 18 files
-- `.mjs`: 12 files
-- `.svg`: 10 files
 
 ## Largest source files (top 15 by line count)
 
@@ -117,11 +117,11 @@ _Generated 2026-06-12 19:51:56_
 - `src/pro/main/ipc/handlers/local_agent/local_agent_handler.ts` (2267 lines)
 - `src/ipc/handlers/chat_stream_handlers.ts` (2238 lines)
 - `assets/icon/logo.icns` (2050 lines)
-- `src/components/preview_panel/PreviewIframe.tsx` (1990 lines)
+- `src/components/preview_panel/PreviewIframe.tsx` (2021 lines)
 - `src/ipc/handlers/app_handlers.ts` (1975 lines)
 - `packages/ts-pg-schema-diff/src/generators/schema.ts` (1755 lines)
 - `src/ipc/utils/git_utils.ts` (1676 lines)
-- `src/components/chat/ChatInput.tsx` (1662 lines)
+- `src/server/local_web_rpc_registry.test.ts` (1675 lines)
 
 ## Test surface
 
@@ -129,7 +129,7 @@ _Generated 2026-06-12 19:51:56_
 - Directories named `tests`: 6
 - Directories named `__tests__`: 19
 - Directories named `spec`: 1
-- Test files (by name pattern): 730
+- Test files (by name pattern): 735
 
 ## Notable config / infra
 
@@ -143,28 +143,28 @@ _Generated 2026-06-12 19:51:56_
 
 ## Recent activity (last 10 commits)
 
+- `51612577` 2026-06-15 Complete local web portal parity
+- `859f50ae` 2026-06-13 Keep hide-menu URL query unquoted
+- `e832b049` 2026-06-13 Support hide-menu chat URLs
+- `3bb98db6` 2026-06-13 Hide Dyad Pro prompts in local web UI
+- `d37ad5ad` 2026-06-12 Resolve scaffold path for local web templates
+- `3eda5b55` 2026-06-12 Handle lenient app blueprint visuals
+- `1d844a53` 2026-06-12 feat: add local web portal runtime
 - `90854928` 2026-06-09 feat(telemetry): capture and report native crashes via Crashpad (#3614)
 - `31bae4d6` 2026-06-08 Show release notes when restoring chat on startup (#3616)
 - `6f50c815` 2026-06-08 chore: remove session debug skill (#3615)
-- `37e61d4b` 2026-06-06 fix(preview): rewrite Set-Cookie to SameSite=None in the proxy (#3592)
-- `535a6163` 2026-06-05 Pin release tag during dispatch (#3604)
-- `5a4d1553` 2026-06-05 Fix plan acceptance wrong-app race (#3601)
-- `7d06d9e0` 2026-06-05 Show rename dialog on app blueprint name conflict (#3593)
-- `61c6d2c5` 2026-06-05 Improve bump version (#3603)
-- `c26db445` 2026-06-05 Bump to v1.3.0 (#3602)
-- `9de6dbac` 2026-06-05 Fix failing e2e tests (#3599)
 
 ## Files churned in last 20 commits (top 10)
 
-- `package.json` (3×)
-- `src/pro/main/ipc/handlers/local_agent/local_agent_handler.test.ts` (2×)
-- `src/lib/windows_signing.test.ts` (2×)
-- `src/ipc/utils/sandbox/sandbox.test.ts` (2×)
-- `src/ipc/utils/sandbox/limits.ts` (2×)
-- `src/ipc/utils/git_utils.test.ts` (2×)
-- `src/hooks/usePlanEvents.ts` (2×)
-- `rules/native-modules.md` (2×)
-- `forge.config.ts` (2×)
-- `e2e-tests/snapshots/local_agent_persistent_todos.spec.ts_local-agent---persistent-todos-across-turns-1.aria.yml` (2×)
+- `src/pages/settings.tsx` (4×)
+- `src/pages/home.tsx` (4×)
+- `src/app/layout.tsx` (4×)
+- `src/lib/settingsSearchIndex.ts` (3×)
+- `src/hooks/usePlanEvents.ts` (3×)
+- `src/components/settings/ProviderSettingsPage.tsx` (3×)
+- `src/components/preview_panel/PreviewIframe.tsx` (3×)
+- `src/components/chat/DyadAppBlueprintCard.tsx` (3×)
+- `src/components/chat/ChatInput.tsx` (3×)
+- `src/components/SetupBanner.tsx` (3×)
 
 _End repo map._
