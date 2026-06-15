@@ -15,11 +15,13 @@ import { toast } from "sonner";
 import { useUserBudgetInfo } from "@/hooks/useUserBudgetInfo";
 import { AiAccessBanner } from "./ProBanner";
 import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
+import { isLocalWebRuntime } from "@/lib/runtime_client";
 import type {
   ThemeGenerationMode,
   ThemeGenerationModel,
   ThemeInputSource,
 } from "@/ipc/types";
+import { useTranslation } from "react-i18next";
 
 // Image upload constants
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per image (raw file size)
@@ -54,6 +56,7 @@ export function AIGeneratorTab({
   isSaving,
   isDialogOpen,
 }: AIGeneratorTabProps) {
+  const { t } = useTranslation(["home", "common"]);
   const [aiImages, setAiImages] = useState<ThemeImage[]>([]);
   const [aiKeywords, setAiKeywords] = useState("");
   const [aiGenerationMode, setAiGenerationMode] =
@@ -75,6 +78,8 @@ export function AIGeneratorTab({
     generatePromptMutation.isPending || generateFromUrlMutation.isPending;
   const { userBudget } = useUserBudgetInfo();
   const hideDyadProUi = shouldHideDyadProUi();
+  const isLocalWeb = isLocalWebRuntime();
+  const canUseImageGeneration = Boolean(userBudget) || isLocalWeb;
   const { themeGenerationModelOptions, isLoadingThemeGenerationModelOptions } =
     useThemeGenerationModelOptions();
 
@@ -93,12 +98,12 @@ export function AIGeneratorTab({
           await ipc.template.cleanupThemeImages({ paths });
         } catch {
           if (showErrors) {
-            showError("Failed to cleanup temporary image files");
+            showError(t("home:customTheme.cleanupImagesFailed"));
           }
         }
       }
     },
-    [],
+    [t],
   );
 
   // Keep ref in sync with isDialogOpen prop
@@ -150,7 +155,7 @@ export function AIGeneratorTab({
 
       const availableSlots = MAX_IMAGES - aiImages.length;
       if (availableSlots <= 0) {
-        showError(`Maximum ${MAX_IMAGES} images allowed`);
+        showError(t("home:customTheme.maxImagesAllowed", { max: MAX_IMAGES }));
         return;
       }
 
@@ -159,7 +164,10 @@ export function AIGeneratorTab({
 
       if (skippedCount > 0) {
         showError(
-          `Only ${availableSlots} image${availableSlots === 1 ? "" : "s"} can be added. ${skippedCount} file${skippedCount === 1 ? " was" : "s were"} skipped.`,
+          t("home:customTheme.imageUploadSlotsSkipped", {
+            availableSlots,
+            skippedCount,
+          }),
         );
       }
 
@@ -172,7 +180,7 @@ export function AIGeneratorTab({
           // Validate file type
           if (!file.type.startsWith("image/")) {
             showError(
-              `Please upload only image files. "${file.name}" is not a valid image.`,
+              t("home:customTheme.uploadOnlyImages", { name: file.name }),
             );
             continue;
           }
@@ -180,7 +188,12 @@ export function AIGeneratorTab({
           // Validate file size (raw file size)
           if (file.size > MAX_FILE_SIZE) {
             const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-            showError(`File "${file.name}" exceeds 10MB limit (${sizeMB}MB)`);
+            showError(
+              t("home:customTheme.fileTooLarge", {
+                name: file.name,
+                size: sizeMB,
+              }),
+            );
             continue;
           }
 
@@ -188,12 +201,15 @@ export function AIGeneratorTab({
             // Read file as base64 for upload
             const base64Data = await new Promise<string>((resolve, reject) => {
               const reader = new FileReader();
-              reader.onerror = () => reject(new Error("Failed to read file"));
+              reader.onerror = () =>
+                reject(new Error(t("home:customTheme.fileReadFailed")));
               reader.onload = () => {
                 const base64 = reader.result as string;
                 const data = base64.split(",")[1];
                 if (!data) {
-                  reject(new Error("Failed to extract image data"));
+                  reject(
+                    new Error(t("home:customTheme.imageDataExtractFailed")),
+                  );
                   return;
                 }
                 resolve(data);
@@ -216,7 +232,13 @@ export function AIGeneratorTab({
             });
           } catch (err) {
             showError(
-              `Error processing "${file.name}": ${err instanceof Error ? err.message : "Unknown error"}`,
+              t("home:customTheme.processingImageFailed", {
+                name: file.name,
+                error:
+                  err instanceof Error
+                    ? err.message
+                    : t("home:customTheme.unknownError"),
+              }),
             );
           }
         }
@@ -243,7 +265,7 @@ export function AIGeneratorTab({
         }
       }
     },
-    [aiImages.length, cleanupImages],
+    [aiImages.length, cleanupImages, t],
   );
 
   const handleRemoveImage = useCallback(
@@ -259,10 +281,15 @@ export function AIGeneratorTab({
   );
 
   const handleGenerate = useCallback(async () => {
+    if (isLocalWeb && inputSource === "url") {
+      showError(t("home:customTheme.websiteUrlUnavailableWeb"));
+      return;
+    }
+
     if (inputSource === "images") {
       // Image-based generation
       if (aiImages.length === 0) {
-        showError("Please upload at least one image");
+        showError(t("home:customTheme.uploadAtLeastOneImage"));
         return;
       }
 
@@ -274,16 +301,21 @@ export function AIGeneratorTab({
           model: aiSelectedModel,
         });
         setAiGeneratedPrompt(result.prompt);
-        toast.success("Theme prompt generated successfully");
+        toast.success(t("home:customTheme.themePromptGenerated"));
       } catch (error) {
         showError(
-          `Failed to generate theme: ${error instanceof Error ? error.message : "Unknown error"}`,
+          t("home:customTheme.failedGenerateTheme", {
+            error:
+              error instanceof Error
+                ? error.message
+                : t("home:customTheme.unknownError"),
+          }),
         );
       }
     } else {
       // URL-based generation
       if (!websiteUrl.trim()) {
-        showError("Please enter a website URL");
+        showError(t("home:customTheme.enterWebsiteUrl"));
         return;
       }
 
@@ -296,15 +328,21 @@ export function AIGeneratorTab({
         });
 
         setAiGeneratedPrompt(result.prompt);
-        toast.success("Theme prompt generated from website");
+        toast.success(t("home:customTheme.themePromptGeneratedFromWebsite"));
       } catch (error) {
         showError(
-          `Failed to generate theme: ${error instanceof Error ? error.message : "Unknown error"}`,
+          t("home:customTheme.failedGenerateTheme", {
+            error:
+              error instanceof Error
+                ? error.message
+                : t("home:customTheme.unknownError"),
+          }),
         );
       }
     }
   }, [
     inputSource,
+    isLocalWeb,
     aiImages,
     websiteUrl,
     aiKeywords,
@@ -313,25 +351,26 @@ export function AIGeneratorTab({
     generatePromptMutation,
     generateFromUrlMutation,
     setAiGeneratedPrompt,
+    t,
   ]);
 
-  // Show Pro-only locked state for non-Pro users
-  if (!userBudget) {
+  // Show Pro-only locked state for Electron non-Pro users.
+  if (!canUseImageGeneration) {
     return (
       <div className="space-y-4 mt-4">
         <div className="flex flex-col items-center justify-center py-8 px-4 border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/10">
           <Lock className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold text-center mb-2">
-            AI Theme Generator
+            {t("home:customTheme.aiGeneratorTitle")}
           </h3>
           <p className="text-sm text-muted-foreground text-center max-w-md">
             {hideDyadProUi
-              ? "AI theme generation is not available in this web build."
-              : "Upload screenshots and let AI generate a custom theme prompt tailored to your design style."}
+              ? t("home:customTheme.aiUnavailableWeb")
+              : t("home:customTheme.aiGeneratorDescription")}
           </p>
           {!hideDyadProUi && (
             <p className="text-xs text-muted-foreground/70 mt-2">
-              Pro-only feature
+              {t("home:customTheme.proOnlyFeature")}
             </p>
           )}
         </div>
@@ -343,20 +382,22 @@ export function AIGeneratorTab({
   return (
     <div className="space-y-4 mt-4">
       <div className="space-y-2">
-        <Label htmlFor="ai-name">Theme Name</Label>
+        <Label htmlFor="ai-name">{t("home:customTheme.themeName")}</Label>
         <Input
           id="ai-name"
-          placeholder="My AI-Generated Theme"
+          placeholder={t("home:customTheme.aiThemeNamePlaceholder")}
           value={aiName}
           onChange={(e) => setAiName(e.target.value)}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="ai-description">Description (optional)</Label>
+        <Label htmlFor="ai-description">
+          {t("home:customTheme.descriptionOptional")}
+        </Label>
         <Input
           id="ai-description"
-          placeholder="A brief description of your theme"
+          placeholder={t("home:customTheme.descriptionPlaceholder")}
           value={aiDescription}
           onChange={(e) => setAiDescription(e.target.value)}
         />
@@ -364,7 +405,7 @@ export function AIGeneratorTab({
 
       {/* Input Source Toggle */}
       <div className="space-y-3">
-        <Label>Reference Source</Label>
+        <Label>{t("home:customTheme.referenceSource")}</Label>
         <div className="grid grid-cols-2 gap-4">
           <button
             type="button"
@@ -376,24 +417,35 @@ export function AIGeneratorTab({
             }`}
           >
             <Upload className="h-5 w-5 mb-1" />
-            <span className="font-medium text-sm">Upload Images</span>
+            <span className="font-medium text-sm">
+              {t("home:customTheme.uploadImages")}
+            </span>
             <span className="text-xs text-muted-foreground mt-1">
-              Use screenshots from your device
+              {t("home:customTheme.uploadImagesDescription")}
             </span>
           </button>
           <button
             type="button"
-            onClick={() => setInputSource("url")}
+            onClick={() => {
+              if (!isLocalWeb) {
+                setInputSource("url");
+              }
+            }}
+            disabled={isLocalWeb}
             className={`flex flex-col items-center rounded-lg border p-3 text-center transition-colors ${
               inputSource === "url"
                 ? "border-primary bg-primary/5"
                 : "hover:bg-muted/50"
-            }`}
+            } ${isLocalWeb ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <Link className="h-5 w-5 mb-1" />
-            <span className="font-medium text-sm">Website URL</span>
+            <span className="font-medium text-sm">
+              {t("home:customTheme.websiteUrl")}
+            </span>
             <span className="text-xs text-muted-foreground mt-1">
-              Extract design from a live website
+              {isLocalWeb
+                ? t("home:customTheme.websiteUrlUnavailableWeb")
+                : t("home:customTheme.websiteUrlDescription")}
             </span>
           </button>
         </div>
@@ -402,7 +454,7 @@ export function AIGeneratorTab({
       {/* Image Upload Section - only shown when inputSource is "images" */}
       {inputSource === "images" && (
         <div className="space-y-2">
-          <Label>Reference Images</Label>
+          <Label>{t("home:customTheme.referenceImages")}</Label>
           <div
             className={`border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center cursor-pointer hover:border-muted-foreground/50 transition-colors ${isUploading ? "opacity-50 pointer-events-none" : ""}`}
             onClick={() => fileInputRef.current?.click()}
@@ -422,18 +474,25 @@ export function AIGeneratorTab({
               <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
             )}
             <p className="text-sm text-muted-foreground">
-              {isUploading ? "Uploading..." : "Click to upload images"}
+              {isUploading
+                ? t("common:uploading")
+                : t("home:customTheme.clickUploadImages")}
             </p>
             <p className="text-xs text-muted-foreground/70 mt-1">
-              Upload UI screenshots to inspire your theme
+              {t("home:customTheme.uploadUiScreenshots")}
             </p>
           </div>
 
           {/* Image counter */}
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            {aiImages.length} / {MAX_IMAGES} images
+            {t("home:customTheme.imageCount", {
+              count: aiImages.length,
+              max: MAX_IMAGES,
+            })}
             {aiImages.length >= MAX_IMAGES && (
-              <span className="text-destructive ml-2">• Maximum reached</span>
+              <span className="text-destructive ml-2">
+                {t("home:customTheme.maximumReached")}
+              </span>
             )}
           </p>
 
@@ -444,12 +503,15 @@ export function AIGeneratorTab({
                 <div key={img.path} className="relative group">
                   <img
                     src={img.preview}
-                    alt={`Upload ${index + 1}`}
+                    alt={t("home:customTheme.uploadAlt", {
+                      index: index + 1,
+                    })}
                     className="h-16 w-16 object-cover rounded-md border"
                   />
                   <button
                     onClick={() => handleRemoveImage(index)}
                     className="absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title={t("home:customTheme.removeImage")}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -463,7 +525,9 @@ export function AIGeneratorTab({
       {/* URL Input Section - only shown when inputSource is "url" */}
       {inputSource === "url" && (
         <div className="space-y-2">
-          <Label htmlFor="website-url">Website URL</Label>
+          <Label htmlFor="website-url">
+            {t("home:customTheme.websiteUrl")}
+          </Label>
           <Input
             id="website-url"
             type="url"
@@ -473,28 +537,30 @@ export function AIGeneratorTab({
             disabled={isGenerating}
           />
           <p className="text-xs text-muted-foreground">
-            Enter a website URL to extract its design system
+            {t("home:customTheme.websiteUrlHelp")}
           </p>
         </div>
       )}
 
       {/* Keywords Input */}
       <div className="space-y-2">
-        <Label htmlFor="ai-keywords">Keywords (optional)</Label>
+        <Label htmlFor="ai-keywords">
+          {t("home:customTheme.keywordsOptional")}
+        </Label>
         <Input
           id="ai-keywords"
-          placeholder="modern, minimal, dark mode, glassmorphism..."
+          placeholder={t("home:customTheme.keywordsPlaceholder")}
           value={aiKeywords}
           onChange={(e) => setAiKeywords(e.target.value)}
         />
         <p className="text-xs text-muted-foreground">
-          Add keywords or reference designs to guide the generation
+          {t("home:customTheme.keywordsHelp")}
         </p>
       </div>
 
       {/* Generation Mode Selection */}
       <div className="space-y-3">
-        <Label>Generation Mode</Label>
+        <Label>{t("home:customTheme.generationMode")}</Label>
         <div className="grid grid-cols-2 gap-4">
           <button
             type="button"
@@ -505,10 +571,11 @@ export function AIGeneratorTab({
                 : "hover:bg-muted/50"
             }`}
           >
-            <span className="font-medium">Inspired</span>
+            <span className="font-medium">
+              {t("home:customTheme.inspired")}
+            </span>
             <span className="text-xs text-muted-foreground mt-1">
-              Extracts an abstract, reusable design system. Does not replicate
-              the original UI.
+              {t("home:customTheme.inspiredDescription")}
             </span>
           </button>
           <button
@@ -520,9 +587,11 @@ export function AIGeneratorTab({
                 : "hover:bg-muted/50"
             }`}
           >
-            <span className="font-medium">High Fidelity</span>
+            <span className="font-medium">
+              {t("home:customTheme.highFidelity")}
+            </span>
             <span className="text-xs text-muted-foreground mt-1">
-              Recreates the visual system from the image as closely as possible.
+              {t("home:customTheme.highFidelityDescription")}
             </span>
           </button>
         </div>
@@ -530,20 +599,20 @@ export function AIGeneratorTab({
 
       {/* Model Selection */}
       <div className="space-y-3">
-        <Label>Model Selection</Label>
+        <Label>{t("home:customTheme.modelSelection")}</Label>
         <div
           className="grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-3"
           role="radiogroup"
-          aria-label="Model Selection"
+          aria-label={t("home:customTheme.modelSelection")}
         >
           {isLoadingThemeGenerationModelOptions ? (
             <div className="col-span-full flex items-center justify-center py-3 text-sm text-muted-foreground">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Loading models...
+              {t("home:customTheme.loadingModels")}
             </div>
           ) : themeGenerationModelOptions.length === 0 ? (
             <div className="col-span-full text-center py-3 text-sm text-muted-foreground">
-              No models available
+              {t("home:customTheme.noModelsAvailable")}
             </div>
           ) : (
             themeGenerationModelOptions.map((modelOption) => (
@@ -573,6 +642,7 @@ export function AIGeneratorTab({
           isLoadingThemeGenerationModelOptions ||
           !aiSelectedModel ||
           isGenerating ||
+          (isLocalWeb && inputSource === "url") ||
           (inputSource === "images" && aiImages.length === 0) ||
           (inputSource === "url" && !websiteUrl.trim())
         }
@@ -583,34 +653,36 @@ export function AIGeneratorTab({
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             {inputSource === "url"
-              ? "Generating from website..."
-              : "Generating prompt..."}
+              ? t("home:customTheme.generatingFromWebsite")
+              : t("home:customTheme.generatingPrompt")}
           </>
         ) : (
           <>
             <Sparkles className="mr-2 h-4 w-4" />
-            Generate Theme Prompt
+            {t("home:customTheme.generateThemePrompt")}
           </>
         )}
       </Button>
 
       {/* Generated Prompt Display */}
       <div className="space-y-2">
-        <Label htmlFor="ai-prompt">Generated Prompt</Label>
+        <Label htmlFor="ai-prompt">
+          {t("home:customTheme.generatedPrompt")}
+        </Label>
         {aiGeneratedPrompt ? (
           <Textarea
             id="ai-prompt"
             className="min-h-[200px] font-mono text-sm"
             value={aiGeneratedPrompt}
             onChange={(e) => setAiGeneratedPrompt(e.target.value)}
-            placeholder="Generated prompt will appear here..."
+            placeholder={t("home:customTheme.generatedPromptPlaceholder")}
           />
         ) : (
           <div className="min-h-[100px] border rounded-md p-4 flex items-center justify-center text-muted-foreground text-sm text-center">
-            No prompt generated yet.{" "}
+            {t("home:customTheme.noPromptGeneratedYet")}{" "}
             {inputSource === "images"
-              ? 'Upload images and click "Generate" to create a theme prompt.'
-              : 'Enter a website URL and click "Generate" to extract a theme.'}
+              ? t("home:customTheme.noPromptGeneratedImages")
+              : t("home:customTheme.noPromptGeneratedUrl")}
           </div>
         )}
       </div>
@@ -625,10 +697,10 @@ export function AIGeneratorTab({
           {isSaving ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
+              {t("common:saving")}
             </>
           ) : (
-            "Save Theme"
+            t("home:customTheme.saveTheme")
           )}
         </Button>
       )}

@@ -423,6 +423,11 @@ export interface LocalWebRpcService
       | "getTemplates"
       | "getThemes"
       | "getCustomThemes"
+      | "getThemeGenerationModelOptions"
+      | "saveThemeImage"
+      | "cleanupThemeImages"
+      | "generateThemePrompt"
+      | "generateThemeFromUrl"
       | "getAppTheme"
       | "listPrompts"
       | "listAppCollections"
@@ -651,6 +656,11 @@ export const LOCAL_WEB_RPC_ALLOWLIST = [
   templateContracts.getThemes.channel,
   templateContracts.setAppTheme.channel,
   templateContracts.getCustomThemes.channel,
+  templateContracts.getThemeGenerationModelOptions.channel,
+  templateContracts.saveThemeImage.channel,
+  templateContracts.cleanupThemeImages.channel,
+  templateContracts.generateThemePrompt.channel,
+  templateContracts.generateThemeFromUrl.channel,
   templateContracts.getAppTheme.channel,
   templateContracts.createCustomTheme.channel,
   templateContracts.updateCustomTheme.channel,
@@ -1046,6 +1056,22 @@ export async function registerLocalWebRpcHandlers(
   );
   registry.register(templateContracts.getCustomThemes, () =>
     resolvedService.getCustomThemes(),
+  );
+  registry.register(templateContracts.getThemeGenerationModelOptions, () =>
+    resolvedService.getThemeGenerationModelOptions(),
+  );
+  registry.register(templateContracts.saveThemeImage, (_context, params) =>
+    resolvedService.saveThemeImage(params),
+  );
+  registry.register(templateContracts.cleanupThemeImages, (_context, params) =>
+    resolvedService.cleanupThemeImages(params),
+  );
+  registry.register(templateContracts.generateThemePrompt, (_context, params) =>
+    resolvedService.generateThemePrompt(params),
+  );
+  registry.register(
+    templateContracts.generateThemeFromUrl,
+    (_context, params) => resolvedService.generateThemeFromUrl(params),
   );
   registry.register(templateContracts.getAppTheme, (_context, params) =>
     resolvedService.getAppTheme(params.appId),
@@ -1489,6 +1515,7 @@ async function createDefaultService(): Promise<LocalWebRpcService> {
     }),
     createDefaultLocalWebIntegrationService({
       settingsStore,
+      pathResolver,
     }),
     await createDefaultWorkflowService(),
   );

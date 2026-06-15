@@ -17,19 +17,20 @@ import { cn } from "@/lib/utils";
 import {
   THINKING_EFFORT_DEFAULT,
   THINKING_EFFORT_OPTIONS,
-  getThinkingEffortOption,
   type ThinkingEffortLevel,
 } from "@/lib/thinkingEffort";
+import { useTranslation } from "react-i18next";
 
 export function ThinkingEffortSelector() {
   const { settings, updateSettings } = useSettings();
+  const { t } = useTranslation("settings");
 
   if (!settings) {
     return null;
   }
 
   const currentValue = settings.thinkingBudget ?? THINKING_EFFORT_DEFAULT;
-  const currentOption = getThinkingEffortOption(currentValue);
+  const currentLabel = t(`ai.thinkingEffort.${currentValue}.label`);
 
   const handleSelect = (value: ThinkingEffortLevel) => {
     updateSettings({ thinkingBudget: value });
@@ -47,15 +48,12 @@ export function ThinkingEffortSelector() {
           }
         >
           <GaugeIcon className="h-3.5 w-3.5" />
-          <span className="truncate">{currentOption.label}</span>
+          <span className="truncate">{currentLabel}</span>
         </TooltipTrigger>
-        <TooltipContent>
-          Effort: how hard the model thinks before responding. Applies to
-          reasoning-capable models.
-        </TooltipContent>
+        <TooltipContent>{t("ai.thinkingEffort.tooltip")}</TooltipContent>
       </Tooltip>
       <DropdownMenuContent className="w-64" align="start">
-        <DropdownMenuLabel>Effort</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("ai.thinkingEffort.label")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {THINKING_EFFORT_OPTIONS.map((option) => {
           const isSelected = option.value === currentValue;
@@ -72,13 +70,16 @@ export function ThinkingEffortSelector() {
               <div className="flex w-full items-start justify-between gap-2">
                 <div className="min-w-0 flex flex-col">
                   <span className="text-[13px] leading-tight">
-                    {option.label}
+                    {t(`ai.thinkingEffort.${option.value}.label`)}
                     {option.value === THINKING_EFFORT_DEFAULT && (
-                      <span className="text-muted-foreground"> (default)</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        {t("ai.thinkingEffort.defaultSuffix")}
+                      </span>
                     )}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    {option.description}
+                    {t(`ai.thinkingEffort.${option.value}.description`)}
                   </span>
                 </div>
                 {isSelected && (

@@ -199,6 +199,44 @@ describe("LocalWebCoreService", () => {
     });
   });
 
+  it("forwards Local Web theme generation operations through injected dependencies", async () => {
+    const service = createLocalWebCoreService(deps);
+
+    await expect(
+      service.saveThemeImage({
+        data: Buffer.from("image").toString("base64"),
+        filename: "reference.png",
+      }),
+    ).resolves.toEqual({ path: "/tmp/reference.png" });
+    await expect(
+      service.generateThemePrompt({
+        imagePaths: ["/tmp/reference.png"],
+        keywords: "modern",
+        generationMode: "inspired",
+        model: "dyad/theme-generator/openai",
+      }),
+    ).resolves.toEqual({ prompt: "<theme>generated</theme>" });
+    await expect(
+      service.cleanupThemeImages({ paths: ["/tmp/reference.png"] }),
+    ).resolves.toBeUndefined();
+    await expect(
+      service.generateThemeFromUrl({
+        url: "https://example.com",
+        keywords: "",
+        generationMode: "inspired",
+        model: "dyad/theme-generator/openai",
+      }),
+    ).rejects.toMatchObject({
+      kind: DyadErrorKind.Precondition,
+      message:
+        "Website URL theme generation is not available in Local Web mode yet.",
+    });
+
+    expect(deps.saveThemeImage).toHaveBeenCalledOnce();
+    expect(deps.generateThemePrompt).toHaveBeenCalledOnce();
+    expect(deps.cleanupThemeImages).toHaveBeenCalledOnce();
+  });
+
   it("forwards app detail diagnostics and logs through injected dependencies", async () => {
     const service = createLocalWebCoreService(deps);
     const logEntry = {
@@ -326,6 +364,12 @@ function createDeps() {
     })),
     getTemplates: vi.fn(async () => []),
     getThemes: vi.fn(async () => []),
+    getThemeGenerationModelOptions: vi.fn(async () => []),
+    saveThemeImage: vi.fn(async () => ({ path: "/tmp/reference.png" })),
+    cleanupThemeImages: vi.fn(async () => undefined),
+    generateThemePrompt: vi.fn(async () => ({
+      prompt: "<theme>generated</theme>",
+    })),
     getLanguageModelProviders: vi.fn(async () => []),
     getLanguageModels: vi.fn(async () => []),
     getLanguageModelsByProviders: vi.fn(async () => ({})),

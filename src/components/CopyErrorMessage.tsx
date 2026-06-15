@@ -5,6 +5,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { useTranslation } from "react-i18next";
 
 interface CopyErrorMessageProps {
   errorMessage: string;
@@ -15,6 +16,7 @@ export const CopyErrorMessage = ({
   errorMessage,
   className = "",
 }: CopyErrorMessageProps) => {
+  const { t } = useTranslation(["chat", "common", "errors"]);
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = async (e: React.MouseEvent) => {
@@ -45,17 +47,17 @@ export const CopyErrorMessage = ({
         {isCopied ? (
           <>
             <Check size={14} />
-            <span>Copied</span>
+            <span>{t("common:copied")}</span>
           </>
         ) : (
           <>
             <Copy size={14} />
-            <span>Copy</span>
+            <span>{t("chat:copy")}</span>
           </>
         )}
       </TooltipTrigger>
       <TooltipContent>
-        {isCopied ? "Copied!" : "Copy error message"}
+        {isCopied ? t("common:copied") : t("errors:copyError")}
       </TooltipContent>
     </Tooltip>
   );

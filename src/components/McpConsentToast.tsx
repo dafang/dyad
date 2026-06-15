@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import { X, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface McpConsentToastProps {
   toastId: string | number;
@@ -20,6 +21,7 @@ export function McpConsentToast({
   inputPreview,
   onDecision,
 }: McpConsentToastProps) {
+  const { t } = useTranslation(["chat", "common"]);
   const handleClose = () => toast.dismiss(toastId);
 
   const handle = (d: "accept-once" | "accept-always" | "decline") => {
@@ -102,21 +104,22 @@ export function McpConsentToast({
                 </div>
               </div>
               <h3 className="ml-3 text-base font-semibold text-amber-900 dark:text-amber-100">
-                Tool wants to run
+                {t("chat:mcpConsent.toolWantsToRun")}
               </h3>
               <button
                 onClick={handleClose}
                 className="ml-auto flex-shrink-0 p-1.5 text-amber-500 dark:text-slate-400 hover:text-amber-700 dark:hover:text-slate-200 transition-colors duration-200 rounded-md hover:bg-amber-100/50 dark:hover:bg-slate-700/50"
-                aria-label="Close"
+                aria-label={t("common:close")}
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="space-y-2 text-sm">
               <p>
-                <span className="font-semibold">{toolName}</span> from
-                <span className="font-semibold"> {serverName}</span> requests
-                your consent.
+                {t("chat:mcpConsent.toolRequestsConsent", {
+                  toolName,
+                  serverName,
+                })}
               </p>
               {toolDescription && (
                 <div>
@@ -136,7 +139,7 @@ export function McpConsentToast({
                       className="mt-1 text-xs font-medium text-amber-700 hover:underline dark:text-amber-300"
                       onClick={() => setIsExpanded((v) => !v)}
                     >
-                      {isExpanded ? "Show less" : "Show more"}
+                      {isExpanded ? t("common:showLess") : t("common:showMore")}
                     </button>
                   )}
                 </div>
@@ -161,7 +164,9 @@ export function McpConsentToast({
                       className="mt-1 text-xs font-medium text-amber-700 hover:underline dark:text-amber-300"
                       onClick={() => setIsInputExpanded((v) => !v)}
                     >
-                      {isInputExpanded ? "Show less" : "Show more"}
+                      {isInputExpanded
+                        ? t("common:showLess")
+                        : t("common:showMore")}
                     </button>
                   )}
                 </div>
@@ -173,7 +178,7 @@ export function McpConsentToast({
                 size="sm"
                 className="px-6"
               >
-                Allow once
+                {t("chat:allowOnce")}
               </Button>
               <Button
                 onClick={() => handle("accept-always")}
@@ -181,7 +186,7 @@ export function McpConsentToast({
                 variant="secondary"
                 className="px-6"
               >
-                Always allow
+                {t("chat:alwaysAllow")}
               </Button>
               <Button
                 onClick={() => handle("decline")}
@@ -189,7 +194,7 @@ export function McpConsentToast({
                 variant="outline"
                 className="px-6"
               >
-                Decline
+                {t("common:decline")}
               </Button>
             </div>
           </div>

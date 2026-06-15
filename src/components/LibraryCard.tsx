@@ -11,6 +11,7 @@ import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog"
 import { EditThemeDialog } from "@/components/EditThemeDialog";
 import { showError } from "@/lib/toast";
 import type { CustomTheme } from "@/ipc/types";
+import { useTranslation } from "react-i18next";
 
 export type LibraryItem =
   | { type: "theme"; data: CustomTheme }
@@ -45,8 +46,11 @@ export function LibraryCard({
   }) => Promise<void>;
   onDeletePrompt?: (id: number) => Promise<void>;
 }) {
+  const { t } = useTranslation("home");
   const config = CARD_TYPE_CONFIG[item.type];
   const Icon = config.icon;
+  const typeLabel =
+    item.type === "theme" ? t("library.typeTheme") : t("library.typePrompt");
 
   const title = item.type === "theme" ? item.data.name : item.data.title;
   const description = item.data.description;
@@ -63,7 +67,7 @@ export function LibraryCard({
         className={cn("absolute top-3 right-3 gap-1", config.badgeClass)}
       >
         <Icon className="h-3 w-3" />
-        {config.label}
+        {typeLabel}
       </Badge>
       <div className="space-y-2">
         <div className="flex items-start justify-between pr-20">
@@ -107,6 +111,7 @@ export function LibraryCard({
 }
 
 function ThemeActions({ theme }: { theme: CustomTheme }) {
+  const { t } = useTranslation("home");
   const updateThemeMutation = useUpdateCustomTheme();
   const deleteThemeMutation = useDeleteCustomTheme();
   const isDeleting = deleteThemeMutation.isPending;
@@ -125,7 +130,12 @@ function ThemeActions({ theme }: { theme: CustomTheme }) {
       await deleteThemeMutation.mutateAsync(theme.id);
     } catch (error) {
       showError(
-        `Failed to delete theme: ${error instanceof Error ? error.message : "Unknown error"}`,
+        t("customTheme.failedDeleteTheme", {
+          error:
+            error instanceof Error
+              ? error.message
+              : t("customTheme.unknownError"),
+        }),
       );
     }
   };
@@ -135,7 +145,7 @@ function ThemeActions({ theme }: { theme: CustomTheme }) {
       <EditThemeDialog theme={theme} onUpdateTheme={handleUpdate} />
       <DeleteConfirmationDialog
         itemName={theme.name}
-        itemType="Theme"
+        itemType={t("library.typeTheme")}
         onDelete={handleDelete}
         isDeleting={isDeleting}
       />

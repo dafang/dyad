@@ -59,5 +59,8 @@
   "builtIn": "内置",
   "advanced": "高级",
   "required": "必填",
-  "optional": "可选"
+  "optional": "可选",
+  "notifications": "通知",
+  "toggleMenu": "切换菜单",
+  "toggleSidebar": "切换侧边栏"
 }

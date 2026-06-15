@@ -266,7 +266,7 @@ export function ChatHeader({
           <button
             data-testid="toggle-preview-panel-button"
             onClick={onTogglePreview}
-            aria-label={isPreviewOpen ? "Hide preview" : "Show preview"}
+            aria-label={isPreviewOpen ? t("hidePreview") : t("showPreview")}
             aria-pressed={isPreviewOpen}
             className="cursor-pointer p-2 hover:bg-(--background-lightest) rounded-md"
           >

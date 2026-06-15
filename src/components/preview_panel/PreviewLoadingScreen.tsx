@@ -303,7 +303,7 @@ export function PreviewLoadingScreen({
         <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-[var(--background-darkest)] flex-shrink-0">
           <Loader2 className="size-4 animate-spin text-primary flex-shrink-0" />
           <span className="text-sm font-medium text-foreground flex-shrink-0">
-            Preparing preview
+            {t("preview.preparingPreview")}
           </span>
           {latestServerLine && (
             <>
@@ -334,7 +334,7 @@ export function PreviewLoadingScreen({
           >
             {sessionEntries.length === 0 ? (
               <p className="italic text-muted-foreground">
-                Waiting for server logs…
+                {t("preview.waitingForServerLogs")}
               </p>
             ) : (
               sessionEntries.map((entry, i) => (
@@ -373,7 +373,7 @@ export function PreviewLoadingScreen({
               >
                 <AlertTriangle size={14} className="flex-shrink-0" />
                 <span className="text-sm font-medium">
-                  {errorCount} error(s)
+                  {t("preview.startupErrorCount", { count: errorCount })}
                 </span>
                 {isErrorsExpanded ? (
                   <ChevronUp size={14} className="flex-shrink-0" />
@@ -400,7 +400,9 @@ export function PreviewLoadingScreen({
                 data-testid="preview-loading-fix-errors-button"
               >
                 <Sparkles size={14} />
-                <span>Fix {errorCount} error(s) with AI</span>
+                <span>
+                  {t("preview.fixStartupErrorsWithAi", { count: errorCount })}
+                </span>
               </button>
             </div>
           </div>

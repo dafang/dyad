@@ -29,8 +29,10 @@ import {
   isChatMenuHiddenSearchValue,
   type ChatHideMenuSearchValue,
 } from "@/lib/chat_search";
+import { useTranslation } from "react-i18next";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const { t } = useTranslation("common");
   const isLocalWeb = isLocalWebRuntime();
   const hideChatMenu = useRouterState({
     select: (state) =>
@@ -161,6 +163,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               richColors
               expand
               duration={settings?.isTestMode ? 500 : undefined}
+              containerAriaLabel={t("notifications")}
             />
             <ReleaseNotesDialog />
           </SidebarProvider>

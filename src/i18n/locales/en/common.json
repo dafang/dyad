@@ -59,5 +59,8 @@
   "builtIn": "Built-in",
   "advanced": "Advanced",
   "required": "Required",
-  "optional": "Optional"
+  "optional": "Optional",
+  "notifications": "Notifications",
+  "toggleMenu": "Toggle Menu",
+  "toggleSidebar": "Toggle Sidebar"
 }

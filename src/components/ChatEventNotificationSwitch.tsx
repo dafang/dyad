@@ -2,16 +2,19 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { MacNotificationGuideDialog } from "./MacNotificationGuideDialog";
 import { useEnableNotifications } from "@/hooks/useEnableNotifications";
+import { useTranslation } from "react-i18next";
 
 export function ChatEventNotificationSwitch() {
   const { isEnabled, enable, disable, showMacGuide, setShowMacGuide } =
     useEnableNotifications();
+  const { t } = useTranslation("settings");
 
   return (
     <>
       <div className="flex items-center space-x-2">
         <Switch
           id="chat-event-notifications"
+          aria-label={t("workflow.chatEventNotification")}
           checked={isEnabled}
           onCheckedChange={async (checked) => {
             if (checked) {
@@ -21,7 +24,9 @@ export function ChatEventNotificationSwitch() {
             }
           }}
         />
-        <Label htmlFor="chat-event-notifications">Enable notifications</Label>
+        <Label htmlFor="chat-event-notifications">
+          {t("workflow.chatEventNotification")}
+        </Label>
       </div>
       <MacNotificationGuideDialog
         open={showMacGuide}

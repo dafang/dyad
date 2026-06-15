@@ -41,6 +41,7 @@ import {
   isSidebarItemActive,
   shouldShowSelectedAppChatList,
 } from "./app-sidebar-state";
+import { useTranslation } from "react-i18next";
 
 // Menu items.
 const items = [
@@ -146,6 +147,7 @@ function AppSidebarRailButton({
 }
 
 export function AppSidebar() {
+  const { t } = useTranslation("home");
   const isLocalWeb = isLocalWebRuntime();
   const { state, setOpen, toggleSidebar } = useSidebar(); // retrieve current sidebar state
   const [hoverState, setHoverState] =
@@ -313,7 +315,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <AppSidebarRailButton
               icon={HelpCircle}
-              label="Help"
+              label={t("navigation.help")}
               isExpanded={state === "expanded"}
               onClick={() => {
                 if (isTouchShell) {
@@ -342,8 +344,15 @@ function AppIcons({
   onTouchActivate: (title: AppSidebarItemTitle) => void;
   isExpanded: boolean;
 }) {
+  const { t } = useTranslation("home");
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
+  const labels: Record<AppSidebarItemTitle, string> = {
+    Apps: t("navigation.apps"),
+    Settings: t("navigation.settings"),
+    Library: t("navigation.library"),
+    Hub: t("navigation.hub"),
+  };
 
   const hoverForTitle = (title: AppSidebarItemTitle): AppSidebarHoverState => {
     switch (title) {
@@ -374,7 +383,7 @@ function AppIcons({
               <SidebarMenuItem key={item.title}>
                 <AppSidebarRailButton
                   icon={item.icon}
-                  label={item.title}
+                  label={labels[item.title]}
                   to={item.to}
                   isActive={isActive}
                   isExpanded={isExpanded}

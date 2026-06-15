@@ -19,21 +19,67 @@
     "stable": "稳定版",
     "beta": "测试版",
     "selectReleaseChannel": "选择发布通道",
+    "releaseChannelStableToast": "正在使用稳定版发布通道",
+    "releaseChannelStableToastDescription": "在新的稳定版可用前，您会继续停留在当前版本；也可以现在手动降级。",
+    "releaseChannelBetaToast": "正在使用测试版发布通道",
+    "downloadStable": "下载稳定版",
     "runtimeMode": "运行时模式",
     "runtimeModeDescription": "选择用于运行应用的运行时。",
+    "runtimeModeHost": "本机（默认）",
+    "runtimeModeDocker": "Docker（实验性）",
+    "runtimeModeCloud": "云沙箱 (Pro)",
+    "runtimeModeUpdateFailed": "更新运行时模式失败：{{message}}",
+    "runtimeModeCloudLockedDescription": "云沙箱是 Dyad Pro 功能。",
+    "runtimeModeUpgradeToPro": "升级到 Pro",
+    "runtimeModeDockerDescriptionBefore": "Docker 模式为",
+    "runtimeModeDockerDescriptionAfter": "，并要求",
+    "runtimeModeDockerDescriptionEnd": "已安装且正在运行。",
+    "runtimeModeCloudDescription": "云沙箱会在远端运行预览，并提供可分享的预览链接。注意：云端模式会消耗 Pro 额度。",
     "runtimeModeSwitchTitle": "切换运行时模式？",
     "runtimeModeSwitchDescription": "切换运行时模式会停止当前正在运行的应用。",
     "runtimeModeSwitchAction": "切换运行时",
     "selectRuntimeMode": "选择运行时模式",
+    "zoomDescription90": "稍微缩小，以便在屏幕上显示更多内容。",
+    "zoomDescription100": "默认缩放级别。",
+    "zoomDescription110": "稍微放大，便于阅读。",
+    "zoomDescription125": "较大缩放，提升可读性。",
+    "zoomDescription150": "最大缩放，提升可访问性。",
     "nodePath": "Node.js 路径配置",
     "browseForNode": "浏览 Node.js",
     "selecting": "选择中...",
     "resetToDefault": "恢复默认",
     "customPath": "自定义路径：",
     "systemPath": "系统 PATH：",
+    "systemPathUnavailable": "系统 PATH（不可用）",
     "notFound": "未找到",
     "nodeConfigured": "Node.js 已正确配置，可以使用。",
-    "nodeSelectFolder": "如果 Node.js 不在系统 PATH 中，请选择其安装文件夹。"
+    "nodeSelectFolder": "如果 Node.js 不在系统 PATH 中，请选择其安装文件夹。",
+    "nodePathUpdated": "Node.js 路径已更新",
+    "nodeNotFoundAtPath": "在路径 \"{{path}}\" 未找到 Node.js",
+    "nodePathSetFailed": "设置 Node.js 路径失败：{{message}}",
+    "nodePathReset": "已恢复为系统 Node.js 路径",
+    "nodePathResetFailed": "重置 Node.js 路径失败：{{message}}",
+    "autoUpdateChanged": "自动更新设置已更改",
+    "restartRequiredDescription": "需要重启 Dyad 后设置才会生效。",
+    "restartDyad": "重启 Dyad",
+    "restartFromTerminal": "请从终端重启",
+    "customAppsFolder": {
+      "label": "自定义应用文件夹",
+      "loading": "加载中...",
+      "selectFolder": "选择文件夹",
+      "defaultFolder": "默认文件夹：",
+      "customFolder": "自定义文件夹：",
+      "webModeDescription": "在 Web 模式下，新应用会存储在本地 Web 服务器数据目录中。浏览器文件夹选择器目前无法向本地服务器授予可复用的可写路径。",
+      "availableDescription": "这是 Dyad 用来存放新应用的顶层文件夹。",
+      "unavailableDescription": "您的应用文件夹不可访问。请确认该文件夹存在且具有写入权限，或更换文件夹。",
+      "webModeSelectionUnavailable": "浏览器文件夹选择器目前无法向本地服务器授予稳定的可写路径。新应用会使用本地 Web 数据目录。",
+      "updated": "自定义应用文件夹已更新",
+      "invalidSelection": "无法使用所选文件夹。请确认它是有效目录且具有写入权限。",
+      "setFailed": "设置自定义应用文件夹失败：{{message}}",
+      "resetSuccess": "Dyad 应用文件夹已恢复默认",
+      "resetFailed": "恢复 Dyad 应用文件夹路径失败：{{message}}",
+      "fetchFailed": "获取 Dyad 应用文件夹路径失败：{{message}}"
+    }
   },
   "workflow": {
     "title": "工作流设置",
@@ -43,7 +89,17 @@
     "autoApprove": "自动批准更改",
     "autoApproveDescription": "将自动批准代码更改并运行。",
     "autoFixProblems": "自动修复问题",
-    "autoFixProblemsDescription": "将自动修复 TypeScript 错误。"
+    "autoFixProblemsDescription": "将自动修复 TypeScript 错误。",
+    "autoFixProblemsDisableHint": "您可以在设置页面关闭自动修复问题。",
+    "appBlueprint": "应用蓝图",
+    "appBlueprintDescription": "创建新应用时，在开始构建前生成轻量级应用蓝图（名称、设计、颜色和模板）。",
+    "autoExpandPreview": "自动展开预览面板",
+    "autoExpandPreviewDescription": "代码更改后自动展开预览面板。",
+    "autoApproveDisableHint": "您可以在设置中关闭自动批准。",
+    "keepPreviewsRunning": "始终保持应用预览运行",
+    "keepPreviewsRunningDescription": "注意：这可能占用更多内存，但在切换应用时可以更快加载预览。",
+    "chatEventNotification": "启用通知",
+    "chatEventNotificationDescription": "当聊天回复完成或问卷需要您输入且应用不在前台时，显示系统通知。"
   },
   "ai": {
     "title": "AI 设置",
@@ -53,12 +109,73 @@
     "low": "低",
     "medium": "中",
     "high": "高",
+    "thinkingEffort": {
+      "label": "思考强度",
+      "tooltip": "思考强度：模型在回复前投入多少推理。适用于支持推理的模型。",
+      "defaultSuffix": "（默认）",
+      "low": {
+        "label": "低",
+        "description": "更快，成本更低"
+      },
+      "medium": {
+        "label": "中",
+        "description": "平衡"
+      },
+      "high": {
+        "label": "高",
+        "description": "更深入推理"
+      }
+    },
     "maxChatTurns": "上下文中最大聊天轮数",
     "maxChatTurnsDescription": "限制上下文中包含的最近聊天轮数。",
     "selectMaxChatTurns": "选择最大轮数",
+    "maxToolCallSteps": "最大工具调用次数（智能体）",
+    "maxToolCallStepsDescription": "限制智能体在暂停前可以执行的工具调用次数。",
+    "selectMaxToolCallSteps": "选择最大工具调用次数",
+    "contextCompaction": "上下文压缩",
     "unlimited": "无限制",
     "turnCount_one": "{{count}} 轮",
     "turnCount_other": "{{count}} 轮",
+    "maxChatTurnsOptions": {
+      "economy": {
+        "label": "精简 (2)",
+        "description": "使用最少上下文，减少 token 用量并提升响应速度。"
+      },
+      "default": {
+        "label": "默认 ({{count}})",
+        "description": "适合大多数对话的平衡上下文大小。"
+      },
+      "plus": {
+        "label": "增强 (5)",
+        "description": "稍微增加上下文，适合更详细的对话。"
+      },
+      "high": {
+        "label": "高 (10)",
+        "description": "扩展上下文，适合需要更多历史的复杂对话。"
+      },
+      "max": {
+        "label": "最大 (100)",
+        "description": "最大上下文（不推荐，成本更高且速度更慢）。"
+      }
+    },
+    "maxToolCallStepsOptions": {
+      "low": {
+        "label": "低 (25)",
+        "description": "限制为 25 次工具调用。适合不需要很多步骤的简单任务。"
+      },
+      "medium": {
+        "label": "中 (50)",
+        "description": "适合直接任务的中等限制。"
+      },
+      "default": {
+        "label": "默认 ({{count}})",
+        "description": "适合大多数任务的平衡限制。"
+      },
+      "high": {
+        "label": "高 (200)",
+        "description": "适合复杂多步骤任务的更高限制（可能增加成本和时间）。"
+      }
+    },
     "providers": "AI 提供商",
     "failedToLoadProviders": "加载 AI 提供商失败：{{message}}",
     "freeTierAvailable": "有免费套餐",
@@ -86,7 +203,8 @@
     "apiKeyEmpty": "API 密钥不能为空。",
     "errorTogglingPro": "切换 Dyad Pro 时出错：{{error}}",
     "failedSaveApiKey": "保存 API 密钥失败。",
-    "failedDeleteApiKey": "删除 API 密钥失败。"
+    "failedDeleteApiKey": "删除 API 密钥失败。",
+    "contextCompactionDescription": "自动压缩较长对话以保持在上下文限制内。原始消息会保留在应用数据目录中。"
   },
   "telemetry": {
     "title": "遥测",
@@ -94,21 +212,40 @@
     "telemetryId": "遥测 ID：",
     "enable": "启用遥测",
     "privacyNotice": "我们使用匿名遥测数据来改进产品。不会收集个人数据。",
-    "acceptAndContinue": "接受并继续"
+    "acceptAndContinue": "接受并继续",
+    "shareAnonymousData": "分享匿名数据？",
+    "helpImprove": "通过匿名使用数据帮助改进 Dyad。",
+    "noCodeOrMessages": "注意：这不会记录您的代码或消息。",
+    "learnMore": "了解更多",
+    "accept": "接受",
+    "reject": "拒绝",
+    "later": "稍后"
   },
   "integrations": {
     "title": "集成"
   },
   "agentPermissions": {
-    "title": "Agent 权限 (Pro)",
-    "description": "配置 Agent 内置工具的权限。",
+    "title": "智能体权限 (Pro)",
+    "titleWithoutPro": "智能体权限",
+    "description": "配置智能体内置工具的权限。",
     "defaultAllowedTools": "默认允许的工具 ({{count}})",
     "ask": "询问",
     "alwaysAllow": "始终允许",
-    "neverAllow": "从不允许"
+    "neverAllow": "从不允许",
+    "toolDescriptions": {
+      "add_dependency": "安装 npm 包。",
+      "execute_sql": "在已连接的数据库中执行 SQL。请分别执行每条 SQL 命令，不要把多条命令合并。",
+      "web_search": "访问训练数据截止时间之后的实时信息。请说明要搜索的内容。",
+      "web_crawl": "抓取网站内容，以便智能体克隆或参考该页面。只在确实需要网页内容时使用。"
+    }
   },
   "toolsMcp": {
     "title": "工具 (MCP)",
+    "pickerDescription": "启用已配置 MCP 服务器中的工具。",
+    "noServersConfiguredPicker": "尚未配置 MCP 服务器。请在「设置 → 工具 (MCP)」中配置。",
+    "environmentVariable": "环境变量",
+    "header": "请求头",
+    "headers": "请求头",
     "name": "名称",
     "namePlaceholder": "我的 MCP 服务器",
     "transport": "传输方式",
@@ -133,12 +270,75 @@
     "noToolsDiscovered": "未发现工具。",
     "noServersConfigured": "尚未配置服务器。",
     "prefilledServer": "已预填 {{name}} MCP 服务器",
+    "itemsSaved": "{{item}}已保存",
+    "noHeadersConfigured": "未配置请求头",
+    "urlRequired": "HTTP MCP 服务器需要填写 URL。",
+    "urlProtocolRequired": "URL 必须使用 http:// 或 https://。",
+    "invalidUrl": "URL 无效：「{{url}}」",
+    "connectingOAuthFor": "正在为「{{name}}」连接 OAuth...",
+    "oauthConnectionSuccessful": "OAuth 连接成功",
+    "oauthFlowFailed": "OAuth 流程失败",
+    "oauthUnsupportedToast": "OAuth 连接失败。此服务器不支持 OAuth。",
+    "serverRequiresAuthenticationMessage": "此服务器需要身份验证。请启用 OAuth 后重试。",
+    "serverRequiresAuthenticationToast": "服务器连接失败。此服务器需要身份验证，请尝试启用 OAuth。",
+    "oauthDisconnected": "已断开 OAuth",
+    "oauthDisconnectFailed": "断开 OAuth 失败",
+    "plaintextTitle": "OAuth token 和客户端密钥未使用系统加密存储",
+    "plaintextDescriptionBefore": "系统密钥环不可用（在 Linux 上通常表示未安装 ",
+    "plaintextDescriptionAfter": "），因此 HTTP MCP 服务器的 OAuth token 和预注册客户端密钥会以未加密形式写入本地数据库。任何能读取 Dyad 数据目录的进程都可以解码它们。客户端密钥尤其敏感，因为它们不会过期。请安装密钥环服务后重新连接，并重新输入预注册客户端密钥以升级存储方式。",
+    "useOAuth": "使用 OAuth",
+    "oauthRequiredForRemote": "大多数远程服务器都需要。",
+    "advancedOAuthOptions": "高级 OAuth 选项",
+    "oauthClientId": "OAuth 客户端 ID",
+    "oauthClientIdHelp": "如果 MCP 服务器要求注册应用，请在此粘贴应用的客户端 ID。否则留空。",
+    "oauthClientIdPlaceholder": "预注册的客户端 ID",
+    "oauthClientSecret": "OAuth 客户端密钥",
+    "oauthClientSecretHelp": "仅当 MCP 服务器随客户端 ID 一起提供密钥时填写。",
+    "oauthClientSecretPlaceholder": "预注册的客户端密钥",
+    "oauthScope": "OAuth 权限范围",
+    "oauthScopeHelp": "要请求的权限，多个权限用空格分隔。留空则使用服务器默认值。",
+    "redirectUriBefore": "如果填写了客户端 ID，请确保将",
+    "redirectUriAfter": "注册为 MCP 服务器的重定向 URI。MCP 服务器通常会提供一个控制台来完成此操作。",
+    "addingServer": "正在添加...",
+    "oauthStatus": "OAuth：{{status}}",
+    "connected": "已连接",
+    "notConnected": "未连接",
+    "connecting": "连接中...",
+    "connect": "连接",
+    "disconnecting": "正在断开...",
+    "disconnect": "断开连接",
+    "toggleServer": "切换 {{name}}",
+    "serverRequiresAuthentication": "服务器需要身份验证",
+    "serverDoesNotSupportOAuth": "服务器不支持 OAuth",
+    "connectionFailed": "连接失败",
+    "enableOAuthAndRetry": "启用 OAuth 并重试",
+    "disableOAuthAndRetry": "停用 OAuth 并重试",
     "deny": "拒绝"
   },
   "experiments": {
     "title": "实验性功能",
+    "description": "不建议启用实验性功能，因为这些功能可能不稳定",
     "enableNativeGit": "启用原生 Git",
-    "enableNativeGitDescription": "无需任何外部 Git 安装，提供更快的原生 Git 性能体验。"
+    "enableNativeGitDescription": "无需任何外部 Git 安装，提供更快的原生 Git 性能体验。",
+    "enableMcpToolSearch": "启用 MCP 工具搜索",
+    "enableMcpToolSearchDescription": "在智能体模式下，让模型按需搜索 MCP 工具，而不是把每个工具定义都列入上下文。需要启用沙箱脚本执行。",
+    "mcpToolSearchRequiresSandbox": "只有开启沙箱脚本执行后才能启用。",
+    "enablePnpmMinimumReleaseAgeWarning": "启用 pnpm 升级警告",
+    "enablePnpmMinimumReleaseAgeWarningDescription": "显示 pnpm release-age 警告 toast 和一键 pnpm 升级操作。",
+    "enableSelectAppFromHomeChatInput": "启用首页聊天输入框选择应用",
+    "enableSelectAppFromHomeChatInputDescription": "在首页聊天输入框中显示应用选择器，以便引用现有应用开始聊天。"
+  },
+  "advanced": {
+    "title": "高级",
+    "description": "除非某些功能无法正常工作，否则建议保留默认设置",
+    "enableNativeGit": "启用原生 Git",
+    "enableNativeGitDescription": "无需任何外部 Git 安装，提供更快的原生 Git 性能体验。",
+    "enableSandboxScriptExecution": "启用沙箱脚本执行",
+    "enableSandboxScriptExecutionDescription": "允许 local-agent 附件脚本通过 execute_sandbox_script 检查文件。",
+    "blockUnsafeNpmPackages": "阻止不安全的 npm 包",
+    "blockUnsafeNpmPackagesDescription": "使用 socket.dev 检测并阻止不安全的包。",
+    "enableMcpServersForBuildMode": "在构建模式中启用 MCP 服务器",
+    "enableMcpServersForBuildModeDescription": "允许在构建模式中使用 MCP 服务器。注意：智能体模式中始终启用 MCP 服务器。"
   },
   "dangerZone": {
     "title": "危险区域",
@@ -146,7 +346,173 @@
     "resetDescription": "这将删除您所有的应用、聊天记录和设置。此操作无法撤销。",
     "resetConfirmation": "您确定要重置所有内容吗？这将删除您所有的应用、聊天记录和设置。此操作无法撤销。",
     "resetting": "正在重置...",
-    "resetSuccess": "已成功重置所有内容。请重新启动应用。"
+    "resetSuccess": "已成功重置所有内容。请重新启动应用。",
+    "unknownError": "发生未知错误"
+  },
+  "settingsSearch": {
+    "placeholder": "搜索设置...",
+    "ariaLabel": "搜索设置",
+    "clearSearch": "清除搜索",
+    "noSettingsFound": "未找到设置",
+    "sections": {
+      "general-settings": "常规",
+      "workflow-settings": "工作流",
+      "ai-settings": "AI",
+      "provider-settings": "模型提供商",
+      "telemetry": "遥测",
+      "integrations": "集成",
+      "agent-permissions": "智能体权限",
+      "tools-mcp": "工具 (MCP)",
+      "advanced": "高级",
+      "experiments": "实验性功能",
+      "danger-zone": "危险区域"
+    },
+    "items": {
+      "setting-theme": {
+        "label": "主题",
+        "description": "在跟随系统、浅色和深色模式之间切换"
+      },
+      "setting-zoom": {
+        "label": "缩放级别",
+        "description": "调整缩放级别以便于阅读内容"
+      },
+      "setting-auto-update": {
+        "label": "自动更新",
+        "description": "有新版本可用时自动更新应用"
+      },
+      "setting-release-channel": {
+        "label": "发布通道",
+        "description": "选择稳定版或测试版发布通道"
+      },
+      "setting-runtime-mode": {
+        "label": "运行时模式",
+        "description": "配置 Node 运行时设置"
+      },
+      "setting-node-path": {
+        "label": "Node 路径",
+        "description": "设置自定义 Node.js 安装路径"
+      },
+      "setting-custom-apps-folder": {
+        "label": "自定义应用文件夹",
+        "description": "设置 Dyad 存放新应用的顶层文件夹"
+      },
+      "setting-default-chat-mode": {
+        "label": "默认聊天模式",
+        "description": "选择新聊天默认使用的模式"
+      },
+      "setting-auto-approve": {
+        "label": "自动批准",
+        "description": "自动批准代码更改并运行"
+      },
+      "setting-auto-fix": {
+        "label": "自动修复问题",
+        "description": "自动修复 TypeScript 错误"
+      },
+      "setting-app-blueprint": {
+        "label": "应用蓝图",
+        "description": "构建新应用前生成轻量级应用蓝图（名称、设计、颜色、模板）"
+      },
+      "setting-auto-expand-preview": {
+        "label": "自动展开预览",
+        "description": "代码更改后自动展开预览面板"
+      },
+      "setting-keep-previews-running": {
+        "label": "保持应用预览持续运行",
+        "description": "避免空闲应用预览在 10 分钟后停止；会占用更多内存，但切换应用时预览加载更快"
+      },
+      "setting-chat-event-notification": {
+        "label": "通知",
+        "description": "当聊天回复完成或问卷需要您输入且应用不在前台时显示系统通知"
+      },
+      "setting-thinking-budget": {
+        "label": "思考预算",
+        "description": "设置 AI 思考 token 预算"
+      },
+      "setting-max-chat-turns": {
+        "label": "最大聊天轮数",
+        "description": "设置最大对话轮数"
+      },
+      "setting-max-tool-call-steps": {
+        "label": "最大工具调用次数（智能体）",
+        "description": "设置本地智能体模式的最大工具调用次数"
+      },
+      "setting-context-compaction": {
+        "label": "上下文压缩",
+        "description": "自动压缩较长对话以保持在上下文限制内"
+      },
+      "provider-settings": {
+        "label": "模型提供商",
+        "description": "配置 AI 模型提供商和 API 密钥"
+      },
+      "setting-telemetry": {
+        "label": "遥测",
+        "description": "启用或禁用匿名使用数据收集"
+      },
+      "setting-github": {
+        "label": "GitHub 集成",
+        "description": "连接您的 GitHub 账户"
+      },
+      "setting-vercel": {
+        "label": "Vercel 集成",
+        "description": "连接 Vercel 账户用于部署"
+      },
+      "setting-supabase": {
+        "label": "Supabase 集成",
+        "description": "连接您的 Supabase 项目"
+      },
+      "setting-neon": {
+        "label": "Neon 集成",
+        "description": "连接您的 Neon 数据库"
+      },
+      "agent-permissions": {
+        "label": "智能体权限",
+        "description": "配置智能体内置工具权限"
+      },
+      "tools-mcp": {
+        "label": "工具 (MCP)",
+        "description": "配置 MCP 服务器和环境变量"
+      },
+      "advanced": {
+        "label": "高级",
+        "description": "Git、沙箱、包管理和 MCP 的高级设置"
+      },
+      "setting-native-git": {
+        "label": "启用原生 Git",
+        "description": "使用原生 Git 获得更快性能，无需外部安装"
+      },
+      "setting-enable-sandbox-script-execution": {
+        "label": "启用沙箱脚本执行",
+        "description": "允许 local-agent 附件脚本通过 execute_sandbox_script 检查文件"
+      },
+      "setting-block-unsafe-npm-packages": {
+        "label": "阻止不安全的 npm 包",
+        "description": "使用 socket.dev 检测并阻止不安全包"
+      },
+      "setting-enable-mcp-servers-for-build-mode": {
+        "label": "在构建模式中启用 MCP 服务器",
+        "description": "允许在构建模式中使用 MCP 服务器"
+      },
+      "setting-enable-cloud-sandbox": {
+        "label": "启用云沙箱 (Pro)",
+        "description": "在云端运行应用，以获得更安全且更少占用本机资源的运行时"
+      },
+      "setting-enable-mcp-tool-search": {
+        "label": "启用 MCP 工具搜索",
+        "description": "让智能体按需搜索 MCP 工具，而不是把每个工具都列入上下文。需要启用沙箱脚本执行"
+      },
+      "setting-enable-pnpm-minimum-release-age-warning": {
+        "label": "启用 pnpm 升级警告",
+        "description": "显示 pnpm release-age 警告 toast 和一键 pnpm 升级操作"
+      },
+      "setting-enable-select-app-from-home-chat-input": {
+        "label": "启用首页聊天输入框选择应用",
+        "description": "在首页聊天输入框中显示应用选择器，以便引用现有应用开始聊天"
+      },
+      "setting-reset": {
+        "label": "重置所有内容",
+        "description": "删除所有应用、聊天记录和设置。此操作无法撤销。"
+      }
+    }
   },
   "apiKey": {
     "fromSettings": "来自设置的 API 密钥",

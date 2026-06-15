@@ -10,6 +10,7 @@ import { PauseCircle, Play, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStreamChat } from "@/hooks/useStreamChat";
 import { selectedChatIdAtom } from "@/atoms/chatAtoms";
+import { useTranslation } from "react-i18next";
 
 interface DyadStepLimitProps {
   node: {
@@ -23,7 +24,9 @@ interface DyadStepLimitProps {
 }
 
 export function DyadStepLimit({ node, children }: DyadStepLimitProps) {
+  const { t } = useTranslation("chat");
   const { steps = "50", limit: _limit = "50", state } = node.properties;
+  const stepCount = Number.parseInt(steps, 10) || 0;
   const isFinished = state === "finished";
   const content = typeof children === "string" ? children : "";
   const chatId = useAtomValue(selectedChatIdAtom);
@@ -49,7 +52,7 @@ export function DyadStepLimit({ node, children }: DyadStepLimitProps) {
     <DyadCard state={state} accentColor="amber" isExpanded={true}>
       <DyadCardHeader icon={<PauseCircle size={15} />} accentColor="amber">
         <span className="font-medium text-sm text-foreground">
-          Paused after {steps} tool calls
+          {t("pausedAfterToolCalls", { count: stepCount })}
         </span>
         {isFinished && (
           <Button
@@ -64,7 +67,7 @@ export function DyadStepLimit({ node, children }: DyadStepLimitProps) {
             ) : (
               <Play size={14} className="mr-1" />
             )}
-            Continue
+            {t("continue")}
           </Button>
         )}
       </DyadCardHeader>

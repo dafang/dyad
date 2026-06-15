@@ -15,7 +15,8 @@ import { isLocalWebRuntime } from "@/lib/runtime_client";
 export function DefaultChatModeSelector() {
   const { settings, updateSettings, envVars } = useSettings();
   const { isQuotaExceeded, isLoading: isQuotaLoading } = useFreeAgentQuota();
-  const { t } = useTranslation("settings");
+  const { t: tSettings } = useTranslation("settings");
+  const { t: tChat } = useTranslation("chat");
 
   if (!settings) {
     return null;
@@ -45,13 +46,15 @@ export function DefaultChatModeSelector() {
   const getModeDisplayName = (mode: ChatMode) => {
     switch (mode) {
       case "build":
-        return "Build";
+        return tChat("chatMode.build");
       case "local-agent":
-        return isProEnabled || isLocalWeb ? "Agent" : "Basic Agent";
+        return isProEnabled || isLocalWeb
+          ? tChat("chatMode.agent")
+          : tChat("chatMode.basicAgent");
       case "ask":
-        return "Ask";
+        return tChat("chatMode.ask");
       case "plan":
-        return "Plan";
+        return tChat("chatMode.plan");
       default:
         throw new Error(`Unknown chat mode: ${mode}`);
     }
@@ -64,7 +67,7 @@ export function DefaultChatModeSelector() {
           htmlFor="default-chat-mode"
           className="text-sm font-medium text-gray-700 dark:text-gray-300"
         >
-          {t("workflow.defaultChatMode")}
+          {tSettings("workflow.defaultChatMode")}
         </label>
         <Select
           value={effectiveDefault}
@@ -78,23 +81,25 @@ export function DefaultChatModeSelector() {
               <SelectItem value="local-agent">
                 <div className="flex flex-col items-start">
                   <span className="font-medium">
-                    {isProEnabled || isLocalWeb ? "Agent" : "Basic Agent"}
+                    {isProEnabled || isLocalWeb
+                      ? tChat("chatMode.agent")
+                      : tChat("chatMode.basicAgent")}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {isProEnabled
-                      ? "Better at bigger tasks"
+                      ? tChat("chatMode.betterAtBiggerTasks")
                       : isLocalWeb
-                        ? "Use your local provider settings"
-                        : "Free tier (10 messages/day)"}
+                        ? tChat("chatMode.localProviderDescription")
+                        : tChat("chatMode.freeTier")}
                   </span>
                 </div>
               </SelectItem>
             )}
             <SelectItem value="build">
               <div className="flex flex-col items-start">
-                <span className="font-medium">Build</span>
+                <span className="font-medium">{tChat("chatMode.build")}</span>
                 <span className="text-xs text-muted-foreground">
-                  Generate and edit code
+                  {tChat("chatMode.buildDescription")}
                 </span>
               </div>
             </SelectItem>
@@ -102,7 +107,7 @@ export function DefaultChatModeSelector() {
         </Select>
       </div>
       <div className="text-sm text-gray-500 dark:text-gray-400">
-        {t("workflow.defaultChatModeDescription")}
+        {tSettings("workflow.defaultChatModeDescription")}
       </div>
     </div>
   );

@@ -16,6 +16,13 @@ import { Loader2, ChevronRight } from "lucide-react";
 import { AgentToolConsent } from "@/lib/schemas";
 import { useTranslation } from "react-i18next";
 
+const AGENT_TOOL_DESCRIPTION_KEYS: Record<string, string> = {
+  add_dependency: "agentPermissions.toolDescriptions.add_dependency",
+  execute_sql: "agentPermissions.toolDescriptions.execute_sql",
+  web_search: "agentPermissions.toolDescriptions.web_search",
+  web_crawl: "agentPermissions.toolDescriptions.web_crawl",
+};
+
 export function AgentToolsSettings() {
   const { tools, isLoading, setConsent } = useAgentTools();
   const { t } = useTranslation("settings");
@@ -110,13 +117,25 @@ function ToolConsentRow({
   onConsentChange: (consent: AgentToolConsent) => void;
 }) {
   const { t } = useTranslation("settings");
+  const descriptionKey = AGENT_TOOL_DESCRIPTION_KEYS[name];
+  const localizedDescription = descriptionKey
+    ? t(descriptionKey, { defaultValue: description })
+    : description;
+  const consentLabel =
+    consent === "always"
+      ? t("agentPermissions.alwaysAllow")
+      : consent === "never"
+        ? t("agentPermissions.neverAllow")
+        : t("agentPermissions.ask");
+
   return (
     <div className="border rounded p-3">
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="font-mono text-sm">{name}</div>
           <div className="text-xs text-muted-foreground truncate">
-            {description?.slice(0, 100)} {description?.length > 100 && "..."}
+            {localizedDescription?.slice(0, 100)}
+            {localizedDescription?.length > 100 && "..."}
           </div>
         </div>
         <Select
@@ -124,7 +143,7 @@ function ToolConsentRow({
           onValueChange={(v) => onConsentChange(v as AgentToolConsent)}
         >
           <SelectTrigger className="w-[140px] h-8">
-            <SelectValue />
+            <SelectValue>{consentLabel}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ask">{t("agentPermissions.ask")}</SelectItem>

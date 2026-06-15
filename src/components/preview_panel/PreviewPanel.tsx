@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { ipc } from "@/ipc/types";
 import { useLoadApp } from "@/hooks/useLoadApp";
 import { Button } from "@/components/ui/button";
+import { HttpInvokeAbortError } from "@/ipc/contracts/core";
 
 interface ConsoleHeaderProps {
   isOpen: boolean;
@@ -65,6 +66,7 @@ interface PreviewPanelProps {
 
 // Main PreviewPanel component
 export function PreviewPanel({ onBackToChat }: PreviewPanelProps = {}) {
+  const { t } = useTranslation("home");
   const previewMode = useAtomValue(previewModeAtom);
   const selectedAppId = useAtomValue(selectedAppIdAtom);
   const [isConsoleOpen, setIsConsoleOpen] = useState(false);
@@ -83,6 +85,9 @@ export function PreviewPanel({ onBackToChat }: PreviewPanelProps = {}) {
     try {
       await ipc.app.selectAppForPreview({ appId });
     } catch (error) {
+      if (error instanceof HttpInvokeAbortError) {
+        return;
+      }
       console.error("Failed to notify app selection:", error);
     }
   }, []);
@@ -148,12 +153,12 @@ export function PreviewPanel({ onBackToChat }: PreviewPanelProps = {}) {
             variant="ghost"
             size="sm"
             onClick={onBackToChat}
-            aria-label="Back to chat"
+            aria-label={t("preview.backToChat")}
             className="gap-1.5"
             data-testid="mobile-preview-back-to-chat-button"
           >
             <ArrowLeft size={16} />
-            <span>Chat</span>
+            <span>{t("preview.chat")}</span>
           </Button>
         </div>
       )}

@@ -16,6 +16,7 @@ import { useCreateCustomTheme } from "@/hooks/useCustomThemes";
 import { showError } from "@/lib/toast";
 import { toast } from "sonner";
 import { AIGeneratorTab } from "./AIGeneratorTab";
+import { useTranslation } from "react-i18next";
 
 interface CustomThemeDialogProps {
   open: boolean;
@@ -28,6 +29,7 @@ export function CustomThemeDialog({
   onOpenChange,
   onThemeCreated,
 }: CustomThemeDialogProps) {
+  const { t } = useTranslation(["home", "common"]);
   const [activeTab, setActiveTab] = useState<"manual" | "ai">("ai");
 
   // Manual tab state
@@ -64,14 +66,14 @@ export function CustomThemeDialog({
     const prompt = isManual ? manualPrompt : aiGeneratedPrompt;
 
     if (!name.trim()) {
-      showError("Please enter a theme name");
+      showError(t("home:customTheme.enterThemeName"));
       return;
     }
     if (!prompt.trim()) {
       showError(
         isManual
-          ? "Please enter a theme prompt"
-          : "Please generate a prompt first",
+          ? t("home:customTheme.enterThemePrompt")
+          : t("home:customTheme.generatePromptFirst"),
       );
       return;
     }
@@ -82,12 +84,17 @@ export function CustomThemeDialog({
         description: description.trim() || undefined,
         prompt: prompt.trim(),
       });
-      toast.success("Custom theme created successfully");
+      toast.success(t("home:customTheme.themeCreated"));
       onThemeCreated?.(createdTheme.id);
       await handleClose();
     } catch (error) {
       showError(
-        `Failed to create theme: ${error instanceof Error ? error.message : "Unknown error"}`,
+        t("home:customTheme.failedCreateTheme", {
+          error:
+            error instanceof Error
+              ? error.message
+              : t("home:customTheme.unknownError"),
+        }),
       );
     }
   }, [
@@ -101,6 +108,7 @@ export function CustomThemeDialog({
     createThemeMutation,
     onThemeCreated,
     handleClose,
+    t,
   ]);
 
   const isSaving = createThemeMutation.isPending;
@@ -109,10 +117,9 @@ export function CustomThemeDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Custom Theme</DialogTitle>
+          <DialogTitle>{t("home:customTheme.createTitle")}</DialogTitle>
           <DialogDescription>
-            Create a custom theme using manual configuration or AI-powered
-            generation.
+            {t("home:customTheme.createDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -124,11 +131,11 @@ export function CustomThemeDialog({
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="ai" className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
-              AI-Powered Generator
+              {t("home:customTheme.aiPoweredGenerator")}
             </TabsTrigger>
             <TabsTrigger value="manual" className="flex items-center gap-2">
               <PenLine className="h-4 w-4" />
-              Manual Configuration
+              {t("home:customTheme.manualConfiguration")}
             </TabsTrigger>
           </TabsList>
 
@@ -150,30 +157,36 @@ export function CustomThemeDialog({
           {/* Manual Configuration Tab */}
           <TabsContent value="manual" className="space-y-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="manual-name">Theme Name</Label>
+              <Label htmlFor="manual-name">
+                {t("home:customTheme.themeName")}
+              </Label>
               <Input
                 id="manual-name"
-                placeholder="My Custom Theme"
+                placeholder={t("home:customTheme.themeNamePlaceholder")}
                 value={manualName}
                 onChange={(e) => setManualName(e.target.value)}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="manual-description">Description (optional)</Label>
+              <Label htmlFor="manual-description">
+                {t("home:customTheme.descriptionOptional")}
+              </Label>
               <Input
                 id="manual-description"
-                placeholder="A brief description of your theme"
+                placeholder={t("home:customTheme.descriptionPlaceholder")}
                 value={manualDescription}
                 onChange={(e) => setManualDescription(e.target.value)}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="manual-prompt">Theme Prompt</Label>
+              <Label htmlFor="manual-prompt">
+                {t("home:customTheme.themePrompt")}
+              </Label>
               <Textarea
                 id="manual-prompt"
-                placeholder="Enter your theme system prompt..."
+                placeholder={t("home:customTheme.themePromptPlaceholder")}
                 className="min-h-[200px] font-mono text-sm"
                 value={manualPrompt}
                 onChange={(e) => setManualPrompt(e.target.value)}
@@ -188,10 +201,10 @@ export function CustomThemeDialog({
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
+                  {t("common:saving")}
                 </>
               ) : (
-                "Save Theme"
+                t("home:customTheme.saveTheme")
               )}
             </Button>
           </TabsContent>

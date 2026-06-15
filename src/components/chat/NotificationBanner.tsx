@@ -3,8 +3,10 @@ import { SkippableBanner } from "./SkippableBanner";
 import { MacNotificationGuideDialog } from "../MacNotificationGuideDialog";
 import { useEnableNotifications } from "@/hooks/useEnableNotifications";
 import { useSettings } from "@/hooks/useSettings";
+import { useTranslation } from "react-i18next";
 
 export function NotificationBanner() {
+  const { t } = useTranslation("chat");
   const { settings, updateSettings } = useSettings();
   const { enable, showMacGuide, setShowMacGuide } = useEnableNotifications();
 
@@ -22,8 +24,9 @@ export function NotificationBanner() {
       {showBanner && (
         <SkippableBanner
           icon={Bell}
-          message="Get notified about chat events."
-          enableLabel="Enable"
+          message={t("notification.message")}
+          enableLabel={t("notification.enable")}
+          dismissLabel={t("notification.dismiss")}
           onEnable={enable}
           onSkip={handleSkip}
           data-testid="notification-tip-banner"

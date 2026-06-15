@@ -6,5 +6,15 @@
   "failedToLoad": "加载失败：{{error}}",
   "networkError": "发生网络错误，请检查您的网络连接。",
   "copyError": "复制错误信息",
-  "errorOccurred": "发生了一个错误"
+  "errorOccurred": "发生了一个错误",
+  "boundary": {
+    "title": "抱歉，发生了不该出现的问题！",
+    "description": "加载应用时发生错误...",
+    "errorName": "错误名称：",
+    "errorMessage": "错误消息：",
+    "preparingReport": "正在准备报告...",
+    "reportBug": "报告 Bug",
+    "tipLabel": "提示：",
+    "tipDescription": "可以先尝试关闭并重新打开 Dyad 作为临时解决办法。"
+  }
 }

@@ -1,15 +1,18 @@
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export function LibrarySearchBar({
   value,
   onChange,
-  placeholder = "Search themes and prompts...",
+  placeholder,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
 }) {
+  const { t } = useTranslation("home");
+  const resolvedPlaceholder = placeholder ?? t("library.searchPlaceholder");
   return (
     <div className="mb-6">
       <div
@@ -22,8 +25,8 @@ export function LibrarySearchBar({
         <Search className="absolute left-4 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
-          placeholder={placeholder}
-          aria-label="Search library"
+          placeholder={resolvedPlaceholder}
+          aria-label={t("library.searchAriaLabel")}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="w-full bg-transparent py-3 pl-11 pr-4 text-sm outline-none placeholder:text-muted-foreground"

@@ -2,8 +2,6 @@ import { createLoggedHandler } from "../../../../ipc/handlers/safe_handle";
 import log from "electron-log";
 import path from "path";
 import os from "os";
-import fs from "fs";
-import { readFile, writeFile, unlink, mkdir } from "fs/promises";
 import { themesData, type Theme } from "../../../../shared/themes";
 import { db } from "../../../../db";
 import { apps, customThemes } from "../../../../db/schema";
@@ -24,9 +22,6 @@ import type {
   GenerateThemePromptParams,
   GenerateThemePromptResult,
   GenerateThemeFromUrlParams,
-  SaveThemeImageParams,
-  SaveThemeImageResult,
-  CleanupThemeImagesParams,
   ThemeGenerationModelOption,
 } from "@/ipc/types";
 import { webCrawlResponseSchema } from "./local_agent/tools/web_crawl";
@@ -35,6 +30,12 @@ import {
   resolveBuiltinModelAlias,
 } from "@/ipc/shared/remote_language_model_catalog";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
+import {
+  createThemeGenerationService,
+  HIGH_FIDELITY_META_PROMPT,
+  sanitizeKeywords,
+  THEME_GENERATION_META_PROMPT,
+} from "../services/theme_generation_service";
 
 const logger = log.scope("themes_handlers");
 const handle = createLoggedHandler(logger);
@@ -52,131 +53,23 @@ function sanitizeForPrompt(content: string): string {
   return content.replace(/`{3,}/g, (match) => "\\`".repeat(match.length));
 }
 
-/**
- * Sanitizes user-provided keywords for use in prompts.
- * Limits length and removes potentially dangerous patterns.
- */
-function sanitizeKeywords(keywords: string): string {
-  // Trim and limit length
-  let sanitized = keywords.trim().slice(0, 500);
-  // Remove potential prompt injection patterns
-  sanitized = sanitized.replace(/<\/?[^>]+(>|$)/g, ""); // Strip HTML-like tags
-  sanitized = sanitized.replace(/`{3,}/g, ""); // Remove code block markers
-  return sanitized;
-}
-
 // Directory for storing temporary theme images
 const THEME_IMAGES_TEMP_DIR = path.join(os.tmpdir(), "dyad-theme-images");
 
-// Ensure temp directory exists
-if (!fs.existsSync(THEME_IMAGES_TEMP_DIR)) {
-  fs.mkdirSync(THEME_IMAGES_TEMP_DIR, { recursive: true });
-}
-
-// Get mime type from extension
-function getMimeTypeFromExtension(
-  ext: string,
-): "image/jpeg" | "image/png" | "image/gif" | "image/webp" {
-  const mimeMap: Record<
-    string,
-    "image/jpeg" | "image/png" | "image/gif" | "image/webp"
-  > = {
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-    ".png": "image/png",
-    ".gif": "image/gif",
-    ".webp": "image/webp",
-  };
-  return mimeMap[ext.toLowerCase()] || "image/png";
-}
-
-const THEME_GENERATION_META_PROMPT = `PURPOSE
-- Generate a strict SYSTEM PROMPT that extracts a reusable UI DESIGN SYSTEM from provided images.
-- This is a visual ruleset, not a website blueprint.
-- Extract constraints, scales, and principles — never layouts or compositions.
-- You are NOT recreating, cloning, or reverse-engineering a specific website.
-- The resulting system must be applicable to unrelated products without visual resemblance.
-
-SCOPE & LIMITATIONS (MANDATORY)
-- Do NOT reproduce:
-  - Page layouts
-  - Component hierarchies
-  - Spatial arrangements
-  - Relative positioning between elements
-  - Information architecture
-- Do NOT describe the original interface.
-- Do NOT reference screen structure, sections, or flows.
-- The output must remain abstract, systemic, and transferable.
-
-INPUTS
-- One or more UI images
-- Optional reference name (popular product or known design system)
-- Visual input defines stylistic constraints only (tokens, shapes, motion, density)
-
-FIXED TECH STACK
-- Assume React + Tailwind CSS + shadcn/ui.
-- Hard Rules:
-  - Never ship default shadcn styles
-  - No inline styles
-  - No arbitrary values outside defined scales
-  - All styling must be token-driven
-
-OUTPUT RULES
-- Wrap the entire output in <theme></theme> tags.
-- Output exactly ONE SYSTEM PROMPT that:
-  - Names the inspiration strictly as a stylistic reference, not a target
-  - Defines enforceable rules, never descriptions
-  - Uses imperative language only ("must", "never", "always")
-  - Never mentions images, screenshots, or visual analysis
-  - Produces a system that cannot recreate the original UI even if followed precisely
-
-REQUIRED STRUCTURE
-- Visual Objective (abstract, non-descriptive)
-- Layout & Spacing Rules (scales only, no patterns)
-- Typography System (roles, hierarchy, constraints)
-- Color & Surfaces (tokens, elevation logic)
-- Components & Shape Language (geometry, affordances — no layouts)
-- Motion & Interaction (timing, intent, limits)
-- Forbidden Patterns (explicit anti-cloning rules)
-- Self-Check (verifies abstraction & non-replication)
-`;
-
-const HIGH_FIDELITY_META_PROMPT = `PURPOSE
-- Generate a strict SYSTEM PROMPT that allows an AI to recreate a UI visual system from a provided image.
-- This is a visual subsystem. Do not define roles or personas.
-- Extract rules, not descriptions.
-
-INPUTS
-- One or more UI images
-- Optional reference name (popular product / design system)
-- Image always takes priority.
-
-FIXED TECH STACK
-- Assume React + Tailwind CSS + shadcn/ui.
-- Rules:
-  - Never ship default shadcn styles
-  - No inline styles
-  - No arbitrary values outside defined scales
-
-OUTPUT RULES
-- Wrap the entire output in <theme></theme> tags.
-- Output one SYSTEM PROMPT that:
-  - Explicitly names the inspiration as a guiding reference
-  - Uses hard, enforceable rules only
-  - Is technical and unambiguous
-  - Never mentions the image 
-  - Avoids vague language ("might", "appears", etc.)
-
-REQUIRED STRUCTURE
-- Visual Objective
-- Layout & Spacing Rules
-- Typography System
-- Color & Surfaces
-- Components & Shape Language
-- Motion & Interaction
-- Forbidden Patterns
-- Self-Check
-`;
+const themeGenerationService = createThemeGenerationService({
+  tempDir: THEME_IMAGES_TEMP_DIR,
+  readSettings,
+  resolveModelAlias: resolveBuiltinModelAlias,
+  getModelClient,
+  streamText,
+  cancelOrphanedBaseStream,
+  prompts: {
+    inspired: THEME_GENERATION_META_PROMPT,
+    "high-fidelity": HIGH_FIDELITY_META_PROMPT,
+  },
+  isTestBuild: () => IS_TEST_BUILD,
+  logger,
+});
 
 // Web crawl "inspired" mode prompt - separate from image-based prompt
 const WEB_CRAWL_THEME_GENERATION_META_PROMPT = `PURPOSE
@@ -515,81 +408,13 @@ export function registerThemesHandlers() {
   );
 
   // Save theme image to temp directory
-  handle(
-    "save-theme-image",
-    async (_, params: SaveThemeImageParams): Promise<SaveThemeImageResult> => {
-      const { data, filename } = params;
-
-      // Validate base64 data
-      if (!data || typeof data !== "string") {
-        throw new DyadError("Invalid image data", DyadErrorKind.Validation);
-      }
-
-      // Validate and extract extension
-      const ext = path.extname(filename).toLowerCase();
-      const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-      if (!validExtensions.includes(ext)) {
-        throw new Error(
-          `Invalid image extension: ${ext}. Supported: ${validExtensions.join(", ")}`,
-        );
-      }
-
-      // Generate unique filename
-      const uniqueFilename = `${Date.now()}-${Math.random().toString(36).slice(2, 11)}${ext}`;
-      const filePath = path.join(THEME_IMAGES_TEMP_DIR, uniqueFilename);
-
-      // Validate size (base64 to bytes approximation)
-      const sizeInBytes = (data.length * 3) / 4;
-      if (sizeInBytes > 10 * 1024 * 1024) {
-        throw new DyadError(
-          "Image size exceeds 10MB limit",
-          DyadErrorKind.Validation,
-        );
-      }
-
-      // Ensure temp directory exists
-      await mkdir(THEME_IMAGES_TEMP_DIR, { recursive: true });
-
-      // Write file
-      const buffer = Buffer.from(data, "base64");
-      await writeFile(filePath, buffer);
-
-      return { path: filePath };
-    },
+  handle("save-theme-image", async (_, params) =>
+    themeGenerationService.saveThemeImage(params),
   );
 
   // Cleanup theme images from temp directory
-  handle(
-    "cleanup-theme-images",
-    async (_, params: CleanupThemeImagesParams): Promise<void> => {
-      const { paths } = params;
-
-      for (const filePath of paths) {
-        // Security: only delete files in our temp directory
-        // Use path.resolve() to normalize and prevent path traversal attacks
-        const normalizedPath = path.resolve(filePath);
-        const normalizedTempDir = path.resolve(THEME_IMAGES_TEMP_DIR);
-        if (!normalizedPath.startsWith(normalizedTempDir + path.sep)) {
-          throw new Error(
-            "Invalid path: cannot delete files outside temp directory",
-          );
-        }
-
-        try {
-          await unlink(filePath);
-          logger.log(`Cleaned up theme image: ${filePath}`);
-        } catch (error) {
-          // File might already be deleted (ENOENT), that's okay
-          // But other errors (permissions, etc.) should be reported
-          if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-            throw new DyadError(
-              "Failed to cleanup temporary image file",
-              DyadErrorKind.External,
-            );
-          }
-        }
-      }
-    },
+  handle("cleanup-theme-images", async (_, params) =>
+    themeGenerationService.cleanupThemeImages(params),
   );
 
   handle(
@@ -598,149 +423,7 @@ export function registerThemesHandlers() {
       _,
       params: GenerateThemePromptParams,
     ): Promise<GenerateThemePromptResult> => {
-      const settings = readSettings();
-
-      // Return mock response in test mode
-      if (IS_TEST_BUILD) {
-        return {
-          prompt: `<theme>
-# Test Mode Theme
-
-## Visual Objective
-Modern dark theme with purple accents for testing.
-
-</theme>`,
-        };
-      }
-
-      if (!settings.enableDyadPro) {
-        throw new Error(
-          "Dyad Pro is required for AI theme generation. Please enable Dyad Pro in Settings.",
-        );
-      }
-
-      // Validate inputs - image paths are required
-      if (params.imagePaths.length === 0) {
-        throw new DyadError(
-          "Please upload at least one image to generate a theme",
-          DyadErrorKind.External,
-        );
-      }
-
-      if (params.imagePaths.length > 5) {
-        throw new DyadError("Maximum 5 images allowed", DyadErrorKind.External);
-      }
-
-      // Validate keywords length
-      if (params.keywords.length > 500) {
-        throw new DyadError(
-          "Keywords must be less than 500 characters",
-          DyadErrorKind.Validation,
-        );
-      }
-
-      // Validate generation mode
-      if (!["inspired", "high-fidelity"].includes(params.generationMode)) {
-        throw new DyadError(
-          "Invalid generation mode",
-          DyadErrorKind.Validation,
-        );
-      }
-
-      // Validate and map model selection
-      const selectedModel = await resolveBuiltinModelAlias(params.model);
-      if (!selectedModel) {
-        throw new Error(
-          `Invalid model selection: alias "${params.model}" could not be resolved`,
-        );
-      }
-
-      // Use the selected model for theme generation
-      const { modelClient } = await getModelClient(
-        {
-          provider: selectedModel.providerId,
-          name: selectedModel.apiName,
-        },
-        settings,
-      );
-
-      // Select system prompt based on generation mode
-      const systemPrompt =
-        params.generationMode === "high-fidelity"
-          ? HIGH_FIDELITY_META_PROMPT
-          : THEME_GENERATION_META_PROMPT;
-
-      // Build the user input prompt (sanitize user-provided keywords)
-      const keywordsPart = sanitizeKeywords(params.keywords) || "N/A";
-      const imagesPart =
-        params.imagePaths.length > 0
-          ? `${params.imagePaths.length} image(s) attached`
-          : "N/A";
-      const userInput = `inspired by: ${keywordsPart}
-images: ${imagesPart}`;
-
-      // Generate theme with images - read from file paths
-      try {
-        const contentParts: (TextPart | ImagePart)[] = [];
-
-        // Add user input text first
-        contentParts.push({ type: "text", text: userInput });
-
-        // Read images from file paths and add to content
-        for (const imagePath of params.imagePaths) {
-          // Security: validate path is in our temp directory
-          // Use path.resolve() to normalize and prevent path traversal attacks
-          const normalizedImagePath = path.resolve(imagePath);
-          const normalizedTempDir = path.resolve(THEME_IMAGES_TEMP_DIR);
-          if (!normalizedImagePath.startsWith(normalizedTempDir + path.sep)) {
-            throw new Error(
-              "Invalid image path: images must be uploaded through the theme dialog",
-            );
-          }
-
-          try {
-            const imageBuffer = await readFile(imagePath);
-            const base64Data = imageBuffer.toString("base64");
-            const ext = path.extname(imagePath).toLowerCase();
-            const mimeType = getMimeTypeFromExtension(ext);
-
-            contentParts.push({
-              type: "image",
-              image: base64Data,
-              mimeType,
-            } as ImagePart);
-          } catch {
-            throw new Error(
-              `Failed to read image file: ${path.basename(imagePath)}`,
-            );
-          }
-        }
-
-        const stream = streamText({
-          model: modelClient.model,
-          system: systemPrompt,
-          maxRetries: 1,
-          messages: [{ role: "user", content: contentParts }],
-        });
-
-        // Read .textStream now (not lazily) so the SDK's tee runs
-        // synchronously, then cancel the orphaned branch before any
-        // chunks are pumped. `await stream.text` would internally
-        // consume `.fullStream` and leave the orphan queueing the
-        // whole response.
-        const textStream = stream.textStream;
-        cancelOrphanedBaseStream(stream);
-        let result = "";
-        for await (const chunk of textStream) result += chunk;
-
-        return { prompt: result };
-      } catch (error) {
-        throw new Error(
-          error instanceof Error
-            ? error.message
-            : "Failed to process images for theme generation. Please try with fewer or smaller images, or use manual mode.",
-        );
-      }
+      return themeGenerationService.generateThemePrompt(params);
     },
   );
 

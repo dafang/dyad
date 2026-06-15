@@ -121,6 +121,7 @@ export async function startLocalWebRuntime(
   const integrationService = createDefaultLocalWebIntegrationService({
     settingsStore,
     hostCapabilities,
+    pathResolver,
   });
   const workflowService = await createDefaultWorkflowService();
   const rpcService = composeLocalWebRpcService(

@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTranslation } from "react-i18next";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -239,11 +240,13 @@ function SidebarTrigger({
   ...props
 }: React.ComponentProps<"button">) {
   const { toggleSidebar } = useSidebar();
+  const { t } = useTranslation("common");
+  const label = t("toggleMenu");
 
   return (
     <Tooltip>
       <TooltipTrigger
-        aria-label="Toggle Menu"
+        aria-label={label}
         data-sidebar="trigger"
         data-slot="sidebar-trigger"
         className={cn(
@@ -257,10 +260,10 @@ function SidebarTrigger({
         {...props}
       >
         <Menu className="size-5" />
-        <span className="sr-only">Toggle Menu</span>
+        <span className="sr-only">{label}</span>
       </TooltipTrigger>
       <TooltipContent side="right" align="center">
-        Toggle Menu
+        {label}
       </TooltipContent>
     </Tooltip>
   );
@@ -268,15 +271,17 @@ function SidebarTrigger({
 
 function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
   const { toggleSidebar } = useSidebar();
+  const { t } = useTranslation("common");
+  const label = t("toggleSidebar");
 
   return (
     <button
       data-sidebar="rail"
       data-slot="sidebar-rail"
-      aria-label="Toggle Sidebar"
+      aria-label={label}
       tabIndex={-1}
       onClick={toggleSidebar}
-      title="Toggle Sidebar"
+      title={label}
       className={cn(
         "hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
         "in-data-[side=left][data-state=collapsed]_&]:cursor-e-resize in-data-[side=right][data-state=collapsed]_&]:cursor-w-resize",

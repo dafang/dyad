@@ -44,8 +44,10 @@ import {
   webHostCapabilities,
 } from "@/lib/web_host_capabilities";
 import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
+import { useTranslation } from "react-i18next";
 
 export default function SettingsPage() {
+  const { t } = useTranslation(["settings", "common"]);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const appVersion = useAppVersion();
@@ -66,11 +68,13 @@ export default function SettingsPage() {
         return;
       }
       await ipc.system.resetAll();
-      showSuccess("Successfully reset everything. Restart the application.");
+      showSuccess(t("settings:dangerZone.resetSuccess"));
     } catch (error) {
       console.error("Error resetting:", error);
       showError(
-        error instanceof Error ? error.message : "An unknown error occurred",
+        error instanceof Error
+          ? error.message
+          : t("settings:dangerZone.unknownError"),
       );
     } finally {
       setIsResetting(false);
@@ -84,7 +88,7 @@ export default function SettingsPage() {
         <BackButton />
         <div className="flex justify-between mb-4">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Settings
+            {t("settings:title")}
           </h1>
         </div>
 
@@ -106,17 +110,19 @@ export default function SettingsPage() {
               className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
             >
               <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Telemetry
+                {t("settings:telemetry.title")}
               </h2>
               <div id={SETTING_IDS.telemetry} className="space-y-2">
                 <TelemetrySwitch />
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  This records anonymous usage data to improve the product.
+                  {t("settings:telemetry.description")}
                 </div>
               </div>
 
               <div className="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
-                <span className="mr-2 font-medium">Telemetry ID:</span>
+                <span className="mr-2 font-medium">
+                  {t("settings:telemetry.telemetryId")}
+                </span>
                 <span className="bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-800 dark:text-gray-200 font-mono">
                   {settings ? settings.telemetryUserId : "n/a"}
                 </span>
@@ -130,7 +136,7 @@ export default function SettingsPage() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
           >
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              Integrations
+              {t("settings:integrations.title")}
             </h2>
             <div className="space-y-4">
               <div id={SETTING_IDS.github}>
@@ -155,7 +161,9 @@ export default function SettingsPage() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
           >
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              {hideDyadProUi ? "Agent Permissions" : "Agent Permissions (Pro)"}
+              {hideDyadProUi
+                ? t("settings:agentPermissions.titleWithoutPro")
+                : t("settings:agentPermissions.title")}
             </h2>
             <AgentToolsSettings />
           </div>
@@ -166,7 +174,7 @@ export default function SettingsPage() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
           >
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              Tools (MCP)
+              {t("settings:toolsMcp.title")}
             </h2>
             <ToolsMcpSettings />
           </div>
@@ -178,11 +186,10 @@ export default function SettingsPage() {
           >
             <div className="mb-6">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-                Advanced
+                {t("settings:advanced.title")}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-2">
-                We recommend keeping the default settings unless something is
-                not working
+                {t("settings:advanced.description")}
               </p>
             </div>
             <div className="space-y-4">
@@ -190,7 +197,7 @@ export default function SettingsPage() {
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="enable-native-git"
-                    aria-label="Enable Native Git"
+                    aria-label={t("settings:advanced.enableNativeGit")}
                     checked={!!settings?.enableNativeGit}
                     onCheckedChange={(checked) => {
                       updateSettings({
@@ -198,11 +205,12 @@ export default function SettingsPage() {
                       });
                     }}
                   />
-                  <Label htmlFor="enable-native-git">Enable Native Git</Label>
+                  <Label htmlFor="enable-native-git">
+                    {t("settings:advanced.enableNativeGit")}
+                  </Label>
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  This doesn't require any external Git installation and offers
-                  a faster, native-Git performance experience.
+                  {t("settings:advanced.enableNativeGitDescription")}
                 </div>
               </div>
               <div
@@ -212,7 +220,9 @@ export default function SettingsPage() {
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="enable-sandbox-script-execution"
-                    aria-label="Enable sandbox script execution"
+                    aria-label={t(
+                      "settings:advanced.enableSandboxScriptExecution",
+                    )}
                     checked={!!settings?.enableSandboxScriptExecution}
                     onCheckedChange={(checked) => {
                       updateSettings({
@@ -221,12 +231,13 @@ export default function SettingsPage() {
                     }}
                   />
                   <Label htmlFor="enable-sandbox-script-execution">
-                    Enable sandbox script execution
+                    {t("settings:advanced.enableSandboxScriptExecution")}
                   </Label>
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Allow local-agent attachment scripts to inspect files with
-                  execute_sandbox_script.
+                  {t(
+                    "settings:advanced.enableSandboxScriptExecutionDescription",
+                  )}
                 </div>
               </div>
               <div
@@ -242,7 +253,9 @@ export default function SettingsPage() {
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="enable-mcp-servers-for-build-mode"
-                    aria-label="Enable MCP servers for Build mode"
+                    aria-label={t(
+                      "settings:advanced.enableMcpServersForBuildMode",
+                    )}
                     checked={!!settings?.enableMcpServersForBuildMode}
                     onCheckedChange={(checked) => {
                       updateSettings({
@@ -251,12 +264,13 @@ export default function SettingsPage() {
                     }}
                   />
                   <Label htmlFor="enable-mcp-servers-for-build-mode">
-                    Enable MCP servers for Build mode
+                    {t("settings:advanced.enableMcpServersForBuildMode")}
                   </Label>
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Allow MCP servers to be used when in Build mode. Note: MCP
-                  servers are always enabled in Agent mode.
+                  {t(
+                    "settings:advanced.enableMcpServersForBuildModeDescription",
+                  )}
                 </div>
               </div>
             </div>
@@ -269,11 +283,10 @@ export default function SettingsPage() {
           >
             <div className="mb-6">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-                Experiments
+                {t("settings:experiments.title")}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-2">
-                We do not recommend enabling experiments as these features may
-                not be stable
+                {t("settings:experiments.description")}
               </p>
             </div>
             <div className="space-y-4">
@@ -287,7 +300,7 @@ export default function SettingsPage() {
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="enable-mcp-tool-search"
-                    aria-label="Enable MCP tool search"
+                    aria-label={t("settings:experiments.enableMcpToolSearch")}
                     disabled={!settings?.enableSandboxScriptExecution}
                     checked={
                       !!settings?.enableMcpToolSearch &&
@@ -300,17 +313,15 @@ export default function SettingsPage() {
                     }}
                   />
                   <Label htmlFor="enable-mcp-tool-search">
-                    Enable MCP tool search
+                    {t("settings:experiments.enableMcpToolSearch")}
                   </Label>
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  In Agent mode, let the model search for MCP tools instead of
-                  listing every tool's definition in its context. Requires
-                  sandbox script execution.
+                  {t("settings:experiments.enableMcpToolSearchDescription")}
                 </div>
                 {!settings?.enableSandboxScriptExecution && (
                   <div className="text-xs text-amber-500">
-                    Cannot be enabled unless sandbox script execution is on.
+                    {t("settings:experiments.mcpToolSearchRequiresSandbox")}
                   </div>
                 )}
               </div>
@@ -321,7 +332,9 @@ export default function SettingsPage() {
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="enable-pnpm-minimum-release-age-warning"
-                    aria-label="Enable pnpm upgrade warning"
+                    aria-label={t(
+                      "settings:experiments.enablePnpmMinimumReleaseAgeWarning",
+                    )}
                     checked={!!settings?.enablePnpmMinimumReleaseAgeWarning}
                     onCheckedChange={(checked) => {
                       updateSettings({
@@ -330,12 +343,15 @@ export default function SettingsPage() {
                     }}
                   />
                   <Label htmlFor="enable-pnpm-minimum-release-age-warning">
-                    Enable pnpm upgrade warning
+                    {t(
+                      "settings:experiments.enablePnpmMinimumReleaseAgeWarning",
+                    )}
                   </Label>
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Show the pnpm release-age warning toast and one-click pnpm
-                  upgrade action.
+                  {t(
+                    "settings:experiments.enablePnpmMinimumReleaseAgeWarningDescription",
+                  )}
                 </div>
               </div>
               <div
@@ -345,7 +361,9 @@ export default function SettingsPage() {
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="enable-select-app-from-home-chat-input"
-                    aria-label="Enable Select App from Home Chat Input"
+                    aria-label={t(
+                      "settings:experiments.enableSelectAppFromHomeChatInput",
+                    )}
                     checked={!!settings?.enableSelectAppFromHomeChatInput}
                     onCheckedChange={(checked) => {
                       updateSettings({
@@ -354,12 +372,13 @@ export default function SettingsPage() {
                     }}
                   />
                   <Label htmlFor="enable-select-app-from-home-chat-input">
-                    Enable Select App from Home Chat Input
+                    {t("settings:experiments.enableSelectAppFromHomeChatInput")}
                   </Label>
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Show an app selector in the home chat input to start a chat
-                  referencing an existing app.
+                  {t(
+                    "settings:experiments.enableSelectAppFromHomeChatInputDescription",
+                  )}
                 </div>
               </div>
             </div>
@@ -371,7 +390,7 @@ export default function SettingsPage() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-red-200 dark:border-red-800"
           >
             <h2 className="text-lg font-medium text-red-600 dark:text-red-400 mb-4">
-              Danger Zone
+              {t("settings:dangerZone.title")}
             </h2>
 
             <div className="space-y-4">
@@ -381,11 +400,10 @@ export default function SettingsPage() {
               >
                 <div>
                   <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                    Reset Everything
+                    {t("settings:dangerZone.resetEverything")}
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    This will delete all your apps, chats, and settings. This
-                    action cannot be undone.
+                    {t("settings:dangerZone.resetDescription")}
                   </p>
                 </div>
                 <button
@@ -393,7 +411,9 @@ export default function SettingsPage() {
                   disabled={isResetting}
                   className="rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isResetting ? "Resetting..." : "Reset Everything"}
+                  {isResetting
+                    ? t("settings:dangerZone.resetting")
+                    : t("settings:dangerZone.resetEverything")}
                 </button>
               </div>
             </div>
@@ -403,10 +423,14 @@ export default function SettingsPage() {
 
       <ConfirmationDialog
         isOpen={isResetDialogOpen}
-        title="Reset Everything"
-        message="Are you sure you want to reset everything? This will delete all your apps, chats, and settings. This action cannot be undone."
-        confirmText={isResetting ? "Resetting..." : "Reset Everything"}
-        cancelText="Cancel"
+        title={t("settings:dangerZone.resetEverything")}
+        message={t("settings:dangerZone.resetConfirmation")}
+        confirmText={
+          isResetting
+            ? t("settings:dangerZone.resetting")
+            : t("settings:dangerZone.resetEverything")
+        }
+        cancelText={t("common:cancel")}
         confirmDisabled={isResetting}
         onConfirm={handleResetEverything}
         onCancel={() => setIsResetDialogOpen(false)}
@@ -416,7 +440,13 @@ export default function SettingsPage() {
 }
 
 export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
+  const { t } = useTranslation("settings");
   const { theme, setTheme } = useTheme();
+  const themeLabels = {
+    system: t("general.themeSystem"),
+    light: t("general.themeLight"),
+    dark: t("general.themeDark"),
+  } as const;
 
   return (
     <div
@@ -424,13 +454,13 @@ export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
       className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
     >
       <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-        General Settings
+        {t("general.title")}
       </h2>
 
       <div className="space-y-4 mb-4">
         <div id={SETTING_IDS.theme} className="flex items-center gap-4">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Theme
+            {t("general.theme")}
           </label>
 
           <div className="relative bg-gray-100 dark:bg-gray-700 rounded-lg p-1 flex">
@@ -448,7 +478,7 @@ export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
                 }
               `}
               >
-                {option.charAt(0).toUpperCase() + option.slice(1)}
+                {themeLabels[option]}
               </button>
             ))}
           </div>
@@ -466,8 +496,7 @@ export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
       <div id={SETTING_IDS.autoUpdate} className="space-y-1 mt-4">
         <AutoUpdateSwitch />
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          This will automatically update the app when new versions are
-          available.
+          {t("general.autoUpdateDescription")}
         </div>
       </div>
 
@@ -486,7 +515,7 @@ export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
       </div>
 
       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-4">
-        <span className="mr-2 font-medium">App Version:</span>
+        <span className="mr-2 font-medium">{t("general.appVersion")}</span>
         <span className="bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-800 dark:text-gray-200 font-mono">
           {appVersion ? appVersion : "-"}
         </span>
@@ -496,13 +525,14 @@ export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
 }
 
 export function WorkflowSettings() {
+  const { t } = useTranslation("settings");
   return (
     <div
       id={SECTION_IDS.workflow}
       className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
     >
       <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-        Workflow Settings
+        {t("workflow.title")}
       </h2>
 
       <div id={SETTING_IDS.defaultChatMode} className="mt-4">
@@ -512,58 +542,56 @@ export function WorkflowSettings() {
       <div id={SETTING_IDS.autoApprove} className="space-y-1 mt-4">
         <AutoApproveSwitch showToast={false} />
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          This will automatically approve code changes and run them.
+          {t("workflow.autoApproveDescription")}
         </div>
       </div>
 
       <div id={SETTING_IDS.autoFix} className="space-y-1 mt-4">
         <AutoFixProblemsSwitch />
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          This will automatically fix TypeScript errors.
+          {t("workflow.autoFixProblemsDescription")}
         </div>
       </div>
 
       <div id={SETTING_IDS.appBlueprint} className="space-y-1 mt-4">
         <AppBlueprintSwitch />
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          When creating a new app, generate a lightweight app blueprint (name,
-          design, color, template) before building.
+          {t("workflow.appBlueprintDescription")}
         </div>
       </div>
 
       <div id={SETTING_IDS.autoExpandPreview} className="space-y-1 mt-4">
         <AutoExpandPreviewSwitch />
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          Automatically expand the preview panel when code changes are made.
+          {t("workflow.autoExpandPreviewDescription")}
         </div>
       </div>
 
       <div id={SETTING_IDS.keepPreviewsRunning} className="space-y-1 mt-4">
         <KeepPreviewsRunningSwitch />
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          Note: this may take more memory but allows faster preview loads when
-          switching apps.
+          {t("workflow.keepPreviewsRunningDescription")}
         </div>
       </div>
 
       <div id={SETTING_IDS.chatEventNotification} className="space-y-1 mt-4">
         <ChatEventNotificationSwitch />
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          Show native notifications when a chat response completes or a
-          questionnaire needs your input while the app is not focused.
+          {t("workflow.chatEventNotificationDescription")}
         </div>
       </div>
     </div>
   );
 }
 export function AISettings() {
+  const { t } = useTranslation("settings");
   return (
     <div
       id={SECTION_IDS.ai}
       className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
     >
       <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-        AI Settings
+        {t("ai.title")}
       </h2>
 
       <div id={SETTING_IDS.thinkingBudget} className="mt-4">
@@ -581,8 +609,7 @@ export function AISettings() {
       <div id={SETTING_IDS.contextCompaction} className="space-y-1 mt-4">
         <ContextCompactionSwitch />
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          Automatically compact long conversations to stay within context
-          limits. Original messages are preserved in the app data directory.
+          {t("ai.contextCompactionDescription")}
         </div>
       </div>
     </div>

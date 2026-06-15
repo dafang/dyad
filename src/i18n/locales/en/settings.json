@@ -19,21 +19,67 @@
     "stable": "Stable",
     "beta": "Beta",
     "selectReleaseChannel": "Select release channel",
+    "releaseChannelStableToast": "Using Stable release channel",
+    "releaseChannelStableToastDescription": "You'll stay on your current version until a newer stable release is available, or you can manually downgrade now.",
+    "releaseChannelBetaToast": "Using Beta release channel",
+    "downloadStable": "Download Stable",
     "runtimeMode": "Runtime Mode",
     "runtimeModeDescription": "Select the runtime to use for running the app.",
+    "runtimeModeHost": "Local (default)",
+    "runtimeModeDocker": "Docker (experimental)",
+    "runtimeModeCloud": "Cloud Sandbox (Pro)",
+    "runtimeModeUpdateFailed": "Failed to update runtime mode: {{message}}",
+    "runtimeModeCloudLockedDescription": "Cloud sandboxes are a Dyad Pro feature.",
+    "runtimeModeUpgradeToPro": "Upgrade to Pro",
+    "runtimeModeDockerDescriptionBefore": "Docker mode is",
+    "runtimeModeDockerDescriptionAfter": "and requires",
+    "runtimeModeDockerDescriptionEnd": "to be installed and running.",
+    "runtimeModeCloudDescription": "Cloud Sandbox runs previews remotely and gives you a shareable preview link. Note: running in cloud mode consumes Pro credits.",
     "runtimeModeSwitchTitle": "Switch runtime mode?",
     "runtimeModeSwitchDescription": "Switching runtime mode will stop your currently running app.",
     "runtimeModeSwitchAction": "Switch runtime",
     "selectRuntimeMode": "Select runtime mode",
+    "zoomDescription90": "Slightly zoomed out to fit more content on screen.",
+    "zoomDescription100": "Default zoom level.",
+    "zoomDescription110": "Zoom in a little for easier reading.",
+    "zoomDescription125": "Large zoom for improved readability.",
+    "zoomDescription150": "Maximum zoom for maximum accessibility.",
     "nodePath": "Node.js Path Configuration",
     "browseForNode": "Browse for Node.js",
     "selecting": "Selecting...",
     "resetToDefault": "Reset to Default",
     "customPath": "Custom Path:",
     "systemPath": "System PATH:",
+    "systemPathUnavailable": "System PATH (not available)",
     "notFound": "Not found",
     "nodeConfigured": "Node.js is properly configured and ready to use.",
-    "nodeSelectFolder": "Select the folder where Node.js is installed if it's not in your system PATH."
+    "nodeSelectFolder": "Select the folder where Node.js is installed if it's not in your system PATH.",
+    "nodePathUpdated": "Node.js path updated successfully",
+    "nodeNotFoundAtPath": "Could not find Node.js at the path \"{{path}}\"",
+    "nodePathSetFailed": "Failed to set Node.js path: {{message}}",
+    "nodePathReset": "Reset to system Node.js path",
+    "nodePathResetFailed": "Failed to reset Node.js path: {{message}}",
+    "autoUpdateChanged": "Auto-update settings changed",
+    "restartRequiredDescription": "You will need to restart Dyad for your settings to take effect.",
+    "restartDyad": "Restart Dyad",
+    "restartFromTerminal": "Restart from terminal",
+    "customAppsFolder": {
+      "label": "Customize Apps Folder",
+      "loading": "Loading...",
+      "selectFolder": "Select A Folder",
+      "defaultFolder": "Default Folder:",
+      "customFolder": "Custom Folder:",
+      "webModeDescription": "In Web mode, new apps are stored under the local Web server data directory. Browser folder pickers cannot currently grant a reusable writable path to the local server.",
+      "availableDescription": "This is the top-level folder that Dyad will store new applications in.",
+      "unavailableDescription": "Your apps folder is inaccessible. Make sure that the folder exists and has write permissions, or change it.",
+      "webModeSelectionUnavailable": "Browser folder selection cannot grant the local server a stable writable folder path yet. New apps use the local Web data directory.",
+      "updated": "Custom apps folder updated successfully",
+      "invalidSelection": "Unable to use selected folder. Please ensure it is a valid directory with write permissions.",
+      "setFailed": "Failed to set custom apps folder: {{message}}",
+      "resetSuccess": "Dyad apps folder reset successfully",
+      "resetFailed": "Failed to reset Dyad Apps folder path: {{message}}",
+      "fetchFailed": "Failed to fetch Dyad apps folder path: {{message}}"
+    }
   },
   "workflow": {
     "title": "Workflow Settings",
@@ -44,8 +90,16 @@
     "autoApproveDescription": "This will automatically approve code changes and run them.",
     "autoFixProblems": "Auto-fix problems",
     "autoFixProblemsDescription": "This will automatically fix TypeScript errors.",
+    "autoFixProblemsDisableHint": "You can disable Auto-fix problems in the Settings page.",
     "appBlueprint": "App Blueprint",
-    "appBlueprintDescription": "When creating a new app, generate a lightweight app blueprint (name, design, color, template) before building."
+    "appBlueprintDescription": "When creating a new app, generate a lightweight app blueprint (name, design, color, template) before building.",
+    "autoExpandPreview": "Auto-expand preview panel",
+    "autoExpandPreviewDescription": "Automatically expand the preview panel when code changes are made.",
+    "autoApproveDisableHint": "You can disable auto-approve in the Settings.",
+    "keepPreviewsRunning": "Keep app previews running forever",
+    "keepPreviewsRunningDescription": "Note: this may take more memory but allows faster preview loads when switching apps.",
+    "chatEventNotification": "Enable notifications",
+    "chatEventNotificationDescription": "Show native notifications when a chat response completes or a questionnaire needs your input while the app is not focused."
   },
   "ai": {
     "title": "AI Settings",
@@ -55,15 +109,73 @@
     "low": "Low",
     "medium": "Medium",
     "high": "High",
+    "thinkingEffort": {
+      "label": "Effort",
+      "tooltip": "Effort: how hard the model thinks before responding. Applies to reasoning-capable models.",
+      "defaultSuffix": "(default)",
+      "low": {
+        "label": "Low",
+        "description": "Faster, cheaper"
+      },
+      "medium": {
+        "label": "Medium",
+        "description": "Balanced"
+      },
+      "high": {
+        "label": "High",
+        "description": "Deeper reasoning"
+      }
+    },
     "maxChatTurns": "Max Chat Turns in Context",
     "maxChatTurnsDescription": "Limits how many recent chat turns are included in context.",
     "selectMaxChatTurns": "Select max turns",
     "maxToolCallSteps": "Max Tool Calls (Agent)",
     "maxToolCallStepsDescription": "Limits how many tool calls the agent can make before pausing.",
     "selectMaxToolCallSteps": "Select max tool calls",
+    "contextCompaction": "Context Compaction",
     "unlimited": "Unlimited",
     "turnCount_one": "{{count}} turn",
     "turnCount_other": "{{count}} turns",
+    "maxChatTurnsOptions": {
+      "economy": {
+        "label": "Economy (2)",
+        "description": "Minimal context to reduce token usage and improve response times."
+      },
+      "default": {
+        "label": "Default ({{count}})",
+        "description": "Balanced context size for most conversations."
+      },
+      "plus": {
+        "label": "Plus (5)",
+        "description": "Slightly higher context size for detailed conversations."
+      },
+      "high": {
+        "label": "High (10)",
+        "description": "Extended context for complex conversations requiring more history."
+      },
+      "max": {
+        "label": "Max (100)",
+        "description": "Maximum context (not recommended due to cost and speed)."
+      }
+    },
+    "maxToolCallStepsOptions": {
+      "low": {
+        "label": "Low (25)",
+        "description": "Limits tool calls to 25. Good for simple tasks that don't need many steps."
+      },
+      "medium": {
+        "label": "Medium (50)",
+        "description": "Moderate limit for straightforward tasks."
+      },
+      "default": {
+        "label": "Default ({{count}})",
+        "description": "Balanced limit for most tasks."
+      },
+      "high": {
+        "label": "High (200)",
+        "description": "Extended limit for complex multi-step tasks (may increase cost and time)."
+      }
+    },
     "providers": "AI Providers",
     "failedToLoadProviders": "Failed to load AI providers: {{message}}",
     "freeTierAvailable": "Free tier available",
@@ -91,7 +203,8 @@
     "apiKeyEmpty": "API Key cannot be empty.",
     "errorTogglingPro": "Error toggling Dyad Pro: {{error}}",
     "failedSaveApiKey": "Failed to save API key.",
-    "failedDeleteApiKey": "Failed to delete API key."
+    "failedDeleteApiKey": "Failed to delete API key.",
+    "contextCompactionDescription": "Automatically compact long conversations to stay within context limits. Original messages are preserved in the app data directory."
   },
   "telemetry": {
     "title": "Telemetry",
@@ -113,14 +226,26 @@
   },
   "agentPermissions": {
     "title": "Agent Permissions (Pro)",
+    "titleWithoutPro": "Agent Permissions",
     "description": "Configure permissions for Agent built-in tools.",
     "defaultAllowedTools": "Default allowed tools ({{count}})",
     "ask": "Ask",
     "alwaysAllow": "Always allow",
-    "neverAllow": "Never allow"
+    "neverAllow": "Never allow",
+    "toolDescriptions": {
+      "add_dependency": "Install npm packages.",
+      "execute_sql": "Execute SQL against the connected database. Run each SQL command separately instead of combining multiple commands.",
+      "web_search": "Access real-time information beyond the model's training cutoff. Describe what you want to search for.",
+      "web_crawl": "Crawl website content so the agent can clone or reference the page. Use this only when website content is needed."
+    }
   },
   "toolsMcp": {
     "title": "Tools (MCP)",
+    "pickerDescription": "Enable tools from your configured MCP servers.",
+    "noServersConfiguredPicker": "No MCP servers configured. Configure them in Settings → Tools (MCP).",
+    "environmentVariable": "Environment Variable",
+    "header": "Header",
+    "headers": "Headers",
     "name": "Name",
     "namePlaceholder": "My MCP Server",
     "transport": "Transport",
@@ -145,12 +270,75 @@
     "noToolsDiscovered": "No tools discovered.",
     "noServersConfigured": "No servers configured yet.",
     "prefilledServer": "Prefilled {{name}} MCP server",
+    "itemsSaved": "{{item}} saved",
+    "noHeadersConfigured": "No headers configured",
+    "urlRequired": "HTTP MCP servers require a URL.",
+    "urlProtocolRequired": "URL must start with http:// or https://.",
+    "invalidUrl": "Invalid URL: {{url}}",
+    "connectingOAuthFor": "Connecting OAuth for {{name}}...",
+    "oauthConnectionSuccessful": "OAuth connected successfully",
+    "oauthFlowFailed": "OAuth flow failed",
+    "oauthUnsupportedToast": "OAuth connection failed. This server does not support OAuth.",
+    "serverRequiresAuthenticationMessage": "This server requires authentication. Enable OAuth and try again.",
+    "serverRequiresAuthenticationToast": "Server connection failed. This server requires authentication; try enabling OAuth.",
+    "oauthDisconnected": "OAuth disconnected",
+    "oauthDisconnectFailed": "Failed to disconnect OAuth",
+    "plaintextTitle": "OAuth tokens and client secrets are not stored with system encryption",
+    "plaintextDescriptionBefore": "The system keyring is unavailable (on Linux this usually means ",
+    "plaintextDescriptionAfter": " is not installed), so OAuth tokens and pre-registered client secrets for HTTP MCP servers are written to the local database without encryption. Any process that can read Dyad's data directory can decode them. Client secrets are especially sensitive because they do not expire. Install a keyring service, reconnect, and re-enter any pre-registered client secrets to upgrade storage.",
+    "useOAuth": "Use OAuth",
+    "oauthRequiredForRemote": "Most remote servers require this.",
+    "advancedOAuthOptions": "Advanced OAuth options",
+    "oauthClientId": "OAuth Client ID",
+    "oauthClientIdHelp": "If the MCP server requires app registration, paste the app's client ID here. Otherwise leave this blank.",
+    "oauthClientIdPlaceholder": "Pre-registered client ID",
+    "oauthClientSecret": "OAuth Client Secret",
+    "oauthClientSecretHelp": "Only fill this in if the MCP server provides a secret with the client ID.",
+    "oauthClientSecretPlaceholder": "Pre-registered client secret",
+    "oauthScope": "OAuth Scope",
+    "oauthScopeHelp": "Scopes to request, separated by spaces. Leave blank to use the server default.",
+    "redirectUriBefore": "If you enter a client ID, make sure",
+    "redirectUriAfter": "is registered as a redirect URI with the MCP server. MCP servers usually provide a console for this.",
+    "addingServer": "Adding...",
+    "oauthStatus": "OAuth: {{status}}",
+    "connected": "Connected",
+    "notConnected": "Not connected",
+    "connecting": "Connecting...",
+    "connect": "Connect",
+    "disconnecting": "Disconnecting...",
+    "disconnect": "Disconnect",
+    "toggleServer": "Toggle {{name}}",
+    "serverRequiresAuthentication": "Server requires authentication",
+    "serverDoesNotSupportOAuth": "Server does not support OAuth",
+    "connectionFailed": "Connection failed",
+    "enableOAuthAndRetry": "Enable OAuth and retry",
+    "disableOAuthAndRetry": "Disable OAuth and retry",
     "deny": "Deny"
   },
   "experiments": {
     "title": "Experiments",
+    "description": "We do not recommend enabling experiments as these features may not be stable",
     "enableNativeGit": "Enable Native Git",
-    "enableNativeGitDescription": "This doesn't require any external Git installation and offers a faster, native-Git performance experience."
+    "enableNativeGitDescription": "This doesn't require any external Git installation and offers a faster, native-Git performance experience.",
+    "enableMcpToolSearch": "Enable MCP tool search",
+    "enableMcpToolSearchDescription": "In Agent mode, let the model search for MCP tools instead of listing every tool's definition in its context. Requires sandbox script execution.",
+    "mcpToolSearchRequiresSandbox": "Cannot be enabled unless sandbox script execution is on.",
+    "enablePnpmMinimumReleaseAgeWarning": "Enable pnpm upgrade warning",
+    "enablePnpmMinimumReleaseAgeWarningDescription": "Show the pnpm release-age warning toast and one-click pnpm upgrade action.",
+    "enableSelectAppFromHomeChatInput": "Enable Select App from Home Chat Input",
+    "enableSelectAppFromHomeChatInputDescription": "Show an app selector in the home chat input to start a chat referencing an existing app."
+  },
+  "advanced": {
+    "title": "Advanced",
+    "description": "We recommend keeping the default settings unless something is not working",
+    "enableNativeGit": "Enable Native Git",
+    "enableNativeGitDescription": "This doesn't require any external Git installation and offers a faster, native-Git performance experience.",
+    "enableSandboxScriptExecution": "Enable sandbox script execution",
+    "enableSandboxScriptExecutionDescription": "Allow local-agent attachment scripts to inspect files with execute_sandbox_script.",
+    "blockUnsafeNpmPackages": "Block unsafe npm packages",
+    "blockUnsafeNpmPackagesDescription": "Uses socket.dev to detect unsafe packages and blocks them.",
+    "enableMcpServersForBuildMode": "Enable MCP servers for Build mode",
+    "enableMcpServersForBuildModeDescription": "Allow MCP servers to be used when in Build mode. Note: MCP servers are always enabled in Agent mode."
   },
   "dangerZone": {
     "title": "Danger Zone",
@@ -158,7 +346,173 @@
     "resetDescription": "This will delete all your apps, chats, and settings. This action cannot be undone.",
     "resetConfirmation": "Are you sure you want to reset everything? This will delete all your apps, chats, and settings. This action cannot be undone.",
     "resetting": "Resetting...",
-    "resetSuccess": "Successfully reset everything. Restart the application."
+    "resetSuccess": "Successfully reset everything. Restart the application.",
+    "unknownError": "An unknown error occurred"
+  },
+  "settingsSearch": {
+    "placeholder": "Search settings...",
+    "ariaLabel": "Search settings",
+    "clearSearch": "Clear search",
+    "noSettingsFound": "No settings found",
+    "sections": {
+      "general-settings": "General",
+      "workflow-settings": "Workflow",
+      "ai-settings": "AI",
+      "provider-settings": "Model Providers",
+      "telemetry": "Telemetry",
+      "integrations": "Integrations",
+      "agent-permissions": "Agent Permissions",
+      "tools-mcp": "Tools (MCP)",
+      "advanced": "Advanced",
+      "experiments": "Experiments",
+      "danger-zone": "Danger Zone"
+    },
+    "items": {
+      "setting-theme": {
+        "label": "Theme",
+        "description": "Switch between system, light, and dark mode"
+      },
+      "setting-zoom": {
+        "label": "Zoom Level",
+        "description": "Adjust the zoom level to make content easier to read"
+      },
+      "setting-auto-update": {
+        "label": "Auto Update",
+        "description": "Automatically update the app when new versions are available"
+      },
+      "setting-release-channel": {
+        "label": "Release Channel",
+        "description": "Choose between stable and beta release channels"
+      },
+      "setting-runtime-mode": {
+        "label": "Runtime Mode",
+        "description": "Configure Node runtime settings"
+      },
+      "setting-node-path": {
+        "label": "Node Path",
+        "description": "Set a custom Node.js installation path"
+      },
+      "setting-custom-apps-folder": {
+        "label": "Customize Apps Folder",
+        "description": "Set the top-level folder that Dyad will store new applications in"
+      },
+      "setting-default-chat-mode": {
+        "label": "Default Chat Mode",
+        "description": "Choose the default mode for new chats"
+      },
+      "setting-auto-approve": {
+        "label": "Auto-approve",
+        "description": "Automatically approve code changes and run them"
+      },
+      "setting-auto-fix": {
+        "label": "Auto Fix Problems",
+        "description": "Automatically fix TypeScript errors"
+      },
+      "setting-app-blueprint": {
+        "label": "App Blueprint",
+        "description": "Generate a lightweight app blueprint (name, design, color, template) before building new apps"
+      },
+      "setting-auto-expand-preview": {
+        "label": "Auto Expand Preview",
+        "description": "Automatically expand the preview panel when code changes are made"
+      },
+      "setting-keep-previews-running": {
+        "label": "Keep app previews running forever",
+        "description": "Prevent idle app previews from being stopped after 10 minutes; uses more memory but enables faster preview loads when switching apps"
+      },
+      "setting-chat-event-notification": {
+        "label": "Notifications",
+        "description": "Show native notifications when a chat response completes or a questionnaire needs your input while the app is not focused"
+      },
+      "setting-thinking-budget": {
+        "label": "Thinking Budget",
+        "description": "Set the AI thinking token budget"
+      },
+      "setting-max-chat-turns": {
+        "label": "Max Chat Turns",
+        "description": "Set the maximum number of conversation turns"
+      },
+      "setting-max-tool-call-steps": {
+        "label": "Max Tool Calls (Agent)",
+        "description": "Set the maximum number of tool calls for local agent mode"
+      },
+      "setting-context-compaction": {
+        "label": "Context Compaction",
+        "description": "Automatically compact long conversations to stay within context limits"
+      },
+      "provider-settings": {
+        "label": "Model Providers",
+        "description": "Configure AI model providers and API keys"
+      },
+      "setting-telemetry": {
+        "label": "Telemetry",
+        "description": "Enable or disable anonymous usage data collection"
+      },
+      "setting-github": {
+        "label": "GitHub Integration",
+        "description": "Connect your GitHub account"
+      },
+      "setting-vercel": {
+        "label": "Vercel Integration",
+        "description": "Connect your Vercel account for deployments"
+      },
+      "setting-supabase": {
+        "label": "Supabase Integration",
+        "description": "Connect your Supabase project"
+      },
+      "setting-neon": {
+        "label": "Neon Integration",
+        "description": "Connect your Neon database"
+      },
+      "agent-permissions": {
+        "label": "Agent Permissions",
+        "description": "Configure permissions for agent built-in tools"
+      },
+      "tools-mcp": {
+        "label": "Tools (MCP)",
+        "description": "Configure MCP servers and environment variables"
+      },
+      "advanced": {
+        "label": "Advanced",
+        "description": "Power-user settings for Git, sandboxing, packages, and MCP"
+      },
+      "setting-native-git": {
+        "label": "Enable Native Git",
+        "description": "Use native Git for faster performance without external installation"
+      },
+      "setting-enable-sandbox-script-execution": {
+        "label": "Enable sandbox script execution",
+        "description": "Allow local-agent attachment scripts to inspect files with execute_sandbox_script"
+      },
+      "setting-block-unsafe-npm-packages": {
+        "label": "Block unsafe npm packages",
+        "description": "Uses socket.dev to detect unsafe packages and blocks them"
+      },
+      "setting-enable-mcp-servers-for-build-mode": {
+        "label": "Enable MCP servers for Build mode",
+        "description": "Allow MCP servers to be used when in Build mode"
+      },
+      "setting-enable-cloud-sandbox": {
+        "label": "Enable Cloud Sandbox (Pro)",
+        "description": "Run your app on the Cloud for a more secure runtime that uses fewer local system resources"
+      },
+      "setting-enable-mcp-tool-search": {
+        "label": "Enable MCP tool search",
+        "description": "Let the agent search for MCP tools on demand instead of listing every tool in its context. Requires sandbox script execution"
+      },
+      "setting-enable-pnpm-minimum-release-age-warning": {
+        "label": "Enable pnpm upgrade warning",
+        "description": "Show the pnpm release-age warning toast and one-click pnpm upgrade action"
+      },
+      "setting-enable-select-app-from-home-chat-input": {
+        "label": "Enable Select App from Home Chat Input",
+        "description": "Show an app selector in the home chat input to start a chat referencing an existing app"
+      },
+      "setting-reset": {
+        "label": "Reset Everything",
+        "description": "Delete all apps, chats, and settings. This action cannot be undone."
+      }
+    }
   },
   "apiKey": {
     "fromSettings": "API Key from Settings",

@@ -7,6 +7,7 @@ interface SkippableBannerProps {
   enableLabel: string;
   onEnable: () => void;
   onSkip: () => void;
+  dismissLabel: string;
   "data-testid"?: string;
 }
 
@@ -26,6 +27,7 @@ export function SkippableBanner({
   enableLabel,
   onEnable,
   onSkip,
+  dismissLabel,
   "data-testid": testId,
 }: SkippableBannerProps) {
   const c = colors;
@@ -39,7 +41,7 @@ export function SkippableBanner({
           type="button"
           onClick={onSkip}
           className={`absolute -top-2 -right-2 inline-flex items-center justify-center rounded-full p-1 transition-colors duration-150 ${c.skipBtn} cursor-pointer bg-white dark:bg-indigo-800 ring-1 ring-inset ${c.ring} shadow-sm`}
-          aria-label="Dismiss"
+          aria-label={dismissLabel}
         >
           <X className="h-3.5 w-3.5" />
         </button>

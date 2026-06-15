@@ -97,16 +97,14 @@ export function SetupBanner() {
         setNodeInstallStep("finished-checking");
         setShowManualConfig(false);
       } else if (result.path === null && result.canceled === false) {
-        showError(
-          `Could not find Node.js at the path "${result.selectedPath}"`,
-        );
+        showError(t("setup.nodePathNotFound", { path: result.selectedPath }));
       }
     } catch (error) {
-      showError("Error setting Node.js path:" + error);
+      showError(t("setup.errorSettingNodePath", { error: String(error) }));
     } finally {
       setIsSelectingPath(false);
     }
-  }, [checkNode]);
+  }, [checkNode, t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -294,12 +292,12 @@ export function SetupBanner() {
                           {isSelectingPath ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Selecting...
+                              {t("selectingFolder")}
                             </>
                           ) : (
                             <>
                               <Folder className="mr-2 h-4 w-4" />
-                              Browse for Node.js folder
+                              {t("setup.browseForNodeFolder")}
                             </>
                           )}
                         </Button>
@@ -329,15 +327,13 @@ export function SetupBanner() {
                 <div className="flex items-center gap-3">
                   {getStatusIcon(isAnyProviderSetup())}
                   <span className="font-medium text-sm">
-                    2. Setup AI Access
+                    {t("setup.setupAiAccess")}
                   </span>
                 </div>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 pt-2 pb-4 bg-white dark:bg-zinc-900 border-t border-inherit">
-              <p className="text-[15px] mb-3">
-                Not sure what to do? Watch the Get Started video above ☝️
-              </p>
+              <p className="text-[15px] mb-3">{t("setup.notSureWatchVideo")}</p>
 
               {!hideDyadProUi && (
                 <SetupProviderCard
@@ -351,9 +347,9 @@ export function SetupBanner() {
                       className="w-6 h-6 mr-0.5"
                     />
                   }
-                  title="Start with Dyad Pro free trial"
-                  subtitle="Unlock the full power of Dyad"
-                  chip={<>Recommended</>}
+                  title={t("setup.startDyadProTrial")}
+                  subtitle={t("setup.unlockDyadPower")}
+                  chip={<>{t("setup.recommended")}</>}
                 />
               )}
               <div className="mt-2 flex gap-2">
@@ -365,8 +361,8 @@ export function SetupBanner() {
                   leadingIcon={
                     <img src={googleIcon} alt="Google" className="w-4 h-4" />
                   }
-                  title="Setup Google Gemini API Key"
-                  chip={<>Free</>}
+                  title={t("setup.setupGeminiApiKey")}
+                  chip={<>{t("setup.free")}</>}
                 />
 
                 <SetupProviderCard
@@ -381,8 +377,8 @@ export function SetupBanner() {
                       className="w-4 h-4"
                     />
                   }
-                  title="Setup OpenRouter API Key"
-                  chip={<>Free</>}
+                  title={t("setup.setupOpenRouterApiKey")}
+                  chip={<>{t("setup.free")}</>}
                 />
               </div>
 
@@ -399,10 +395,10 @@ export function SetupBanner() {
                     </div>
                     <div>
                       <h4 className="font-medium text-[15px] text-gray-800 dark:text-gray-300">
-                        Setup other AI providers
+                        {t("setup.setupOtherProviders")}
                       </h4>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        OpenAI, Anthropic and more
+                        {t("setup.openAiAnthropicMore")}
                       </p>
                     </div>
                   </div>
@@ -423,24 +419,23 @@ export function SetupBanner() {
 }
 
 function NodeJsHelpCallout() {
+  const { t } = useTranslation("home");
+
   return (
     <div className="mt-3 p-3 bg-(--background-lighter) border rounded-lg text-sm">
       <p>
-        If you run into issues, read our{" "}
+        {t("setup.ifNodeIssues")}{" "}
         <a
           onClick={() => {
             ipc.system.openExternalUrl("https://www.dyad.sh/docs/help/nodejs");
           }}
           className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
         >
-          Node.js troubleshooting guide
+          {t("setup.nodeTroubleshooting")}
         </a>
         .{" "}
       </p>
-      <p className="mt-2">
-        Still stuck? Click the <b>Help</b> button in the bottom-left corner and
-        then <b>Report a Bug</b>.
-      </p>
+      <p className="mt-2">{t("setup.stillStuck")}</p>
     </div>
   );
 }
@@ -454,11 +449,13 @@ function NodeInstallButton({
   handleNodeInstallClick: () => void;
   finishNodeInstall: () => void;
 }) {
+  const { t } = useTranslation("home");
+
   switch (nodeInstallStep) {
     case "install":
       return (
         <Button className="mt-3" onClick={handleNodeInstallClick}>
-          Install Node.js Runtime
+          {t("setup.installNodeRuntime")}
         </Button>
       );
     case "continue-processing":
@@ -466,7 +463,7 @@ function NodeInstallButton({
         <Button className="mt-3" onClick={finishNodeInstall} disabled>
           <div className="flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Checking Node.js setup...
+            {t("setup.checkingNodeSetup")}
           </div>
         </Button>
       );
@@ -474,14 +471,14 @@ function NodeInstallButton({
       return (
         <Button className="mt-3" onClick={finishNodeInstall}>
           <div className="flex items-center gap-2">
-            Continue | I installed Node.js
+            {t("setup.continueInstalled")}
           </div>
         </Button>
       );
     case "finished-checking":
       return (
         <div className="mt-3 text-sm text-red-600 dark:text-red-400">
-          Node.js not detected. Closing and re-opening Dyad usually fixes this.
+          {t("setup.nodeNotDetected")}
         </div>
       );
     default:
@@ -494,6 +491,7 @@ export const OpenRouterSetupBanner = ({
 }: {
   className?: string;
 }) => {
+  const { t } = useTranslation("home");
   const posthog = usePostHog();
   const navigate = useNavigate();
   return (
@@ -511,11 +509,11 @@ export const OpenRouterSetupBanner = ({
       leadingIcon={
         <img src={openrouterLogo} alt="OpenRouter" className="w-4 h-4" />
       }
-      title="Setup OpenRouter API Key"
+      title={t("setup.setupOpenRouterApiKey")}
       chip={
         <>
           <GiftIcon className="w-3 h-3" />
-          Free models available
+          {t("setup.freeModelsAvailable")}
         </>
       }
     />

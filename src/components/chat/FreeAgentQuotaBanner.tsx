@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useFreeAgentQuota } from "@/hooks/useFreeAgentQuota";
 import { ipc } from "@/ipc/types";
 import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
+import { useTranslation } from "react-i18next";
 
 interface FreeAgentQuotaBannerProps {
   onSwitchToBuildMode: () => void;
@@ -23,6 +24,7 @@ export function FreeAgentQuotaBanner({
     messagesLimit,
   } = useFreeAgentQuota();
   const hideDyadProUi = shouldHideDyadProUi();
+  const { t } = useTranslation("chat");
 
   if (!isQuotaExceeded || !quotaStatus) {
     return null;
@@ -32,9 +34,9 @@ export function FreeAgentQuotaBanner({
   const resetTimeDisplay =
     hoursUntilReset !== null
       ? hoursUntilReset === 0
-        ? "less than 1 hour"
-        : `${hoursUntilReset} hour${hoursUntilReset === 1 ? "" : "s"}`
-      : "later";
+        ? t("freeAgentQuota.lessThanOneHour")
+        : t("freeAgentQuota.hourCount", { count: hoursUntilReset })
+      : t("freeAgentQuota.later");
 
   // Format the actual reset time (e.g., "11:59 PM")
   const resetDateTime = resetTime
@@ -58,15 +60,17 @@ export function FreeAgentQuotaBanner({
         <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
         <div className="flex-1 space-y-2">
           <p className="text-sm text-amber-700 dark:text-amber-300">
-            You have used all {messagesLimit} messages for the free Agent mode
-            today. Check back in {resetTimeDisplay} ({resetDateTime}). If you
-            don't want to wait, switch back to Build mode.
+            {t("freeAgentQuota.message", {
+              limit: messagesLimit,
+              resetTime: resetTimeDisplay,
+              resetDateTime,
+            })}
           </p>
           <div className="flex flex-wrap gap-2">
             {!hideDyadProUi && (
               <Button onClick={handleUpgrade} size="sm" className="gap-1.5">
                 <Sparkles className="h-3.5 w-3.5" />
-                Upgrade to Dyad Pro
+                {t("errorBox.upgradeToDyadPro")}
               </Button>
             )}
             <Button
@@ -76,7 +80,7 @@ export function FreeAgentQuotaBanner({
               className="gap-1.5 border-amber-500/50 hover:bg-amber-500/20"
             >
               <ArrowRight className="h-3.5 w-3.5" />
-              Switch back to Build mode
+              {t("freeAgentQuota.switchBackToBuild")}
             </Button>
           </div>
         </div>

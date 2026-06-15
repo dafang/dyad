@@ -95,6 +95,7 @@ import {
   isSamePreviewOrigin,
   normalizePreviewUrlForApp,
 } from "./previewUrl";
+import { canUsePreviewAdvancedTools } from "./previewFeatureAccess";
 
 interface ErrorBannerProps {
   error:
@@ -110,6 +111,7 @@ interface ErrorBannerProps {
 const ErrorBanner = ({ error, onDismiss, onAIFix }: ErrorBannerProps) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const { isStreaming } = useStreamChat();
+  const { t } = useTranslation("home");
   if (!error) return null;
   const isDockerError = error.message.includes("Cannot connect to the Docker");
   const isInternalDyadError = error.source === "dyad-app";
@@ -139,7 +141,9 @@ const ErrorBanner = ({ error, onDismiss, onAIFix }: ErrorBannerProps) => {
 
       {(isInternalDyadError || isSyncError) && (
         <div className="absolute top-1 right-1 p-1 bg-red-100 dark:bg-red-900 rounded-md text-xs font-medium text-red-700 dark:text-red-300">
-          {isSyncError ? "Cloud sync issue" : "Internal Dyad error"}
+          {isSyncError
+            ? t("preview.errorBanner.cloudSyncIssue")
+            : t("preview.errorBanner.internalDyadError")}
         </div>
       )}
 
@@ -170,14 +174,16 @@ const ErrorBanner = ({ error, onDismiss, onAIFix }: ErrorBannerProps) => {
             <Lightbulb size={16} className=" text-red-800 dark:text-red-300" />
           </div>
           <span className="text-sm text-red-700 dark:text-red-200">
-            <span className="font-medium">Tip: </span>
+            <span className="font-medium">
+              {t("preview.errorBanner.tipLabel")}{" "}
+            </span>
             {isDockerError
-              ? "Make sure Docker Desktop is running and try restarting the app."
+              ? t("preview.errorBanner.dockerTip")
               : isSyncError
-                ? "Dyad could not upload your latest local changes to the cloud sandbox. Check your network connection or wait for sync to recover."
+                ? t("preview.errorBanner.syncTip")
                 : isInternalDyadError
-                  ? "Try restarting the Dyad app or restarting your computer to see if that fixes the error."
-                  : "Check if restarting the app fixes the error."}
+                  ? t("preview.errorBanner.internalTip")
+                  : t("preview.errorBanner.defaultTip")}
           </span>
         </div>
       </div>
@@ -192,7 +198,7 @@ const ErrorBanner = ({ error, onDismiss, onAIFix }: ErrorBannerProps) => {
             className="cursor-pointer flex items-center space-x-1 px-2 py-1 bg-red-500 dark:bg-red-600 text-white rounded text-sm hover:bg-red-600 dark:hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Sparkles size={14} />
-            <span>Fix error with AI</span>
+            <span>{t("preview.errorBanner.fixWithAi")}</span>
           </button>
         </div>
       )}
@@ -254,7 +260,10 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
   const { settings, updateSettings } = useSettings();
   const hideDyadProUi = shouldHideDyadProUi();
   const { userBudget } = useUserBudgetInfo();
-  const isProMode = !!userBudget;
+  const canUseAdvancedPreviewTools = canUsePreviewAdvancedTools({
+    hideDyadProUi,
+    userBudget,
+  });
   const queryClient = useQueryClient();
 
   // Preserved URL state (persists across HMR-induced remounts)
@@ -492,10 +501,10 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
     },
     onSuccess: async () => {
       await refreshAppIframe();
-      showSuccess("Preview data cleared");
+      showSuccess(t("preview.previewDataCleared"));
     },
     onError: (error) => {
-      showError(`Error clearing preview data: ${error}`);
+      showError(t("preview.errorClearingPreviewData", { error }));
     },
   });
   const { data: cloudSandboxStatus } = useQuery({
@@ -524,8 +533,8 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
         cloudSandboxStatus.lastErrorCode === "sandbox_billing_unavailable")
     ) {
       const creditsExhaustedMessage = hideDyadProUi
-        ? "This cloud sandbox was stopped because its usage quota ran out. Check your runtime settings and start it again."
-        : "This cloud sandbox was stopped because your Dyad Pro credits ran out. Add credits and start it again.";
+        ? t("preview.cloudSandboxUsageQuotaStopped")
+        : t("preview.cloudSandboxCreditsStopped");
 
       setErrorMessage({
         message: cloudSandboxStatus.lastErrorMessage
@@ -533,10 +542,10 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
             ? cloudSandboxStatus.lastErrorMessage
             : cloudSandboxStatus.terminationReason === "credits_exhausted"
               ? creditsExhaustedMessage
-              : "This cloud sandbox was stopped because Dyad could not confirm billing. Please try starting it again."
+              : t("preview.cloudSandboxBillingStopped")
           : cloudSandboxStatus.terminationReason === "credits_exhausted"
             ? creditsExhaustedMessage
-            : "This cloud sandbox was stopped because Dyad could not confirm billing. Please try starting it again.",
+            : t("preview.cloudSandboxBillingStopped"),
         source: "dyad-app",
       });
     }
@@ -697,11 +706,11 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
   useEffect(() => {
     if (iframeRef.current?.contentWindow && isComponentSelectorInitialized) {
       iframeRef.current.contentWindow.postMessage(
-        { type: "dyad-pro-mode", enabled: isProMode },
+        { type: "dyad-pro-mode", enabled: canUseAdvancedPreviewTools },
         "*",
       );
     }
-  }, [isProMode, isComponentSelectorInitialized]);
+  }, [canUseAdvancedPreviewTools, isComponentSelectorInitialized]);
 
   // Restore component overlays in iframe only during queued-message edit restoration.
   // Normal interactive selections are already handled by the iframe's own click handler,
@@ -830,7 +839,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
       if (event.data?.type === "dyad-component-selector-initialized") {
         setIsComponentSelectorInitialized(true);
         iframeRef.current?.contentWindow?.postMessage(
-          { type: "dyad-pro-mode", enabled: isProMode },
+          { type: "dyad-pro-mode", enabled: canUseAdvancedPreviewTools },
           "*",
         );
 
@@ -895,7 +904,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
         if (!component) return;
 
         // Store the coordinates
-        if (event.data.coordinates && isProMode) {
+        if (event.data.coordinates && canUseAdvancedPreviewTools) {
           setCurrentComponentCoordinates(event.data.coordinates);
         }
 
@@ -915,7 +924,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
           return [...prev, component];
         });
 
-        if (isProMode) {
+        if (canUseAdvancedPreviewTools) {
           // Set as the highlighted component for visual editing
           setVisualEditingSelectedComponent(component);
           // Trigger AST analysis
@@ -954,7 +963,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
       }
 
       if (event.data?.type === "dyad-image-load-error") {
-        showError("Image failed to load. Please check the URL and try again.");
+        showError(t("preview.imageLoadFailed"));
         // Remove the broken image from pending changes
         const { elementId } = event.data;
         if (elementId) {
@@ -1428,7 +1437,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
   if (selectedAppId === null) {
     return (
       <div className="p-4 text-gray-500 dark:text-gray-400">
-        Select an app to see the preview.
+        {t("preview.noAppSelected")}
       </div>
     );
   }
@@ -1467,7 +1476,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                 <TooltipTrigger
                   render={
                     <div
-                      aria-label="Running in a cloud sandbox"
+                      aria-label={t("preview.runningInCloudSandbox")}
                       className="flex items-center rounded-full bg-sky-100 px-2 py-1 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300"
                       data-testid="preview-cloud-badge"
                       role="status"
@@ -1476,7 +1485,9 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                 >
                   <Cloud size={14} />
                 </TooltipTrigger>
-                <TooltipContent>Running in a Cloud sandbox</TooltipContent>
+                <TooltipContent>
+                  {t("preview.runningInCloudSandbox")}
+                </TooltipContent>
               </Tooltip>
             )}
             <div className="flex items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-full p-0.5">
@@ -1488,13 +1499,13 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                       disabled={!canGoBack || loading || !selectedAppId}
                       onClick={handleNavigateBack}
                       data-testid="preview-navigate-back-button"
-                      aria-label="Navigate back"
+                      aria-label={t("preview.navigateBack")}
                     />
                   }
                 >
                   <ArrowLeft size={16} />
                 </TooltipTrigger>
-                <TooltipContent>Navigate back</TooltipContent>
+                <TooltipContent>{t("preview.navigateBack")}</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger
@@ -1504,13 +1515,13 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                       disabled={!canGoForward || loading || !selectedAppId}
                       onClick={handleNavigateForward}
                       data-testid="preview-navigate-forward-button"
-                      aria-label="Navigate forward"
+                      aria-label={t("preview.navigateForward")}
                     />
                   }
                 >
                   <ArrowRight size={16} />
                 </TooltipTrigger>
-                <TooltipContent>Navigate forward</TooltipContent>
+                <TooltipContent>{t("preview.navigateForward")}</TooltipContent>
               </Tooltip>
             </div>
           </div>
@@ -1539,7 +1550,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                 >
                   <MonitorSmartphone size={14} />
                 </TooltipTrigger>
-                <TooltipContent>Device Mode</TooltipContent>
+                <TooltipContent>{t("preview.deviceMode")}</TooltipContent>
               </Tooltip>
               <PopoverContent className="w-auto p-2">
                 <ToggleGroup
@@ -1561,39 +1572,39 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                       render={
                         <ToggleGroupItem
                           value="desktop"
-                          aria-label="Desktop view"
+                          aria-label={t("preview.desktopView")}
                         />
                       }
                     >
                       <Monitor size={16} />
                     </TooltipTrigger>
-                    <TooltipContent>Desktop</TooltipContent>
+                    <TooltipContent>{t("preview.desktop")}</TooltipContent>
                   </Tooltip>
                   <Tooltip>
                     <TooltipTrigger
                       render={
                         <ToggleGroupItem
                           value="tablet"
-                          aria-label="Tablet view"
+                          aria-label={t("preview.tabletView")}
                         />
                       }
                     >
                       <Tablet size={16} className="scale-x-130" />
                     </TooltipTrigger>
-                    <TooltipContent>Tablet</TooltipContent>
+                    <TooltipContent>{t("preview.tablet")}</TooltipContent>
                   </Tooltip>
                   <Tooltip>
                     <TooltipTrigger
                       render={
                         <ToggleGroupItem
                           value="mobile"
-                          aria-label="Mobile view"
+                          aria-label={t("preview.mobileView")}
                         />
                       }
                     >
                       <Smartphone size={16} />
                     </TooltipTrigger>
-                    <TooltipContent>Mobile</TooltipContent>
+                    <TooltipContent>{t("preview.mobile")}</TooltipContent>
                   </Tooltip>
                 </ToggleGroup>
               </PopoverContent>
@@ -1617,11 +1628,11 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
               <DropdownMenuContent className="w-full">
                 {routesLoading ? (
                   <DropdownMenuItem disabled>
-                    Loading routes...
+                    {t("preview.loadingRoutes")}
                   </DropdownMenuItem>
                 ) : routesError ? (
                   <DropdownMenuItem disabled>
-                    Unable to load routes
+                    {t("preview.unableToLoadRoutes")}
                   </DropdownMenuItem>
                 ) : availableRoutes.length > 0 ? (
                   availableRoutes.map((route) => (
@@ -1638,7 +1649,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                   ))
                 ) : (
                   <DropdownMenuItem disabled>
-                    No routes detected
+                    {t("preview.noRoutesDetected")}
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -1651,20 +1662,20 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                     className="flex-shrink-0 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
                     disabled={loading || !selectedAppId}
                     data-testid="preview-refresh-button"
-                    aria-label="Refresh preview"
+                    aria-label={t("preview.refreshPreview")}
                   />
                 }
               >
                 <RefreshCw size={14} />
               </TooltipTrigger>
-              <TooltipContent>Refresh preview</TooltipContent>
+              <TooltipContent>{t("preview.refreshPreview")}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger
                 render={
                   <button
                     data-testid="preview-open-browser-button"
-                    aria-label="Open in browser"
+                    aria-label={t("preview.openInBrowser")}
                     onClick={async () => {
                       try {
                         const url = await resolvePreviewBrowserUrl({
@@ -1679,7 +1690,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                         showError(
                           error instanceof Error
                             ? error.message
-                            : "Failed to open cloud sandbox share link.",
+                            : t("preview.failedOpenCloudSandboxShareLink"),
                         );
                       }
                     }}
@@ -1695,7 +1706,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
               >
                 <ExternalLink size={14} />
               </TooltipTrigger>
-              <TooltipContent>Open in browser</TooltipContent>
+              <TooltipContent>{t("preview.openInBrowser")}</TooltipContent>
             </Tooltip>
           </div>
 
@@ -1708,7 +1719,9 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                     onClick={onRestart}
                     data-testid="preview-restart-button"
                     aria-label={
-                      isCloudMode ? "Restart Cloud Sandbox" : "Restart"
+                      isCloudMode
+                        ? t("preview.restartCloudSandbox")
+                        : t("preview.restart")
                     }
                     className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
                   />
@@ -1717,7 +1730,9 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                 <Power size={16} />
               </TooltipTrigger>
               <TooltipContent>
-                {isCloudMode ? "Restart Cloud Sandbox" : "Restart App"}
+                {isCloudMode
+                  ? t("preview.restartCloudSandbox")
+                  : t("preview.restartApp")}
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -1727,8 +1742,8 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                     onClick={handleActivateComponentSelector}
                     aria-label={
                       isPicking
-                        ? "Deactivate component selector"
-                        : "Select component"
+                        ? t("preview.deactivateComponentSelector")
+                        : t("preview.selectComponent")
                     }
                     aria-pressed={isPicking}
                     className={`p-1 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
@@ -1749,8 +1764,10 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
               </TooltipTrigger>
               <TooltipContent>
                 {isPicking
-                  ? "Deactivate component selector"
-                  : `Select component (${isMac ? "⌘ + ⇧ + C" : "Ctrl + ⇧ + C"})`}
+                  ? t("preview.deactivateComponentSelector")
+                  : t("preview.selectComponentWithShortcut", {
+                      shortcut: isMac ? "⌘ + ⇧ + C" : "Ctrl + ⇧ + C",
+                    })}
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -1760,8 +1777,8 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                     onClick={handleAnnotatorClick}
                     aria-label={
                       annotatorMode
-                        ? "Annotator mode active"
-                        : "Activate annotator"
+                        ? t("preview.annotatorModeActive")
+                        : t("preview.activateAnnotator")
                     }
                     aria-pressed={annotatorMode}
                     className={`p-1 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
@@ -1782,7 +1799,9 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                 <Pen size={16} />
               </TooltipTrigger>
               <TooltipContent>
-                {annotatorMode ? "Annotator mode active" : "Activate annotator"}
+                {annotatorMode
+                  ? t("preview.annotatorModeActive")
+                  : t("preview.activateAnnotator")}
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -1790,7 +1809,11 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                 render={
                   <button
                     onClick={() => setIsChatPanelHidden(!isChatPanelHidden)}
-                    aria-label={isChatPanelHidden ? "Show chat" : "Hide chat"}
+                    aria-label={
+                      isChatPanelHidden
+                        ? t("preview.showChat")
+                        : t("preview.hideChat")
+                    }
                     aria-pressed={isChatPanelHidden}
                     className="p-1 rounded transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                     data-testid="preview-toggle-chat-panel-button"
@@ -1804,7 +1827,9 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                 )}
               </TooltipTrigger>
               <TooltipContent>
-                {isChatPanelHidden ? "Show chat" : "Hide chat"}
+                {isChatPanelHidden
+                  ? t("preview.showChat")
+                  : t("preview.hideChat")}
               </TooltipContent>
             </Tooltip>
             <DropdownMenu>
@@ -1838,9 +1863,9 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                   <DropdownMenuItem onClick={onRecreateSandbox}>
                     <Cog size={16} />
                     <div className="flex flex-col">
-                      <span>Recreate Sandbox</span>
+                      <span>{t("preview.recreateSandbox")}</span>
                       <span className="text-xs text-muted-foreground">
-                        Destroys the current sandbox and creates a new one
+                        {t("preview.recreateSandboxDescription")}
                       </span>
                     </div>
                   </DropdownMenuItem>
@@ -1887,7 +1912,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                     : { width: `${deviceWidthConfig[deviceMode]}px` }
                 }
               >
-                {userBudget ? (
+                {canUseAdvancedPreviewTools ? (
                   <Annotator
                     screenshotUrl={screenshotDataUrl}
                     onSubmit={addAttachments}
@@ -1923,7 +1948,7 @@ export const PreviewIframe = ({ loading }: { loading: boolean }) => {
                   allow="clipboard-read; clipboard-write; fullscreen; microphone; camera; display-capture; geolocation; autoplay; picture-in-picture"
                 />
                 {/* Visual Editing Toolbar */}
-                {isProMode &&
+                {canUseAdvancedPreviewTools &&
                   visualEditingSelectedComponent &&
                   selectedAppId && (
                     <VisualEditingToolbar

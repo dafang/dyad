@@ -9,6 +9,7 @@ import {
   ListChecks,
 } from "lucide-react";
 import { unescapeXmlAttr, unescapeXmlContent } from "../../../shared/xmlEscape";
+import { useTranslation } from "react-i18next";
 
 interface QAEntry {
   question: string;
@@ -34,22 +35,14 @@ function parseQAEntries(content: string): QAEntry[] {
   return entries;
 }
 
-const TYPE_META: Record<string, { icon: React.ReactNode; label: string }> = {
-  text: {
-    icon: <MessageSquareText size={12} />,
-    label: "Free text",
-  },
-  radio: {
-    icon: <CircleDot size={12} />,
-    label: "Single choice",
-  },
-  checkbox: {
-    icon: <ListChecks size={12} />,
-    label: "Multiple choice",
-  },
+const TYPE_ICONS: Record<string, React.ReactNode> = {
+  text: <MessageSquareText size={12} />,
+  radio: <CircleDot size={12} />,
+  checkbox: <ListChecks size={12} />,
 };
 
 export function DyadQuestionnaire({ children }: DyadQuestionnaireProps) {
+  const { t } = useTranslation("chat");
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const entries = useMemo(
@@ -62,7 +55,19 @@ export function DyadQuestionnaire({ children }: DyadQuestionnaireProps) {
   const current = entries[currentIndex];
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < entries.length - 1;
-  const meta = TYPE_META[current.type];
+  const typeIcon = TYPE_ICONS[current.type];
+  const typeLabel = (() => {
+    switch (current.type) {
+      case "text":
+        return t("questionnaire.typeText");
+      case "radio":
+        return t("questionnaire.typeRadio");
+      case "checkbox":
+        return t("questionnaire.typeCheckbox");
+      default:
+        return null;
+    }
+  })();
 
   return (
     <div className="my-4 border rounded-lg overflow-hidden border-primary/20 bg-primary/5">
@@ -71,10 +76,10 @@ export function DyadQuestionnaire({ children }: DyadQuestionnaireProps) {
         <div className="flex items-center gap-2">
           <ClipboardList className="text-primary" size={20} />
           <span className="font-semibold text-foreground">
-            Questionnaire Responses
+            {t("questionnaire.responsesTitle")}
           </span>
           <span className="flex items-center text-xs text-primary px-2 py-0.5 bg-primary/10 rounded-md font-medium">
-            {entries.length} answered
+            {t("questionnaire.answeredCount", { count: entries.length })}
           </span>
         </div>
         <CheckCircle2 className="size-4 text-green-600 dark:text-green-500 shrink-0" />
@@ -86,10 +91,10 @@ export function DyadQuestionnaire({ children }: DyadQuestionnaireProps) {
           {/* Question */}
           <div className="px-3.5 pt-3 pb-2.5 bg-muted/40">
             <div className="flex items-center gap-1.5 mb-1.5">
-              {meta && (
+              {typeLabel && (
                 <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                  {meta.icon}
-                  {meta.label}
+                  {typeIcon}
+                  {typeLabel}
                 </span>
               )}
             </div>
@@ -103,7 +108,7 @@ export function DyadQuestionnaire({ children }: DyadQuestionnaireProps) {
           {/* Answer */}
           <div className="px-3.5 pt-2.5 pb-3">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
-              Answer
+              {t("questionnaire.answer")}
             </p>
             <p className="text-sm text-foreground/90 leading-relaxed">
               {current.answer}
@@ -125,7 +130,9 @@ export function DyadQuestionnaire({ children }: DyadQuestionnaireProps) {
                       ? "w-5 h-1.5 bg-primary"
                       : "w-1.5 h-1.5 bg-primary/25 hover:bg-primary/40"
                   }`}
-                  aria-label={`Go to question ${i + 1}`}
+                  aria-label={t("questionnaire.goToQuestion", {
+                    number: i + 1,
+                  })}
                 />
               ))}
             </div>
@@ -136,7 +143,7 @@ export function DyadQuestionnaire({ children }: DyadQuestionnaireProps) {
                 onClick={() => setCurrentIndex((i) => i - 1)}
                 disabled={!hasPrev}
                 className="p-1 rounded-md hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
-                aria-label="Previous question"
+                aria-label={t("questionnaire.previousQuestion")}
               >
                 <ChevronLeft size={16} className="text-muted-foreground" />
               </button>
@@ -147,7 +154,7 @@ export function DyadQuestionnaire({ children }: DyadQuestionnaireProps) {
                 onClick={() => setCurrentIndex((i) => i + 1)}
                 disabled={!hasNext}
                 className="p-1 rounded-md hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
-                aria-label="Next question"
+                aria-label={t("questionnaire.nextQuestion")}
               >
                 <ChevronRight size={16} className="text-muted-foreground" />
               </button>

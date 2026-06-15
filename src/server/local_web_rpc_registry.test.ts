@@ -1,8 +1,19 @@
 import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import {
+  closeDatabase,
+  configureDatabaseUserDataPath,
+  db,
+  initializeDatabase,
+} from "@/db";
+import { apps } from "@/db/schema";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
 import { createHttpInvokeTransport } from "@/ipc/contracts/core";
+import { createDefaultLocalWebIntegrationService } from "@/ipc/services/default_local_web_integration_service";
+import { createLocalWebPathResolver } from "./local_web_paths";
 import {
   LOCAL_WEB_RPC_ALLOWLIST,
   registerLocalWebRpcHandlers,
@@ -13,6 +24,7 @@ import {
   createSseEventTransport,
 } from "./local_event_stream";
 import { createLocalRpcServer, type LocalRpcServer } from "./local_rpc_server";
+import { createLocalWebSettingsStore } from "./local_web_settings";
 
 const now = new Date("2026-06-11T00:00:00.000Z");
 const origin = "http://localhost:5173";
@@ -118,6 +130,11 @@ describe("local Web RPC registry", () => {
       "get-themes",
       "set-app-theme",
       "get-custom-themes",
+      "get-theme-generation-model-options",
+      "save-theme-image",
+      "cleanup-theme-images",
+      "generate-theme-prompt",
+      "generate-theme-from-url",
       "get-app-theme",
       "create-custom-theme",
       "update-custom-theme",
@@ -378,6 +395,11 @@ describe("local Web RPC registry", () => {
     await expect(
       transport.invoke("get-custom-themes", undefined),
     ).resolves.toEqual([]);
+    await expect(
+      transport.invoke("get-theme-generation-model-options", undefined),
+    ).resolves.toEqual([
+      { id: "dyad/theme-generator/openai", label: "OpenAI" },
+    ]);
     await expect(
       transport.invoke("get-app-theme", { appId: 1 }),
     ).resolves.toBeNull();
@@ -779,6 +801,55 @@ describe("local Web RPC registry", () => {
       }),
     ).resolves.toMatchObject({ id: 1, name: "Theme" });
     await expect(
+      transport.invoke("save-theme-image", {
+        data: Buffer.from("image").toString("base64"),
+        filename: "reference.png",
+      }),
+    ).resolves.toEqual({ path: "/tmp/reference.png" });
+    await expect(
+      transport.invoke("generate-theme-prompt", {
+        imagePaths: ["/tmp/reference.png"],
+        keywords: "modern",
+        generationMode: "inspired",
+        model: "dyad/theme-generator/openai",
+      }),
+    ).resolves.toEqual({ prompt: "<theme>generated</theme>" });
+    await expect(
+      transport.invoke("cleanup-theme-images", {
+        paths: ["/tmp/reference.png"],
+      }),
+    ).resolves.toBeUndefined();
+    await expect(
+      transport.invoke("generate-theme-from-url", {
+        url: "https://example.com",
+        keywords: "",
+        generationMode: "inspired",
+        model: "dyad/theme-generator/openai",
+      }),
+    ).rejects.toThrow(
+      "Website URL theme generation is not available in Local Web mode yet.",
+    );
+    const unsupportedUrlResponse = await nodeFetch(
+      `${baseUrl}/api/rpc/generate-theme-from-url`,
+      {
+        method: "POST",
+        headers: rpcHeaders(),
+        body: JSON.stringify({
+          url: "https://example.com",
+          keywords: "",
+          generationMode: "inspired",
+          model: "dyad/theme-generator/openai",
+        }),
+      },
+    );
+    await expect(unsupportedUrlResponse.json()).resolves.toEqual({
+      ok: false,
+      error:
+        "Website URL theme generation is not available in Local Web mode yet.",
+      kind: "precondition",
+    });
+    expect(unsupportedUrlResponse.status).toBe(409);
+    await expect(
       transport.invoke("rename-media-file", {
         appId: 1,
         fileName: "old.png",
@@ -831,7 +902,96 @@ describe("local Web RPC registry", () => {
     expect(service.createPrompt).toHaveBeenCalledOnce();
     expect(service.createAppCollection).toHaveBeenCalledOnce();
     expect(service.createCustomTheme).toHaveBeenCalledOnce();
+    expect(service.saveThemeImage).toHaveBeenCalledOnce();
+    expect(service.generateThemePrompt).toHaveBeenCalledOnce();
+    expect(service.cleanupThemeImages).toHaveBeenCalledOnce();
+    expect(service.generateThemeFromUrl).toHaveBeenCalledTimes(2);
     expect(service.renameMediaFile).toHaveBeenCalledOnce();
+  });
+
+  it("serves Local Web visual editing over authenticated HTTP using local app files", async () => {
+    const tempDir = fs.mkdtempSync(
+      path.join(process.cwd(), "tmp-local-web-visual-rpc-"),
+    );
+    try {
+      configureDatabaseUserDataPath(tempDir);
+      initializeDatabase();
+      const settingsStore = createLocalWebSettingsStore({
+        userDataPath: tempDir,
+      });
+      const pathResolver = createLocalWebPathResolver({
+        userDataPath: tempDir,
+        settingsStore,
+      });
+      const appPath = pathResolver.getDyadAppPath("visual-rpc-app");
+      await fs.promises.mkdir(path.join(appPath, "src"), { recursive: true });
+      await fs.promises.writeFile(
+        path.join(appPath, "src", "App.tsx"),
+        [
+          "export function App() {",
+          '  return <section className="p-[4px]">RPC copy</section>;',
+          "}",
+          "",
+        ].join("\n"),
+        "utf-8",
+      );
+      const appId = Number(
+        db
+          .insert(apps)
+          .values({ name: "Visual RPC App", path: "visual-rpc-app" })
+          .run().lastInsertRowid,
+      );
+      const integrationService = createDefaultLocalWebIntegrationService({
+        settingsStore,
+        pathResolver,
+      });
+      await startRegistryServer(
+        createService({
+          applyVisualEditingChanges:
+            integrationService.applyVisualEditingChanges!,
+          analyzeComponent: integrationService.analyzeComponent!,
+        }),
+      );
+      const transport = createTransport(baseUrl);
+
+      await expect(
+        transport.invoke("analyze-component", {
+          appId,
+          componentId: "src/App.tsx:2",
+        }),
+      ).resolves.toMatchObject({
+        isDynamic: false,
+        hasStaticText: true,
+        hasImage: false,
+      });
+      await expect(
+        transport.invoke("apply-visual-editing-changes", {
+          appId,
+          changes: [
+            {
+              componentId: "src/App.tsx:2",
+              componentName: "section",
+              relativePath: "src/App.tsx",
+              lineNumber: 2,
+              styles: {
+                padding: { left: "20px", right: "20px" },
+              },
+              textContent: "RPC edited copy",
+            },
+          ],
+        }),
+      ).resolves.toBeUndefined();
+
+      await expect(
+        fs.promises.readFile(path.join(appPath, "src", "App.tsx"), "utf-8"),
+      ).resolves.toContain("RPC edited copy");
+      await expect(
+        fs.promises.readFile(path.join(appPath, "src", "App.tsx"), "utf-8"),
+      ).resolves.toContain("px-[20px]");
+    } finally {
+      closeDatabase();
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   it("rejects auth failures with a structured error envelope", async () => {
@@ -1161,6 +1321,20 @@ function createService(
       },
     ]),
     getCustomThemes: vi.fn(async () => []),
+    getThemeGenerationModelOptions: vi.fn(async () => [
+      { id: "dyad/theme-generator/openai", label: "OpenAI" },
+    ]),
+    saveThemeImage: vi.fn(async () => ({ path: "/tmp/reference.png" })),
+    cleanupThemeImages: vi.fn(async () => undefined),
+    generateThemePrompt: vi.fn(async () => ({
+      prompt: "<theme>generated</theme>",
+    })),
+    generateThemeFromUrl: vi.fn(async () => {
+      throw new DyadError(
+        "Website URL theme generation is not available in Local Web mode yet.",
+        DyadErrorKind.Precondition,
+      );
+    }),
     getAppTheme: vi.fn(async () => null),
     listPrompts: vi.fn(async () => []),
     listAppCollections: vi.fn(async () => []),

@@ -13,7 +13,10 @@ import { useStreamChat } from "@/hooks/useStreamChat";
 import { HomeChatInput } from "@/components/chat/HomeChatInput";
 import { usePostHog } from "posthog-js/react";
 import { PrivacyBanner } from "@/components/TelemetryBanner";
-import { INSPIRATION_PROMPTS } from "@/prompts/inspiration_prompts";
+import {
+  INSPIRATION_PROMPTS,
+  type InspirationPromptLocaleKey,
+} from "@/prompts/inspiration_prompts";
 
 import { ImportAppButton } from "@/components/ImportAppButton";
 import { showError } from "@/lib/toast";
@@ -38,6 +41,8 @@ import { useFreeAgentQuota } from "@/hooks/useFreeAgentQuota";
 import { useInitialChatMode } from "@/hooks/useInitialChatMode";
 import { isLocalWebRuntime } from "@/lib/runtime_client";
 import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
+
+type InspirationTranslationKey = `inspiration.${InspirationPromptLocaleKey}`;
 
 // Adding an export for attachments
 export interface HomeSubmitOptions {
@@ -89,6 +94,12 @@ export default function HomePage() {
     const shuffled = [...INSPIRATION_PROMPTS].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 3);
   }, []);
+
+  const getInspirationLabel = useCallback(
+    (localeKey: InspirationPromptLocaleKey) =>
+      t(`inspiration.${localeKey}` as InspirationTranslationKey),
+    [t],
+  );
 
   // Initialize random prompts
   useEffect(() => {
@@ -273,7 +284,11 @@ export default function HomePage() {
                   type="button"
                   key={index}
                   onClick={() =>
-                    setInputValue(t("buildMeA", { label: item.label }))
+                    setInputValue(
+                      t("buildMeA", {
+                        label: getInspirationLabel(item.localeKey),
+                      }),
+                    )
                   }
                   className="flex items-center gap-3 px-4 py-2 rounded-xl border border-gray-200
                            bg-white/50 backdrop-blur-sm
@@ -287,7 +302,7 @@ export default function HomePage() {
                     {item.icon}
                   </span>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {item.label}
+                    {getInspirationLabel(item.localeKey)}
                   </span>
                 </button>
               ))}

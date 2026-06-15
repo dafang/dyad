@@ -86,6 +86,10 @@ function KeyValueEditor({
   const [newKey, setNewKey] = useState("");
   const [newValue, setNewValue] = useState("");
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const itemTranslation =
+    itemLabel === "Header"
+      ? t("settings:toolsMcp.header")
+      : t("settings:toolsMcp.environmentVariable");
 
   React.useEffect(() => {
     setEnvVars(initial);
@@ -98,7 +102,7 @@ function KeyValueEditor({
 
   const handleAdd = async () => {
     if (!newKey.trim() || !newValue.trim()) {
-      showError(t("toolsMcp.keyValueRequired"));
+      showError(t("settings:toolsMcp.keyValueRequired"));
       return;
     }
     if (envVars.some((e) => e.key === newKey.trim())) {
@@ -110,7 +114,7 @@ function KeyValueEditor({
     setNewKey("");
     setNewValue("");
     setIsAddingNew(false);
-    showSuccess(`${itemLabel}s saved`);
+    showSuccess(t("settings:toolsMcp.itemsSaved", { item: itemTranslation }));
   };
 
   const handleEdit = (kv: KeyValue) => {
@@ -122,7 +126,7 @@ function KeyValueEditor({
   const handleSaveEdit = async () => {
     if (!editingKey) return;
     if (!editingKeyValue.trim() || !editingValue.trim()) {
-      showError(t("toolsMcp.keyValueRequired"));
+      showError(t("settings:toolsMcp.keyValueRequired"));
       return;
     }
     if (
@@ -142,7 +146,7 @@ function KeyValueEditor({
     setEditingKey(null);
     setEditingKeyValue("");
     setEditingValue("");
-    showSuccess(`${itemLabel}s saved`);
+    showSuccess(t("settings:toolsMcp.itemsSaved", { item: itemTranslation }));
   };
 
   const handleCancelEdit = () => {
@@ -154,7 +158,7 @@ function KeyValueEditor({
   const handleDelete = async (key: string) => {
     const next = envVars.filter((e) => e.key !== key);
     await saveAll(next);
-    showSuccess(`${itemLabel}s saved`);
+    showSuccess(t("settings:toolsMcp.itemsSaved", { item: itemTranslation }));
   };
 
   return (
@@ -232,7 +236,9 @@ function KeyValueEditor({
       <div className="space-y-2">
         {envVars.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            No {itemLabel.toLowerCase()}s configured
+            {itemLabel === "Header"
+              ? t("settings:toolsMcp.noHeadersConfigured")
+              : t("settings:toolsMcp.noEnvVars")}
           </p>
         ) : (
           envVars.map((kv) => (
@@ -246,14 +252,14 @@ function KeyValueEditor({
                     <Input
                       value={editingKeyValue}
                       onChange={(e) => setEditingKeyValue(e.target.value)}
-                      placeholder="Key"
+                      placeholder={t("settings:toolsMcp.key")}
                       className="h-8"
                       disabled={disabled || isSaving}
                     />
                     <Input
                       value={editingValue}
                       onChange={(e) => setEditingValue(e.target.value)}
-                      placeholder="Value"
+                      placeholder={t("settings:toolsMcp.value")}
                       className="h-8"
                       disabled={disabled || isSaving}
                     />
@@ -331,6 +337,7 @@ export function ToolsMcpSettings() {
     isStartingOAuth,
     isDisconnectingOAuth,
   } = useMcp();
+  const { t } = useTranslation(["settings", "common"]);
   const [consents, setConsents] = useState<Record<string, any>>({});
   const [name, setName] = useState("");
   const [transport, setTransport] = useState<Transport>("stdio");
@@ -381,14 +388,14 @@ export function ToolsMcpSettings() {
   });
   const oauthStorageEncrypted = oauthStorageEncryptedQuery.data ?? null;
   const { lastDeepLink, clearLastDeepLink } = useDeepLink();
-  console.log("lastDeepLink!!!", lastDeepLink);
   useEffect(() => {
-    console.log("rerun effect");
     const handleDeepLink = async () => {
       if (lastDeepLink?.type === "add-mcp-server") {
         const deepLink = lastDeepLink as AddMcpServerDeepLinkData;
         const payload = deepLink.payload;
-        showInfo(`Prefilled ${payload.name} MCP server`);
+        showInfo(
+          t("settings:toolsMcp.prefilledServer", { name: payload.name }),
+        );
         setName(payload.name);
         setTransport(payload.config.type);
         if (payload.config.type === "stdio") {
@@ -424,17 +431,17 @@ export function ToolsMcpSettings() {
     if (transport === "http") {
       const trimmedUrl = url.trim();
       if (!trimmedUrl) {
-        showError("URL is required for HTTP MCP servers.");
+        showError(t("settings:toolsMcp.urlRequired"));
         return;
       }
       try {
         const parsed = new URL(trimmedUrl);
         if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-          showError("URL must use http:// or https://");
+          showError(t("settings:toolsMcp.urlProtocolRequired"));
           return;
         }
       } catch {
-        showError(`Invalid URL: "${trimmedUrl}"`);
+        showError(t("settings:toolsMcp.invalidUrl", { url: trimmedUrl }));
         return;
       }
     }
@@ -485,7 +492,9 @@ export function ToolsMcpSettings() {
       if (wantsOAuth) {
         // Bridge the gap until the new row arrives in `serversQuery`
         // and shows its own "Connecting…" state.
-        showInfo(`Connecting OAuth for "${created.name}"…`);
+        showInfo(
+          t("settings:toolsMcp.connectingOAuthFor", { name: created.name }),
+        );
         await runAutoConnect(created.id, {
           showToast: true,
           callbackPort:
@@ -515,10 +524,10 @@ export function ToolsMcpSettings() {
       });
       if (result.success) {
         setConnectFeedback(null);
-        showSuccess("OAuth connection successful");
+        showSuccess(t("settings:toolsMcp.oauthConnectionSuccessful"));
         return;
       }
-      const message = result.error ?? "OAuth flow failed";
+      const message = result.error ?? t("settings:toolsMcp.oauthFlowFailed");
       if (result.errorKind === "discovery_failed") {
         setConnectFeedback({
           serverId,
@@ -529,9 +538,7 @@ export function ToolsMcpSettings() {
         // failure is visible even when the new row is scrolled out of
         // view. Manual retries show the inline panel in place.
         if (opts?.showToast) {
-          showError(
-            "OAuth connection failed. This server doesn't support OAuth.",
-          );
+          showError(t("settings:toolsMcp.oauthUnsupportedToast"));
         }
       } else {
         showError(message);
@@ -548,13 +555,10 @@ export function ToolsMcpSettings() {
         setConnectFeedback({
           serverId,
           kind: "unauthorized",
-          message:
-            "This server requires authentication. Enable OAuth and try again.",
+          message: t("settings:toolsMcp.serverRequiresAuthenticationMessage"),
         });
         if (opts?.showToast) {
-          showError(
-            "Server connection failed. This server requires authentication. Try enabling OAuth.",
-          );
+          showError(t("settings:toolsMcp.serverRequiresAuthenticationToast"));
         }
       } else {
         setConnectFeedback(null);
@@ -587,10 +591,12 @@ export function ToolsMcpSettings() {
     setDisconnectingServerId(serverId);
     try {
       await disconnectOAuth(serverId);
-      showSuccess("Disconnected OAuth");
+      showSuccess(t("settings:toolsMcp.oauthDisconnected"));
     } catch (err) {
       showError(
-        err instanceof Error ? err.message : "Failed to disconnect OAuth",
+        err instanceof Error
+          ? err.message
+          : t("settings:toolsMcp.oauthDisconnectFailed"),
       );
     } finally {
       setDisconnectingServerId(null);
@@ -604,6 +610,15 @@ export function ToolsMcpSettings() {
   ) => {
     await updateToolConsent(serverId, toolName, consent);
     setConsents((prev) => ({ ...prev, [`${serverId}:${toolName}`]: consent }));
+  };
+  const getToolConsentLabel = (consent: string) => {
+    if (consent === "always") {
+      return t("settings:agentPermissions.alwaysAllow");
+    }
+    if (consent === "denied") {
+      return t("settings:toolsMcp.deny");
+    }
+    return t("settings:agentPermissions.ask");
   };
 
   const hasOauthServer = useMemo(
@@ -623,33 +638,28 @@ export function ToolsMcpSettings() {
     <div className="space-y-6">
       {showPlaintextBanner && (
         <Alert variant="destructive">
-          <AlertTitle>
-            OAuth tokens and client secrets stored without OS encryption
-          </AlertTitle>
+          <AlertTitle>{t("settings:toolsMcp.plaintextTitle")}</AlertTitle>
           <AlertDescription>
-            Your OS keyring is unavailable (on Linux this usually means
+            {t("settings:toolsMcp.plaintextDescriptionBefore")}
             <code className="mx-1">libsecret</code>/<code>gnome-keyring</code>
-            is not installed), so OAuth tokens and pre-registered client secrets
-            for HTTP MCP servers are written to the local database without
-            encryption. Any process with read access to the Dyad data directory
-            can decode them. Client secrets are especially sensitive because
-            they don't expire. Install a keyring service and reconnect (and
-            re-enter any pre-registered client secret) to upgrade.
+            {t("settings:toolsMcp.plaintextDescriptionAfter")}
           </AlertDescription>
         </Alert>
       )}
       <div className="space-y-2">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label>Name</Label>
+            <Label>{t("settings:toolsMcp.name")}</Label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="My MCP Server"
+              placeholder={t("settings:toolsMcp.namePlaceholder")}
             />
           </div>
           <div>
-            <Label htmlFor="mcp-transport-select">Transport</Label>
+            <Label htmlFor="mcp-transport-select">
+              {t("settings:toolsMcp.transport")}
+            </Label>
             <select
               id="mcp-transport-select"
               data-testid="mcp-transport-select"
@@ -664,19 +674,19 @@ export function ToolsMcpSettings() {
           {transport === "stdio" && (
             <>
               <div>
-                <Label>Command</Label>
+                <Label>{t("settings:toolsMcp.command")}</Label>
                 <Input
                   value={command}
                   onChange={(e) => setCommand(e.target.value)}
-                  placeholder="node"
+                  placeholder={t("settings:toolsMcp.commandPlaceholder")}
                 />
               </div>
               <div>
-                <Label>Args</Label>
+                <Label>{t("settings:toolsMcp.args")}</Label>
                 <Input
                   value={args}
                   onChange={(e) => setArgs(e.target.value)}
-                  placeholder="path/to/mcp-server.js --flag"
+                  placeholder={t("settings:toolsMcp.argsPlaceholder")}
                 />
               </div>
             </>
@@ -684,24 +694,24 @@ export function ToolsMcpSettings() {
           {transport === "http" && (
             <>
               <div className="col-span-2">
-                <Label>URL</Label>
+                <Label>{t("settings:toolsMcp.url")}</Label>
                 <Input
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="http://localhost:3000"
+                  placeholder={t("settings:toolsMcp.urlPlaceholder")}
                 />
               </div>
               <div className="col-span-2">
                 <div className="flex items-center gap-2">
                   <Switch
-                    aria-label="Use OAuth"
+                    aria-label={t("settings:toolsMcp.useOAuth")}
                     checked={oauthEnabled}
                     onCheckedChange={setOauthEnabled}
                   />
-                  <Label>Use OAuth</Label>
+                  <Label>{t("settings:toolsMcp.useOAuth")}</Label>
                 </div>
                 <div className="ml-10 mt-1 text-xs text-muted-foreground">
-                  Required for most remote servers.
+                  {t("settings:toolsMcp.oauthRequiredForRemote")}
                 </div>
               </div>
               {oauthEnabled && (
@@ -709,30 +719,29 @@ export function ToolsMcpSettings() {
                   <Accordion>
                     <AccordionItem value="advanced">
                       <AccordionTrigger className="py-2 text-sm">
-                        Advanced OAuth options
+                        {t("settings:toolsMcp.advancedOAuthOptions")}
                       </AccordionTrigger>
                       <AccordionContent className="space-y-3">
                         <div>
                           <Label>
-                            OAuth Client ID
+                            {t("settings:toolsMcp.oauthClientId")}
                             <span className="ml-1 text-xs text-muted-foreground">
-                              If the MCP server's setup requires you to register
-                              an app, paste the Client ID of your app here.
-                              Otherwise leave this blank.
+                              {t("settings:toolsMcp.oauthClientIdHelp")}
                             </span>
                           </Label>
                           <Input
                             value={oauthClientId}
                             onChange={(e) => setOauthClientId(e.target.value)}
-                            placeholder="Pre-registered client ID"
+                            placeholder={t(
+                              "settings:toolsMcp.oauthClientIdPlaceholder",
+                            )}
                           />
                         </div>
                         <div>
                           <Label>
-                            OAuth Client Secret
+                            {t("settings:toolsMcp.oauthClientSecret")}
                             <span className="ml-1 text-xs text-muted-foreground">
-                              Include this only if the MCP server gave you a
-                              secret alongside the Client ID.
+                              {t("settings:toolsMcp.oauthClientSecretHelp")}
                             </span>
                           </Label>
                           <Input
@@ -741,15 +750,16 @@ export function ToolsMcpSettings() {
                             onChange={(e) =>
                               setOauthClientSecret(e.target.value)
                             }
-                            placeholder="Pre-registered client secret"
+                            placeholder={t(
+                              "settings:toolsMcp.oauthClientSecretPlaceholder",
+                            )}
                           />
                         </div>
                         <div>
                           <Label>
-                            OAuth Scope
+                            {t("settings:toolsMcp.oauthScope")}
                             <span className="ml-1 text-xs text-muted-foreground">
-                              Permissions to request, space-separated. Leave
-                              this blank to use the server's default.
+                              {t("settings:toolsMcp.oauthScopeHelp")}
                             </span>
                           </Label>
                           <Input
@@ -759,16 +769,13 @@ export function ToolsMcpSettings() {
                           />
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          If you include a Client ID, make sure that you
-                          register{" "}
+                          {t("settings:toolsMcp.redirectUriBefore")}{" "}
                           <code>
                             http://localhost:
                             {callbackPort ?? "…"}
                             /callback
                           </code>{" "}
-                          as a redirect URI for your MCP server. Your MCP server
-                          most likely provides a dashboard where you can do
-                          this.
+                          {t("settings:toolsMcp.redirectUriAfter")}
                         </div>
                       </AccordionContent>
                     </AccordionItem>
@@ -779,16 +786,18 @@ export function ToolsMcpSettings() {
           )}
           <div className="flex items-center gap-2">
             <Switch
-              aria-label="Enabled"
+              aria-label={t("common:enabled")}
               checked={enabled}
               onCheckedChange={setEnabled}
             />
-            <Label>Enabled</Label>
+            <Label>{t("common:enabled")}</Label>
           </div>
         </div>
         <div>
           <Button onClick={onCreate} disabled={!name.trim() || isAdding}>
-            {isAdding ? "Adding…" : "Add Server"}
+            {isAdding
+              ? t("settings:toolsMcp.addingServer")
+              : t("settings:toolsMcp.addServer")}
           </Button>
         </div>
       </div>
@@ -804,8 +813,9 @@ export function ToolsMcpSettings() {
                 ? {
                     serverId: s.id,
                     kind: "unauthorized",
-                    message:
-                      "This server requires authentication. Enable OAuth and try again.",
+                    message: t(
+                      "settings:toolsMcp.serverRequiresAuthenticationMessage",
+                    ),
                   }
                 : null;
           return (
@@ -822,8 +832,11 @@ export function ToolsMcpSettings() {
                             : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
                         }`}
                       >
-                        OAuth:{" "}
-                        {s.oauthConnected ? "connected" : "not connected"}
+                        {t("settings:toolsMcp.oauthStatus", {
+                          status: s.oauthConnected
+                            ? t("settings:toolsMcp.connected")
+                            : t("settings:toolsMcp.notConnected"),
+                        })}
                       </span>
                     )}
                   </div>
@@ -844,8 +857,8 @@ export function ToolsMcpSettings() {
                       disabled={isStartingOAuth && connectingServerId === s.id}
                     >
                       {isStartingOAuth && connectingServerId === s.id
-                        ? "Connecting…"
-                        : "Connect"}
+                        ? t("settings:toolsMcp.connecting")
+                        : t("settings:toolsMcp.connect")}
                     </Button>
                   )}
                   {s.oauthEnabled && s.oauthConnected && (
@@ -857,26 +870,28 @@ export function ToolsMcpSettings() {
                       }
                     >
                       {isDisconnectingOAuth && disconnectingServerId === s.id
-                        ? "Disconnecting…"
-                        : "Disconnect"}
+                        ? t("settings:toolsMcp.disconnecting")
+                        : t("settings:toolsMcp.disconnect")}
                     </Button>
                   )}
                   <Switch
-                    aria-label={`Toggle ${s.name}`}
+                    aria-label={t("settings:toolsMcp.toggleServer", {
+                      name: s.name,
+                    })}
                     checked={!!s.enabled}
                     onCheckedChange={() =>
                       toggleServerEnabled(s.id, !!s.enabled)
                     }
                   />
                   <Button variant="outline" onClick={() => deleteServer(s.id)}>
-                    Delete
+                    {t("common:delete")}
                   </Button>
                 </div>
               </div>
               {s.transport === "stdio" && (
                 <div className="mt-3">
                   <div className="text-sm font-medium mb-2">
-                    Environment Variables
+                    {t("settings:toolsMcp.environmentVariables")}
                   </div>
                   <KeyValueEditor
                     id={s.id}
@@ -897,10 +912,10 @@ export function ToolsMcpSettings() {
                   <Alert variant="destructive">
                     <AlertTitle>
                       {rowFeedback.kind === "unauthorized"
-                        ? "Server requires authentication"
+                        ? t("settings:toolsMcp.serverRequiresAuthentication")
                         : rowFeedback.kind === "discovery_failed"
-                          ? "Server doesn't support OAuth"
-                          : "Connection failed"}
+                          ? t("settings:toolsMcp.serverDoesNotSupportOAuth")
+                          : t("settings:toolsMcp.connectionFailed")}
                     </AlertTitle>
                     <AlertDescription className="gap-2">
                       <span>{rowFeedback.message}</span>
@@ -910,7 +925,7 @@ export function ToolsMcpSettings() {
                           onClick={() => onEnableOAuthAndRetry(s.id)}
                           disabled={isUpdatingServer || isStartingOAuth}
                         >
-                          Enable OAuth & retry
+                          {t("settings:toolsMcp.enableOAuthAndRetry")}
                         </Button>
                       )}
                       {rowFeedback.kind === "discovery_failed" && (
@@ -919,7 +934,7 @@ export function ToolsMcpSettings() {
                           onClick={() => onDisableOAuthAndRetry(s.id)}
                           disabled={isUpdatingServer}
                         >
-                          Disable OAuth & retry
+                          {t("settings:toolsMcp.disableOAuthAndRetry")}
                         </Button>
                       )}
                     </AlertDescription>
@@ -928,7 +943,9 @@ export function ToolsMcpSettings() {
               )}
               {s.transport === "http" && (
                 <div className="mt-3">
-                  <div className="text-sm font-medium mb-2">Headers</div>
+                  <div className="text-sm font-medium mb-2">
+                    {t("settings:toolsMcp.headers")}
+                  </div>
                   <KeyValueEditor
                     id={s.id}
                     json={s.headersJson}
@@ -945,38 +962,51 @@ export function ToolsMcpSettings() {
                 </div>
               )}
               <div className="mt-3 space-y-2">
-                {(toolsByServer[s.id] || []).map((t) => (
-                  <div key={t.name} className="border rounded p-2">
-                    <div className="flex items-center gap-4">
-                      <div className="font-mono text-sm truncate">{t.name}</div>
-                      <div className="flex items-center gap-2">
-                        <Select
-                          value={consents[`${s.id}:${t.name}`] || "ask"}
-                          onValueChange={(v) =>
-                            onSetToolConsent(s.id, t.name, v as any)
-                          }
-                        >
-                          <SelectTrigger className="w-[140px] h-8">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ask">Ask</SelectItem>
-                            <SelectItem value="always">Always allow</SelectItem>
-                            <SelectItem value="denied">Deny</SelectItem>
-                          </SelectContent>
-                        </Select>
+                {(toolsByServer[s.id] || []).map((tool) => {
+                  const consent = consents[`${s.id}:${tool.name}`] || "ask";
+                  return (
+                    <div key={tool.name} className="border rounded p-2">
+                      <div className="flex items-center gap-4">
+                        <div className="font-mono text-sm truncate">
+                          {tool.name}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={consent}
+                            onValueChange={(v) =>
+                              onSetToolConsent(s.id, tool.name, v as any)
+                            }
+                          >
+                            <SelectTrigger className="w-[140px] h-8">
+                              <SelectValue>
+                                {getToolConsentLabel(consent)}
+                              </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="ask">
+                                {t("settings:agentPermissions.ask")}
+                              </SelectItem>
+                              <SelectItem value="always">
+                                {t("settings:agentPermissions.alwaysAllow")}
+                              </SelectItem>
+                              <SelectItem value="denied">
+                                {t("settings:toolsMcp.deny")}
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
+                      {tool.description && (
+                        <div className="mt-1 text-xs max-w-[500px] text-muted-foreground truncate">
+                          {tool.description}
+                        </div>
+                      )}
                     </div>
-                    {t.description && (
-                      <div className="mt-1 text-xs max-w-[500px] text-muted-foreground truncate">
-                        {t.description}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
                 {(toolsByServer[s.id] || []).length === 0 && (
                   <div className="text-xs text-muted-foreground">
-                    No tools discovered.
+                    {t("settings:toolsMcp.noToolsDiscovered")}
                   </div>
                 )}
               </div>
@@ -985,7 +1015,7 @@ export function ToolsMcpSettings() {
         })}
         {servers.length === 0 && (
           <div className="text-sm text-muted-foreground">
-            No servers configured yet.
+            {t("settings:toolsMcp.noServersConfigured")}
           </div>
         )}
       </div>

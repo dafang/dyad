@@ -38,6 +38,7 @@ import { AppBlueprintVisuals } from "./AppBlueprintVisuals";
 import { getAppBlueprintTemplateOptions } from "./appBlueprintTemplateOptions";
 import { AppBlueprintNameConflictDialog } from "./AppBlueprintNameConflictDialog";
 import type { CustomTagState } from "./stateTypes";
+import { useTranslation } from "react-i18next";
 
 /**
  * The rename handler throws a name or path conflict (both surface as
@@ -72,6 +73,7 @@ interface DyadAppBlueprintCardProps {
 export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
   node,
 }) => {
+  const { t } = useTranslation(["chat", "common"]);
   const props = node.properties;
   const chatId = useAtomValue(selectedChatIdAtom);
   const appBlueprintState = useAtomValue(appBlueprintStateAtom);
@@ -218,10 +220,10 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         .editVisual({ chatId, visualId, field, value })
         .catch((error) => {
           console.error("Failed to persist visual edit:", error);
-          showError("Could not save visual changes. Please try again.");
+          showError(t("chat:blueprint.card.errors.saveVisual"));
         });
     },
-    [chatId, isApproved, setAppBlueprintState],
+    [chatId, isApproved, setAppBlueprintState, t],
   );
 
   const handleAddVisual = useCallback(
@@ -266,7 +268,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         })
         .catch((error) => {
           console.error("Failed to add visual:", error);
-          showError("Could not add visual. Please try again.");
+          showError(t("chat:blueprint.card.errors.addVisual"));
           // Roll back optimistic update
           setAppBlueprintState((prev) => {
             const nextPlans = new Map(prev.plansByChatId);
@@ -281,7 +283,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
           });
         });
     },
-    [chatId, isApproved, setAppBlueprintState],
+    [chatId, isApproved, setAppBlueprintState, t],
   );
 
   const handleRemoveVisual = useCallback(
@@ -313,7 +315,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         .removeVisual({ chatId, visualId })
         .catch((error) => {
           console.error("Failed to remove visual:", error);
-          showError("Could not remove visual. Please try again.");
+          showError(t("chat:blueprint.card.errors.removeVisual"));
           // Roll back
           setAppBlueprintState((prev) => {
             const nextPlans = new Map(prev.plansByChatId);
@@ -328,7 +330,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
           });
         });
     },
-    [chatId, isApproved, appBlueprintState, setAppBlueprintState],
+    [chatId, isApproved, appBlueprintState, setAppBlueprintState, t],
   );
 
   const handleFieldEdit = useCallback(
@@ -353,11 +355,11 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         .then(() => true)
         .catch((error) => {
           console.error("Failed to persist app blueprint field edit:", error);
-          showError("Could not save app blueprint changes. Please try again.");
+          showError(t("chat:blueprint.card.errors.saveChanges"));
           return false;
         });
     },
-    [chatId, isApproved, setAppBlueprintState],
+    [chatId, isApproved, setAppBlueprintState, t],
   );
 
   const handleApprove = useCallback(
@@ -367,7 +369,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
 
       const plan = appBlueprintState.plansByChatId.get(chatId) ?? planData;
       if (!plan) {
-        showError("Blueprint data is unavailable. Please regenerate the plan.");
+        showError(t("chat:blueprint.card.errors.dataUnavailable"));
         return;
       }
 
@@ -427,7 +429,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
               currentApp = await ipc.app.getApp(selectedAppId);
             } catch (error) {
               recordApplyError(
-                "Could not load the app before applying the app blueprint.",
+                t("chat:blueprint.card.errors.loadAppBeforeApply"),
                 error,
               );
             }
@@ -461,7 +463,10 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
                   // would build under the old name/path. Treat them as fatal so
                   // the user can fix the blueprint and re-approve.
                   renameFailed = true;
-                  recordApplyError("Could not rename the app.", error);
+                  recordApplyError(
+                    t("chat:blueprint.card.errors.renameApp"),
+                    error,
+                  );
                 }
               }
             }
@@ -485,7 +490,10 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
               templateNeedsRestart = needsRestart;
             } catch (error) {
               templateApplyFailed = true;
-              recordApplyError("Could not apply the selected template.", error);
+              recordApplyError(
+                t("chat:blueprint.card.errors.applyTemplate"),
+                error,
+              );
             }
           }
 
@@ -501,7 +509,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
               });
             }
           } catch (error) {
-            recordApplyError("Could not apply the selected theme.", error);
+            recordApplyError(t("chat:blueprint.card.errors.applyTheme"), error);
           }
         }
 
@@ -511,8 +519,8 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         // wrong app name/path.
         if (templateApplyFailed || renameFailed) {
           const errorPrefix = renameFailed
-            ? "Could not rename the app. Please choose a different name and try again"
-            : "Could not apply the selected template. Please review the plan and try again";
+            ? t("chat:blueprint.card.errors.renamePrefix")
+            : t("chat:blueprint.card.errors.applyTemplatePrefix");
           const errorMessage = `${errorPrefix}:\n- ${applyErrors.join("\n- ")}`;
           setApprovalError(errorMessage);
           showError(errorMessage);
@@ -520,7 +528,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         }
 
         if (applyErrors.length > 0) {
-          const errorMessage = `Blueprint approved, but some changes could not be applied:\n- ${applyErrors.join("\n- ")}`;
+          const errorMessage = `${t("chat:blueprint.card.errors.approvedPartial")}:\n- ${applyErrors.join("\n- ")}`;
           setApprovalError(errorMessage);
           showError(errorMessage);
         }
@@ -556,8 +564,9 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
                 removeNodeModules: true,
               });
             } catch {
-              const restartError =
-                "Blueprint approved, but the app preview could not be restarted after the template change.";
+              const restartError = t(
+                "chat:blueprint.card.errors.previewRestartFailed",
+              );
               setApprovalError(restartError);
               showError(restartError);
             } finally {
@@ -565,7 +574,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
                 await refreshAppMetadata();
               } catch {
                 setApprovalError(
-                  "Blueprint approved, but app metadata refresh failed.",
+                  t("chat:blueprint.card.errors.metadataRefreshFailed"),
                 );
               }
             }
@@ -573,7 +582,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         } else {
           void refreshAppMetadata().catch(() => {
             setApprovalError(
-              "Blueprint approved, but app metadata refresh failed.",
+              t("chat:blueprint.card.errors.metadataRefreshFailed"),
             );
           });
         }
@@ -611,8 +620,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         try {
           await streamMessage({ chatId, prompt: followUpPrompt });
         } catch {
-          const followUpError =
-            "Blueprint approved, but the follow-up message could not be sent. You can type your next message to continue building.";
+          const followUpError = t("chat:blueprint.card.errors.followUpFailed");
           setApprovalError(followUpError);
           showError(followUpError);
         }
@@ -624,13 +632,12 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
             nextApproved.delete(chatId);
             return { ...prev, approvedChatIds: nextApproved };
           });
-          setApprovalError(
-            "Failed to approve the app blueprint. Please try again.",
-          );
-          showError("Failed to approve the app blueprint. Please try again.");
+          setApprovalError(t("chat:blueprint.card.errors.approveFailed"));
+          showError(t("chat:blueprint.card.errors.approveFailed"));
         } else {
-          const errorMessage =
-            "Blueprint approved, but follow-up work could not be started. You can type your next message to continue building.";
+          const errorMessage = t(
+            "chat:blueprint.card.errors.followUpStartFailed",
+          );
           setApprovalError(errorMessage);
           showError(errorMessage);
         }
@@ -650,6 +657,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
       setAppBlueprintState,
       streamMessage,
       handleFieldEdit,
+      t,
     ],
   );
 
@@ -681,13 +689,13 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
             size={18}
           />
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            App Blueprint
+            {t("chat:blueprint.card.title")}
           </span>
         </div>
         {!isReady && (
           <span className="flex items-center gap-1.5 text-xs text-primary px-3 py-1 bg-primary/10 rounded-md font-medium">
             <Loader2 size={12} className="animate-spin" />
-            Generating...
+            {t("chat:blueprint.card.generating")}
           </span>
         )}
       </div>
@@ -712,7 +720,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         {/* App Name */}
         <div className="space-y-1.5">
           <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
-            App Name
+            {t("chat:blueprint.card.appName")}
           </div>
           {editingName && !isApproved ? (
             <input
@@ -728,7 +736,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
                   setEditingName(false);
                 }
               }}
-              aria-label="App Name"
+              aria-label={t("chat:blueprint.card.appName")}
               className="block w-full text-lg font-semibold bg-transparent border-b border-primary/40 focus:border-primary outline-none pb-0.5 text-foreground"
               autoFocus
             />
@@ -736,8 +744,10 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
             <button
               id={appNameFieldId}
               type="button"
-              aria-label="Edit app name"
-              title={isApproved ? undefined : "Edit app name"}
+              aria-label={t("chat:blueprint.card.editAppName")}
+              title={
+                isApproved ? undefined : t("chat:blueprint.card.editAppName")
+              }
               className={`group inline-flex items-center gap-1 text-lg font-semibold text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm ${
                 !isApproved
                   ? "hover:text-primary cursor-text transition-colors"
@@ -751,7 +761,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
               }}
               disabled={isApproved}
             >
-              <span>{appName || "Untitled App"}</span>
+              <span>{appName || t("chat:blueprint.card.untitledApp")}</span>
               {!isApproved && (
                 <Pencil
                   size={14}
@@ -767,7 +777,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         {userPrompt && (
           <div className="space-y-1">
             <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
-              Prompt
+              {t("chat:blueprint.card.prompt")}
             </div>
             <AppBlueprintUserPrompt
               prompt={userPrompt}
@@ -782,7 +792,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
           <div className="space-y-1">
             <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
               <Layout size={10} />
-              Tech Stack
+              {t("chat:blueprint.card.techStack")}
             </div>
             {isApproved ? (
               <span className="text-sm text-foreground/80">
@@ -792,7 +802,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
             ) : (
               <select
                 id={templateFieldId}
-                aria-label="Tech Stack"
+                aria-label={t("chat:blueprint.card.techStack")}
                 data-testid="app-blueprint-template-select"
                 value={templateId}
                 onChange={(e) => handleFieldEdit("templateId", e.target.value)}
@@ -800,7 +810,9 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
               >
                 {!(templates ?? []).some((t) => t.id === templateId) && (
                   <option value={templateId} disabled>
-                    Unknown template ({templateId})
+                    {t("chat:blueprint.card.unknownTemplate", {
+                      templateId,
+                    })}
                   </option>
                 )}
                 {templateOptions.map((t) => (
@@ -816,7 +828,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
           <div className="space-y-1">
             <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
               <Paintbrush size={10} />
-              Theme
+              {t("chat:blueprint.card.theme")}
             </div>
             {isApproved ? (
               <span className="text-sm text-foreground/80">
@@ -825,7 +837,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
             ) : (
               <select
                 id={themeFieldId}
-                aria-label="Theme"
+                aria-label={t("chat:blueprint.card.theme")}
                 data-testid="app-blueprint-theme-select"
                 value={themeId}
                 onChange={(e) => handleFieldEdit("themeId", e.target.value)}
@@ -833,7 +845,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
               >
                 {!allThemeOptions.some((t) => t.id === themeId) && (
                   <option value={themeId} disabled>
-                    Unknown theme ({themeId})
+                    {t("chat:blueprint.card.unknownTheme", { themeId })}
                   </option>
                 )}
                 {(themes ?? []).map((t) => (
@@ -842,7 +854,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
                   </option>
                 ))}
                 {customThemes.length > 0 && (
-                  <optgroup label="Custom Themes">
+                  <optgroup label={t("chat:blueprint.card.customThemes")}>
                     {customThemes.map((t) => (
                       <option key={`custom:${t.id}`} value={`custom:${t.id}`}>
                         {t.name}
@@ -860,7 +872,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
           <div className="space-y-1">
             <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
               <Palette size={10} />
-              Primary Color
+              {t("chat:blueprint.card.primaryColor")}
             </div>
             <div className="flex items-center gap-2">
               {isApproved ? (
@@ -880,7 +892,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
                   <input
                     id={primaryColorPickerFieldId}
                     type="color"
-                    aria-label="Primary Color Picker"
+                    aria-label={t("chat:blueprint.card.primaryColorPicker")}
                     value={primaryColor || "#000000"}
                     onChange={(e) => {
                       setColorTextValue(e.target.value);
@@ -891,7 +903,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
                   <input
                     id={primaryColorTextFieldId}
                     type="text"
-                    aria-label="Primary Color Hex Code"
+                    aria-label={t("chat:blueprint.card.primaryColorHex")}
                     value={colorTextValue}
                     onChange={(e) => setColorTextValue(e.target.value)}
                     onBlur={() => {
@@ -919,7 +931,7 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
         {(designDirection || !isApproved) && (
           <div className="space-y-1">
             <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
-              Design Direction
+              {t("chat:blueprint.card.designDirection")}
             </div>
             <AppBlueprintDesignDirection
               direction={designDirection}
@@ -965,17 +977,17 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
               {isApproving ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
-                  Applying plan...
+                  {t("chat:blueprint.card.applyingPlan")}
                 </>
               ) : approvalError ? (
                 <>
                   <AlertCircle size={16} className="text-amber-500" />
-                  Plan approved with issues
+                  {t("chat:blueprint.card.approvedWithIssues")}
                 </>
               ) : (
                 <>
                   <Check size={16} className="text-emerald-500" />
-                  Plan approved
+                  {t("chat:blueprint.card.approved")}
                 </>
               )}
             </span>
@@ -995,10 +1007,10 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
               }`}
             >
               {isTimedOut
-                ? "Blueprint timed out — start a new chat to try again."
+                ? t("chat:blueprint.card.timedOutStatus")
                 : isReady
-                  ? "Your app blueprint is ready to review."
-                  : "Preparing app blueprint..."}
+                  ? t("chat:blueprint.card.readyStatus")
+                  : t("chat:blueprint.card.preparingStatus")}
             </p>
             <button
               type="button"
@@ -1010,21 +1022,21 @@ export const DyadAppBlueprintCard: React.FC<DyadAppBlueprintCardProps> = ({
               {isApproving ? (
                 <>
                   <Loader2 size={14} className="animate-spin" />
-                  Applying plan...
+                  {t("chat:blueprint.card.applyingPlan")}
                 </>
               ) : isTimedOut ? (
-                "Plan timed out"
+                t("chat:blueprint.card.planTimedOut")
               ) : !isReady ? (
                 <>
                   <Loader2 size={14} className="animate-spin" />
-                  Generating...
+                  {t("chat:blueprint.card.generating")}
                 </>
               ) : !appName ? (
-                "Add an app name to continue"
+                t("chat:blueprint.card.addNameToContinue")
               ) : (
                 <>
                   <Check size={14} />
-                  Approve Plan
+                  {t("chat:blueprint.card.approvePlan")}
                 </>
               )}
             </button>

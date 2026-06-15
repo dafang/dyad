@@ -10,10 +10,26 @@ import {
 import { MAX_CHAT_TURNS_IN_CONTEXT } from "@/constants/settings_constants";
 import { useTranslation } from "react-i18next";
 
+const MAX_CHAT_TURNS_LABEL_KEYS = {
+  economy: "ai.maxChatTurnsOptions.economy.label",
+  default: "ai.maxChatTurnsOptions.default.label",
+  plus: "ai.maxChatTurnsOptions.plus.label",
+  high: "ai.maxChatTurnsOptions.high.label",
+  max: "ai.maxChatTurnsOptions.max.label",
+} as const;
+
+const MAX_CHAT_TURNS_DESCRIPTION_KEYS = {
+  economy: "ai.maxChatTurnsOptions.economy.description",
+  default: "ai.maxChatTurnsOptions.default.description",
+  plus: "ai.maxChatTurnsOptions.plus.description",
+  high: "ai.maxChatTurnsOptions.high.description",
+  max: "ai.maxChatTurnsOptions.max.description",
+} as const;
+
 interface OptionInfo {
   value: string;
-  label: string;
-  description: string;
+  labelKey: (typeof MAX_CHAT_TURNS_LABEL_KEYS)[keyof typeof MAX_CHAT_TURNS_LABEL_KEYS];
+  descriptionKey: (typeof MAX_CHAT_TURNS_DESCRIPTION_KEYS)[keyof typeof MAX_CHAT_TURNS_DESCRIPTION_KEYS];
 }
 
 const defaultValue = "default";
@@ -21,30 +37,28 @@ const defaultValue = "default";
 const options: OptionInfo[] = [
   {
     value: "2",
-    label: "Economy (2)",
-    description:
-      "Minimal context to reduce token usage and improve response times.",
+    labelKey: MAX_CHAT_TURNS_LABEL_KEYS.economy,
+    descriptionKey: MAX_CHAT_TURNS_DESCRIPTION_KEYS.economy,
   },
   {
     value: defaultValue,
-    label: `Default (${MAX_CHAT_TURNS_IN_CONTEXT})  `,
-    description: "Balanced context size for most conversations.",
+    labelKey: MAX_CHAT_TURNS_LABEL_KEYS.default,
+    descriptionKey: MAX_CHAT_TURNS_DESCRIPTION_KEYS.default,
   },
   {
     value: "5",
-    label: "Plus (5)",
-    description: "Slightly higher context size for detailed conversations.",
+    labelKey: MAX_CHAT_TURNS_LABEL_KEYS.plus,
+    descriptionKey: MAX_CHAT_TURNS_DESCRIPTION_KEYS.plus,
   },
   {
     value: "10",
-    label: "High (10)",
-    description:
-      "Extended context for complex conversations requiring more history.",
+    labelKey: MAX_CHAT_TURNS_LABEL_KEYS.high,
+    descriptionKey: MAX_CHAT_TURNS_DESCRIPTION_KEYS.high,
   },
   {
     value: "100",
-    label: "Max (100)",
-    description: "Maximum context (not recommended due to cost and speed).",
+    labelKey: MAX_CHAT_TURNS_LABEL_KEYS.max,
+    descriptionKey: MAX_CHAT_TURNS_DESCRIPTION_KEYS.max,
   },
 ];
 
@@ -68,6 +82,13 @@ export const MaxChatTurnsSelector: React.FC = () => {
   // Find the current option to display its description
   const currentOption =
     options.find((opt) => opt.value === currentValue) || options[1];
+  const getOptionLabel = (option: OptionInfo) => {
+    if (option.value === defaultValue) {
+      return t(option.labelKey, { count: MAX_CHAT_TURNS_IN_CONTEXT });
+    }
+    return t(option.labelKey);
+  };
+  const currentLabel = getOptionLabel(currentOption);
 
   return (
     <div className="space-y-1">
@@ -83,19 +104,19 @@ export const MaxChatTurnsSelector: React.FC = () => {
           onValueChange={(v) => v && handleValueChange(v)}
         >
           <SelectTrigger className="w-[180px]" id="max-chat-turns">
-            <SelectValue placeholder={t("ai.selectMaxChatTurns")} />
+            <SelectValue>{currentLabel}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {options.map((option) => (
               <SelectItem key={option.value} value={option.value}>
-                {option.label}
+                {getOptionLabel(option)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
       <div className="text-sm text-gray-500 dark:text-gray-400">
-        {currentOption.description}
+        {t(currentOption.descriptionKey)}
       </div>
     </div>
   );

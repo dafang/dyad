@@ -1,6 +1,7 @@
 import { ArrowLeft, FolderOpen } from "lucide-react";
 import type { MediaFile } from "@/ipc/types";
 import { MediaFileThumbnail } from "./MediaFileThumbnail";
+import { useTranslation } from "react-i18next";
 
 export function MediaFolderOpen({
   appName,
@@ -29,6 +30,7 @@ export function MediaFolderOpen({
   isBusy: boolean;
   searchQuery?: string;
 }) {
+  const { t } = useTranslation("home");
   const filteredFiles = searchQuery
     ? files.filter((f) =>
         f.fileName.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -43,7 +45,7 @@ export function MediaFolderOpen({
       <div className="flex items-center gap-2 mb-4">
         <button
           data-testid="media-folder-back-button"
-          aria-label="Back to folders"
+          aria-label={t("media.backToFolders")}
           onClick={onClose}
           className="p-1 rounded-md hover:bg-secondary transition-colors"
         >
@@ -52,14 +54,14 @@ export function MediaFolderOpen({
         <FolderOpen className="h-5 w-5 text-amber-500" />
         <h3 className="text-lg font-semibold">{appName}</h3>
         <span className="text-sm text-muted-foreground">
-          ({filteredFiles.length} file{filteredFiles.length !== 1 ? "s" : ""})
+          ({t("media.fileCount", { count: filteredFiles.length })})
         </span>
       </div>
       {filteredFiles.length === 0 ? (
         <p className="text-muted-foreground text-center py-8">
           {searchQuery
-            ? "No files match your search."
-            : "No media files found."}
+            ? t("media.noFilesMatchSearch")
+            : t("media.noMediaFilesDescription")}
         </p>
       ) : (
         <div className="flex flex-wrap gap-3">

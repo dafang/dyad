@@ -63,7 +63,11 @@ export function RuntimeModeSelector() {
     try {
       await updateSettings({ runtimeMode2: value });
     } catch (error: any) {
-      showError(`Failed to update runtime mode: ${error.message}`);
+      showError(
+        t("general.runtimeModeUpdateFailed", {
+          message: error.message,
+        }),
+      );
     }
   };
 
@@ -83,6 +87,17 @@ export function RuntimeModeSelector() {
 
     void applyRuntimeModeChange(value);
   };
+  const getRuntimeModeLabel = (value: RuntimeMode2) => {
+    switch (value) {
+      case "docker":
+        return t("general.runtimeModeDocker");
+      case "cloud":
+        return t("general.runtimeModeCloud");
+      default:
+        return t("general.runtimeModeHost");
+    }
+  };
+  const currentRuntimeMode = settings.runtimeMode2 ?? "host";
 
   return (
     <div className="space-y-2">
@@ -92,18 +107,24 @@ export function RuntimeModeSelector() {
             {t("general.runtimeMode")}
           </Label>
           <Select
-            value={settings.runtimeMode2 ?? "host"}
+            value={currentRuntimeMode}
             onValueChange={(v) => v && handleRuntimeModeChange(v)}
           >
             <SelectTrigger className="w-48" id="runtime-mode">
-              <SelectValue />
+              <SelectValue>
+                {getRuntimeModeLabel(currentRuntimeMode)}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="host">Local (default)</SelectItem>
-              <SelectItem value="docker">Docker (experimental)</SelectItem>
+              <SelectItem value="host">
+                {t("general.runtimeModeHost")}
+              </SelectItem>
+              <SelectItem value="docker">
+                {t("general.runtimeModeDocker")}
+              </SelectItem>
               {showCloudSandboxOption && !hideDyadProUi && (
                 <SelectItem disabled={!hasCloudSandboxAccess} value="cloud">
-                  Cloud Sandbox (Pro)
+                  {t("general.runtimeModeCloud")}
                 </SelectItem>
               )}
             </SelectContent>
@@ -115,19 +136,21 @@ export function RuntimeModeSelector() {
       </div>
       {showCloudSandboxOption && !hideDyadProUi && !hasCloudSandboxAccess && (
         <div className="text-sm text-muted-foreground bg-muted/40 p-2 rounded">
-          Cloud sandboxes are a Dyad Pro feature.{" "}
+          {t("general.runtimeModeCloudLockedDescription")}{" "}
           <button
             type="button"
             className="underline font-medium cursor-pointer text-primary"
             onClick={() => ipc.system.openExternalUrl("https://dyad.sh/pro#ai")}
           >
-            Upgrade to Pro
+            {t("general.runtimeModeUpgradeToPro")}
           </button>
         </div>
       )}
       {isDockerMode && (
         <div className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-2 rounded">
-          ⚠️ Docker mode is <b>experimental</b> and requires{" "}
+          {t("general.runtimeModeDockerDescriptionBefore")}{" "}
+          <b>{t("common:experimental")}</b>
+          {t("general.runtimeModeDockerDescriptionAfter")}{" "}
           <button
             type="button"
             className="underline font-medium cursor-pointer"
@@ -139,13 +162,12 @@ export function RuntimeModeSelector() {
           >
             Docker Desktop
           </button>{" "}
-          to be installed and running
+          {t("general.runtimeModeDockerDescriptionEnd")}
         </div>
       )}
       {isCloudMode && hasCloudSandboxAccess && (
         <div className="text-sm text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/30 p-2 rounded">
-          Cloud Sandbox runs previews remotely and gives you a shareable preview
-          link. Note: running in cloud mode consumes Pro credits.
+          {t("general.runtimeModeCloudDescription")}
         </div>
       )}
       <AlertDialog

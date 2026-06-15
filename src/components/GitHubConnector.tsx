@@ -124,7 +124,7 @@ function ConnectedGitHubConnector({
         await ipc.github.rebaseAbort({ appId });
         updateSyncState({
           rebaseInProgress: false,
-          rebaseStatusMessage: "Rebase aborted.",
+          rebaseStatusMessage: t("integrations.github.rebaseAbortedShort"),
         });
         aborted = true;
       } else if (state.mergeInProgress) {
@@ -133,10 +133,10 @@ function ConnectedGitHubConnector({
       }
       updateSyncState({ conflicts: [], syncError: null });
       if (aborted) {
-        showSuccess("Sync cancelled");
+        showSuccess(t("integrations.github.syncCancelled"));
       }
     } catch (error: any) {
-      showError(error?.message || "Failed to cancel sync");
+      showError(error?.message || t("integrations.github.failedCancelSync"));
     } finally {
       setIsCancellingSync(false);
     }
@@ -196,7 +196,7 @@ function ConnectedGitHubConnector({
         });
         // Toast so the user sees the result even if they navigated away
         // from the Publish tab while the push was running.
-        showSuccess("Successfully pushed to GitHub!");
+        showSuccess(t("integrations.github.pushedSuccess"));
         return {};
       } catch (err: any) {
         // Always check for conflicts when sync fails, regardless of error type
@@ -216,10 +216,9 @@ function ConnectedGitHubConnector({
           // Conflicts were detected - show resolution buttons below
           updateSyncState({
             conflicts: conflictsDetected,
-            syncError:
-              "Merge conflicts detected. Use the buttons below to resolve them.",
+            syncError: t("integrations.github.mergeConflictsUseButtons"),
           });
-          showError("Merge conflicts detected while syncing to GitHub.");
+          showError(t("integrations.github.mergeConflictsWhileSyncing"));
           (err as Error & { handled?: boolean }).handled = true;
           return { error: err, handled: true };
         }
@@ -232,8 +231,7 @@ function ConnectedGitHubConnector({
         if (isConflict) {
           // Conflict error detected but no conflicts found - this shouldn't happen
           // but we'll show an error message
-          const msg =
-            "Merge conflict detected, but no conflicting files were returned. Please check git status and try again.";
+          const msg = t("integrations.github.mergeConflictNoFiles");
           updateSyncState({ syncError: msg });
           showError(msg);
           return { error: err };
@@ -266,12 +264,15 @@ function ConnectedGitHubConnector({
           inferredRebaseInProgress ||
           messageIndicatesRebase;
 
-        const baseErrorMessage = err.message || "Failed to sync to GitHub.";
+        const baseErrorMessage =
+          err.message || t("integrations.github.failedSync");
         const conflictCheckMessage =
           conflictCheckError instanceof Error
-            ? ` Conflict check failed: ${conflictCheckError.message}`
+            ? t("integrations.github.conflictCheckFailedWithMessage", {
+                message: conflictCheckError.message,
+              })
             : conflictCheckError
-              ? " Conflict check failed."
+              ? t("integrations.github.conflictCheckFailed")
               : "";
         const finalErrorMessage = `${baseErrorMessage}${conflictCheckMessage}`;
         updateSyncState({
@@ -279,7 +280,11 @@ function ConnectedGitHubConnector({
           rebaseInProgress: rebaseInProgressState,
           rebaseStatusMessage: null,
         });
-        showError(`Failed to sync to GitHub: ${finalErrorMessage}`);
+        showError(
+          t("integrations.github.failedSyncWithMessage", {
+            message: finalErrorMessage,
+          }),
+        );
         return { error: err };
       } finally {
         updateSyncState({ isSyncing: false });
@@ -299,11 +304,11 @@ function ConnectedGitHubConnector({
       await ipc.github.rebaseAbort({ appId });
       updateSyncState({
         rebaseInProgress: false,
-        rebaseStatusMessage: "Rebase aborted. You can try syncing again.",
+        rebaseStatusMessage: t("integrations.github.rebaseAborted"),
       });
     } catch (err: any) {
       updateSyncState({
-        syncError: err.message || "Failed to abort rebase.",
+        syncError: err.message || t("integrations.github.failedAbortRebase"),
         rebaseInProgress: true,
       });
     } finally {
@@ -322,11 +327,11 @@ function ConnectedGitHubConnector({
       await ipc.github.rebaseContinue({ appId });
       updateSyncState({
         rebaseInProgress: false,
-        rebaseStatusMessage: "Rebase continued. You can sync when ready.",
+        rebaseStatusMessage: t("integrations.github.rebaseContinued"),
       });
     } catch (err: any) {
       updateSyncState({
-        syncError: err.message || "Failed to continue rebase.",
+        syncError: err.message || t("integrations.github.failedContinueRebase"),
         rebaseInProgress: true,
       });
     } finally {
@@ -360,14 +365,14 @@ function ConnectedGitHubConnector({
         return;
       }
       updateSyncState({
-        rebaseStatusMessage: "Rebase and push completed successfully.",
+        rebaseStatusMessage: t("integrations.github.rebaseAndPushCompleted"),
       });
     } catch (err: any) {
       if (err?.handled) {
         return;
       }
       const errorMessage =
-        err?.message || "Failed to rebase and sync to GitHub.";
+        err?.message || t("integrations.github.failedRebaseAndSync");
       updateSyncState({
         syncError: errorMessage,
         rebaseInProgress: errorMessage.includes("rebase-merge"),
@@ -375,8 +380,7 @@ function ConnectedGitHubConnector({
       // If rebase failed, show appropriate message
       if (errorMessage.includes("rebase")) {
         updateSyncState({
-          rebaseStatusMessage:
-            "Rebase failed. You may need to resolve conflicts or abort the rebase.",
+          rebaseStatusMessage: t("integrations.github.rebaseFailed"),
         });
       }
       // Clear any stale rebase success message if sync failed after rebase
@@ -432,7 +436,7 @@ function ConnectedGitHubConnector({
 
   return (
     <div className="w-full" data-testid="github-connected-repo">
-      <p>Connected to GitHub Repo:</p>
+      <p>{t("integrations.github.connectedToRepo")}</p>
       <a
         onClick={(e) => {
           e.preventDefault();
@@ -477,10 +481,10 @@ function ConnectedGitHubConnector({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              Syncing...
+              {t("integrations.github.syncing")}
             </>
           ) : (
-            "Sync to GitHub"
+            t("integrations.github.syncToGithub")
           )}
         </Button>
         <Button
@@ -488,7 +492,9 @@ function ConnectedGitHubConnector({
           disabled={isDisconnecting}
           variant="outline"
         >
-          {isDisconnecting ? "Disconnecting..." : "Disconnect from repo"}
+          {isDisconnecting
+            ? t("common:disconnecting")
+            : t("integrations.github.disconnectFromRepo")}
         </Button>
       </div>
       {syncError && (
@@ -506,13 +512,13 @@ function ConnectedGitHubConnector({
               target="_blank"
               rel="noopener noreferrer"
             >
-              See troubleshooting guide
+              {t("integrations.github.seeTroubleshooting")}
             </a>
           </p>
           {showRebaseRecoveryOptions && (
             <div className="space-y-2 rounded-md border border-orange-200 p-3 dark:border-orange-800 dark:bg-orange-900/20">
               <p className="text-sm text-orange-800 dark:text-orange-100">
-                A rebase is already in progress. Choose how to proceed.
+                {t("integrations.github.rebaseInProgress")}
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -522,7 +528,9 @@ function ConnectedGitHubConnector({
                   disabled={isRebaseActionPending}
                 >
                   <AlertTriangle className="h-4 w-4 mr-2" />
-                  {rebaseAction === "abort" ? "Aborting..." : "Abort rebase"}
+                  {rebaseAction === "abort"
+                    ? t("integrations.github.aborting")
+                    : t("integrations.github.abortRebase")}
                 </Button>
                 <Button
                   onClick={handleContinueRebase}
@@ -532,8 +540,8 @@ function ConnectedGitHubConnector({
                 >
                   <GitMerge className="h-4 w-4 mr-2" />
                   {rebaseAction === "continue"
-                    ? "Continuing..."
-                    : "Continue rebase"}
+                    ? t("integrations.github.continuing")
+                    : t("integrations.github.continueRebase")}
                 </Button>
                 <Button
                   onClick={handleSafeForcePush}
@@ -544,8 +552,8 @@ function ConnectedGitHubConnector({
                 >
                   <AlertTriangle className="h-4 w-4 mr-2" />
                   {rebaseAction === "safe-push"
-                    ? "Safe force pushing..."
-                    : "Safe Force Push"}
+                    ? t("integrations.github.safeForcePushing")
+                    : t("integrations.github.safeForcesPush")}
                 </Button>
               </div>
             </div>
@@ -559,7 +567,7 @@ function ConnectedGitHubConnector({
               className="text-orange-600 border-orange-600 hover:bg-orange-50"
             >
               <AlertTriangle className="h-4 w-4 mr-2" />
-              Force Push (Dangerous)
+              {t("integrations.github.forcePushDangerous")}
             </Button>
           )}
           {showRebaseAndSync && (
@@ -571,7 +579,7 @@ function ConnectedGitHubConnector({
               className="mt-2 ml-2"
             >
               <GitMerge className="h-4 w-4 mr-2" />
-              Rebase and Sync
+              {t("integrations.github.rebaseAndSync")}
             </Button>
           )}
         </div>
@@ -580,22 +588,28 @@ function ConnectedGitHubConnector({
       {conflicts.length > 0 && (
         <div className="mt-3 p-3 rounded-md border border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20">
           <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-3">
-            {conflicts.length} file{conflicts.length > 1 ? "s" : ""} with merge
-            conflicts: {conflicts.join(", ")}
+            {t("integrations.github.conflictFiles", {
+              count: conflicts.length,
+              files: conflicts.join(", "),
+            })}
           </p>
           <div className="flex gap-2">
             <Button
               onClick={resolveWithAI}
               disabled={isCancellingSync || isResolving}
             >
-              {isResolving ? "Resolving..." : "Resolve merge conflicts with AI"}
+              {isResolving
+                ? t("integrations.github.resolving")
+                : t("integrations.github.resolveMergeConflictsWithAI")}
             </Button>
             <Button
               variant="outline"
               onClick={handleCancelSync}
               disabled={isCancellingSync || isResolving}
             >
-              {isCancellingSync ? "Cancelling..." : "Cancel sync"}
+              {isCancellingSync
+                ? t("integrations.github.cancelling")
+                : t("integrations.github.cancelSync")}
             </Button>
           </div>
         </div>
@@ -606,7 +620,9 @@ function ConnectedGitHubConnector({
         </p>
       )}
       {syncSuccess && (
-        <p className="text-green-600 mt-2">Successfully pushed to GitHub!</p>
+        <p className="text-green-600 mt-2">
+          {t("integrations.github.pushedSuccess")}
+        </p>
       )}
       {disconnectError && (
         <p className="text-red-600 mt-2">{disconnectError}</p>
@@ -618,44 +634,40 @@ function ConnectedGitHubConnector({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-orange-500" />
-              Force Push Warning
+              {t("integrations.github.forcePushWarning")}
             </DialogTitle>
             <DialogDescription>
               <div className="space-y-3">
-                <p>
-                  You are about to perform a <strong>force push</strong> to your
-                  GitHub repository.
-                </p>
+                <p>{t("integrations.github.forcePushDescription")}</p>
                 <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded-md border border-orange-200 dark:border-orange-800">
                   <p className="text-sm text-orange-800 dark:text-orange-200">
                     <strong>
-                      This is dangerous and non-reversible and will:
+                      {t("integrations.github.dangerousNonReversible")}
                     </strong>
                   </p>
                   <ul className="text-sm text-orange-700 dark:text-orange-300 list-disc list-inside mt-2 space-y-1">
-                    <li>Overwrite the remote repository history</li>
-                    <li>
-                      Permanently delete commits that exist on the remote but
-                      not locally
-                    </li>
+                    <li>{t("integrations.github.overwriteRemote")}</li>
+                    <li>{t("integrations.github.deleteRemoteCommits")}</li>
                   </ul>
                 </div>
                 <p className="text-sm">
-                  Only proceed if you're certain this is what you want to do.
+                  {t("integrations.github.onlyProceedCertain")}
                 </p>
               </div>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowForceDialog(false)}>
-              Cancel
+              {t("common:cancel")}
             </Button>
             <Button
               variant="destructive"
               onClick={() => handleSyncToGithub({ force: true })}
               disabled={isSyncing}
             >
-              {isSyncing ? "Force Pushing..." : "Force Push"}
+              {isSyncing
+                ? t("integrations.github.forcePushing")
+                : t("integrations.github.forcePush")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -673,6 +685,7 @@ export function UnconnectedGitHubConnector({
   expanded,
   linkedRepo,
 }: UnconnectedGitHubConnectorProps) {
+  const { t } = useTranslation(["home", "common"]);
   // --- Collapsible State ---
   const [isExpanded, setIsExpanded] = useState(expanded || false);
 
@@ -726,7 +739,7 @@ export function UnconnectedGitHubConnector({
     setGithubError(null);
     setGithubUserCode(null);
     setGithubVerificationUri(null);
-    setGithubStatusMessage("Requesting device code from GitHub...");
+    setGithubStatusMessage(t("integrations.github.requestingDeviceCode"));
 
     // Send IPC message to main process to start the flow
     ipc.github.startFlow({ appId });
@@ -762,7 +775,7 @@ export function UnconnectedGitHubConnector({
     // Listener for success
     const removeSuccessListener = ipc.events.github.onFlowSuccess((data) => {
       console.log("Received github:flow-success", data);
-      setGithubStatusMessage("Successfully connected to GitHub!");
+      setGithubStatusMessage(t("integrations.github.connectedSuccess"));
       setGithubUserCode(null); // Clear user-facing info
       setGithubVerificationUri(null);
       setGithubError(null);
@@ -775,7 +788,7 @@ export function UnconnectedGitHubConnector({
     // Listener for errors
     const removeErrorListener = ipc.events.github.onFlowError((data) => {
       console.log("Received github:flow-error", data);
-      setGithubError(data.error || "An unknown error occurred.");
+      setGithubError(data.error || t("integrations.github.unknownError"));
       setGithubStatusMessage(null);
       setGithubUserCode(null);
       setGithubVerificationUri(null);
@@ -859,11 +872,13 @@ export function UnconnectedGitHubConnector({
         setRepoAvailable(result.available);
         if (!result.available) {
           setRepoCheckError(
-            result.error || "Repository name is not available.",
+            result.error || t("integrations.github.repoNotAvailable"),
           );
         }
       } catch (err: any) {
-        setRepoCheckError(err.message || "Failed to check repo availability.");
+        setRepoCheckError(
+          err.message || t("integrations.github.failedCheckRepoAvailability"),
+        );
       } finally {
         setIsCheckingRepo(false);
       }
@@ -917,7 +932,9 @@ export function UnconnectedGitHubConnector({
     } catch (err: any) {
       setCreateRepoError(
         err.message ||
-          `Failed to ${repoSetupMode === "create" ? "create" : "connect to"} repository.`,
+          (repoSetupMode === "create"
+            ? t("integrations.github.failedCreateRepository")
+            : t("integrations.github.failedConnectRepository")),
       );
     } finally {
       setIsCreatingRepo(false);
@@ -929,10 +946,13 @@ export function UnconnectedGitHubConnector({
       <div className="mt-1 w-full" data-testid="github-unconnected-repo">
         {linkedRepo && (
           <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100">
-            <p className="font-medium">Reconnect your GitHub account</p>
+            <p className="font-medium">
+              {t("integrations.github.reconnectAccount")}
+            </p>
             <p className="mt-1">
-              This app is linked to {linkedRepo.org}/{linkedRepo.repo}, but
-              GitHub credentials are missing from settings.
+              {t("integrations.github.missingCredentialsForLinkedRepo", {
+                repo: `${linkedRepo.org}/${linkedRepo.repo}`,
+              })}
             </p>
           </div>
         )}
@@ -943,7 +963,7 @@ export function UnconnectedGitHubConnector({
           variant="outline"
           disabled={isConnectingToGithub} // Also disable if appId is null
         >
-          Connect to GitHub
+          {t("integrations.github.connectToGithub")}
           <Github className="h-5 w-5" />
           {isConnectingToGithub && (
             <svg
@@ -972,16 +992,20 @@ export function UnconnectedGitHubConnector({
         {/* GitHub Connection Status/Instructions */}
         {(githubUserCode || githubStatusMessage || githubError) && (
           <div className="mt-6 p-4 border rounded-md bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600">
-            <h4 className="font-medium mb-2">GitHub Connection</h4>
+            <h4 className="font-medium mb-2">
+              {t("integrations.github.githubConnection")}
+            </h4>
             {githubError && (
               <p className="text-red-600 dark:text-red-400 mb-2">
-                Error: {githubError}
+                {t("integrations.github.errorWithMessage", {
+                  message: githubError,
+                })}
               </p>
             )}
             {githubUserCode && githubVerificationUri && (
               <div className="mb-2">
                 <p>
-                  1. Go to:
+                  {t("integrations.github.goTo")}
                   <a
                     href={githubVerificationUri} // Make it a direct link
                     onClick={(e) => {
@@ -996,7 +1020,7 @@ export function UnconnectedGitHubConnector({
                   </a>
                 </p>
                 <p>
-                  2. Enter code:
+                  {t("integrations.github.enterCode")}
                   <strong className="ml-1 font-mono text-lg tracking-wider bg-gray-200 dark:bg-gray-600 px-2 py-0.5 rounded">
                     {githubUserCode}
                   </strong>
@@ -1015,7 +1039,7 @@ export function UnconnectedGitHubConnector({
                           );
                       }
                     }}
-                    title="Copy to clipboard"
+                    title={t("common:copyToClipboard")}
                   >
                     {codeCopied ? (
                       <Check className="h-4 w-4 text-green-500" />
@@ -1049,7 +1073,9 @@ export function UnconnectedGitHubConnector({
             : ""
         }`}
       >
-        <span className="font-medium">Set up your GitHub repo</span>
+        <span className="font-medium">
+          {t("integrations.github.setupGithubRepo")}
+        </span>
         {isExpanded ? undefined : (
           <ChevronRight className="h-4 w-4 text-gray-500" />
         )}
@@ -1079,7 +1105,7 @@ export function UnconnectedGitHubConnector({
                   setCreateRepoSuccess(false);
                 }}
               >
-                Create new repo
+                {t("integrations.github.createNewRepo")}
               </Button>
               <Button
                 type="button"
@@ -1095,7 +1121,7 @@ export function UnconnectedGitHubConnector({
                   setCreateRepoSuccess(false);
                 }}
               >
-                Connect to existing repo
+                {t("integrations.github.connectExistingRepo")}
               </Button>
             </div>
           </div>
@@ -1105,7 +1131,7 @@ export function UnconnectedGitHubConnector({
               <>
                 <div>
                   <Label className="block text-sm font-medium">
-                    Repository Name
+                    {t("integrations.github.repositoryName")}
                   </Label>
                   <Input
                     data-testid="github-create-repo-name-input"
@@ -1122,12 +1148,12 @@ export function UnconnectedGitHubConnector({
                   />
                   {isCheckingRepo && (
                     <p className="text-xs text-gray-500 mt-1">
-                      Checking availability...
+                      {t("integrations.github.checkingAvailability")}
                     </p>
                   )}
                   {repoAvailable === true && (
                     <p className="text-xs text-green-600 mt-1">
-                      Repository name is available!
+                      {t("integrations.github.repoAvailable")}
                     </p>
                   )}
                   {repoAvailable === false && (
@@ -1141,7 +1167,7 @@ export function UnconnectedGitHubConnector({
               <>
                 <div>
                   <Label className="block text-sm font-medium">
-                    Select Repository
+                    {t("integrations.github.selectRepository")}
                   </Label>
                   <Select
                     value={selectedRepo}
@@ -1155,8 +1181,8 @@ export function UnconnectedGitHubConnector({
                       <SelectValue
                         placeholder={
                           isLoadingRepos
-                            ? "Loading repositories..."
-                            : "Select a repository"
+                            ? t("integrations.github.loadingRepositories")
+                            : t("integrations.github.selectARepository")
                         }
                       />
                     </SelectTrigger>
@@ -1174,7 +1200,9 @@ export function UnconnectedGitHubConnector({
 
             {/* Branch Selection */}
             <div>
-              <Label className="block text-sm font-medium">Branch</Label>
+              <Label className="block text-sm font-medium">
+                {t("integrations.github.branch")}
+              </Label>
               {repoSetupMode === "existing" && selectedRepo ? (
                 <div className="space-y-2">
                   <Select
@@ -1199,8 +1227,8 @@ export function UnconnectedGitHubConnector({
                       <SelectValue
                         placeholder={
                           isLoadingBranches
-                            ? "Loading branches..."
-                            : "Select a branch"
+                            ? t("integrations.github.loadingBranches")
+                            : t("integrations.github.selectABranch")
                         }
                       />
                     </SelectTrigger>
@@ -1212,7 +1240,7 @@ export function UnconnectedGitHubConnector({
                       ))}
                       <SelectItem value="custom">
                         <span className="font-medium">
-                          ✏️ Type custom branch name
+                          {t("integrations.github.typeCustomBranch")}
                         </span>
                       </SelectItem>
                     </SelectContent>
@@ -1223,7 +1251,7 @@ export function UnconnectedGitHubConnector({
                       className="w-full"
                       value={customBranchName}
                       onChange={(e) => setCustomBranchName(e.target.value)}
-                      placeholder="Enter branch name (e.g., feature/new-feature)"
+                      placeholder={t("integrations.github.enterBranchName")}
                       disabled={isCreatingRepo}
                     />
                   )}
@@ -1254,11 +1282,11 @@ export function UnconnectedGitHubConnector({
             >
               {isCreatingRepo
                 ? repoSetupMode === "create"
-                  ? "Creating..."
-                  : "Connecting..."
+                  ? t("common:creating")
+                  : t("common:connecting")
                 : repoSetupMode === "create"
-                  ? "Create Repo"
-                  : "Connect to Repo"}
+                  ? t("integrations.github.createRepo")
+                  : t("integrations.github.connectToRepo")}
             </Button>
           </form>
 
@@ -1268,8 +1296,8 @@ export function UnconnectedGitHubConnector({
           {createRepoSuccess && (
             <p className="text-green-600 mt-2">
               {repoSetupMode === "create"
-                ? "Repository created and linked!"
-                : "Connected to repository!"}
+                ? t("integrations.github.repoCreatedLinked")
+                : t("integrations.github.connectedToRepo2")}
             </p>
           )}
         </div>

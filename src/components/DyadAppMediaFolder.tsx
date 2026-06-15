@@ -41,6 +41,7 @@ import { MediaFolderOpen } from "./media-library/MediaFolderOpen";
 import { ImageLightbox } from "./chat/ImageLightbox";
 import { buildDyadMediaUrl } from "@/lib/dyadMediaUrl";
 import { AppSearchSelect } from "./AppSearchSelect";
+import { useTranslation } from "react-i18next";
 
 interface DyadAppMediaFolderProps {
   appName: string;
@@ -67,6 +68,7 @@ export function DyadAppMediaFolder({
   isMutatingMedia = false,
   searchQuery,
 }: DyadAppMediaFolderProps) {
+  const { t } = useTranslation(["home", "common"]);
   const [isOpen, setIsOpen] = useState(false);
   const [renameTargetFile, setRenameTargetFile] = useState<MediaFile | null>(
     null,
@@ -94,7 +96,7 @@ export function DyadAppMediaFolder({
     isMutatingMedia || isRenaming || isDeleting || isMoving || isStartingChat;
   const renameError =
     renameBaseName.trim() && INVALID_FILE_NAME_CHARS.test(renameBaseName.trim())
-      ? 'Name contains invalid characters (<>:"/\\|?*)'
+      ? t("home:media.invalidImageName")
       : null;
 
   const handleStartNewChatWithImage = async (file: MediaFile) => {
@@ -206,21 +208,23 @@ export function DyadAppMediaFolder({
         >
           <DialogContent data-testid="media-rename-dialog">
             <DialogHeader>
-              <DialogTitle>Rename Image</DialogTitle>
+              <DialogTitle>{t("home:media.renameImage")}</DialogTitle>
               <DialogDescription>
-                Rename the image without changing its extension.
+                {t("home:media.renameImageDescription")}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-2 py-2">
               <p className="text-sm text-muted-foreground">
-                Current file: {renameTargetFile?.fileName}
+                {t("home:media.currentFile", {
+                  name: renameTargetFile?.fileName,
+                })}
               </p>
               <div className="flex items-center gap-2">
                 <Input
                   data-testid="media-rename-input"
                   value={renameBaseName}
                   onChange={(event) => setRenameBaseName(event.target.value)}
-                  placeholder="New image name"
+                  placeholder={t("home:media.newImageName")}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
                       void handleRenameImage();
@@ -246,7 +250,7 @@ export function DyadAppMediaFolder({
                 }}
                 disabled={isBusy}
               >
-                Cancel
+                {t("common:cancel")}
               </Button>
               <Button
                 data-testid="media-rename-confirm-button"
@@ -262,7 +266,7 @@ export function DyadAppMediaFolder({
                     getFileNameWithoutExtension(renameTargetFile.fileName)
                 }
               >
-                Save
+                {t("common:save")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -278,15 +282,17 @@ export function DyadAppMediaFolder({
         >
           <AlertDialogContent data-testid="media-delete-dialog">
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete Image</AlertDialogTitle>
+              <AlertDialogTitle>{t("home:media.deleteImage")}</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete{" "}
-                <strong>{deleteTargetFile?.fileName}</strong>? This action
-                cannot be undone.
+                {t("home:media.deleteImageDescription", {
+                  name: deleteTargetFile?.fileName,
+                })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isBusy}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={isBusy}>
+                {t("common:cancel")}
+              </AlertDialogCancel>
               <Button
                 data-testid="media-delete-confirm-button"
                 variant="destructive"
@@ -295,7 +301,7 @@ export function DyadAppMediaFolder({
                 }}
                 disabled={isBusy}
               >
-                Delete
+                {t("common:delete")}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -312,9 +318,11 @@ export function DyadAppMediaFolder({
         >
           <DialogContent data-testid="media-move-dialog">
             <DialogHeader>
-              <DialogTitle>Move Image</DialogTitle>
+              <DialogTitle>{t("home:media.moveImage")}</DialogTitle>
               <DialogDescription>
-                Move <strong>{moveTargetFile?.fileName}</strong> to another app.
+                {t("home:media.moveImageDescription", {
+                  name: moveTargetFile?.fileName,
+                })}
               </DialogDescription>
             </DialogHeader>
             <div className="py-2">
@@ -334,7 +342,7 @@ export function DyadAppMediaFolder({
                 }}
                 disabled={isBusy}
               >
-                Cancel
+                {t("common:cancel")}
               </Button>
               <Button
                 data-testid="media-move-confirm-button"
@@ -343,7 +351,7 @@ export function DyadAppMediaFolder({
                 }}
                 disabled={isBusy || moveTargetAppId === null}
               >
-                Move
+                {t("home:media.move")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -386,7 +394,7 @@ export function DyadAppMediaFolder({
         )}
       >
         <Image className="h-3 w-3" />
-        Media
+        {t("home:library.filters.media")}
       </Badge>
       <div className="flex items-center gap-3">
         <div className="w-14 h-14 flex items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-900/20">
@@ -395,7 +403,7 @@ export function DyadAppMediaFolder({
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-semibold truncate">{appName}</h3>
           <p className="text-sm text-muted-foreground">
-            {files.length} media file{files.length !== 1 ? "s" : ""}
+            {t("home:media.fileCount", { count: files.length })}
           </p>
         </div>
       </div>

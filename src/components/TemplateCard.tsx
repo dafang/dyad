@@ -7,6 +7,7 @@ import type { Template } from "@/shared/templates";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { showWarning } from "@/lib/toast";
+import { useTranslation } from "react-i18next";
 
 interface TemplateCardProps {
   template: Template;
@@ -21,6 +22,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
   onSelect,
   onCreateApp,
 }) => {
+  const { t } = useTranslation(["home", "common"]);
   const { settings, updateSettings } = useSettings();
   const [showConsentDialog, setShowConsentDialog] = useState(false);
 
@@ -32,7 +34,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
     }
 
     if (template.requiresNeon && !settings?.neon?.accessToken) {
-      showWarning("Please connect your Neon account to use this template.");
+      showWarning(t("home:template.connectNeonRequired"));
       return;
     }
 
@@ -88,7 +90,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
           />
           {isSelected && (
             <span className="absolute top-3 right-3 bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-md shadow-lg">
-              Selected
+              {t("home:template.selected")}
             </span>
           )}
         </div>
@@ -111,12 +113,12 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
                     : "bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-200"
                 }`}
               >
-                Official
+                {t("home:template.official")}
               </span>
             )}
             {template.isExperimental && (
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-200">
-                Experimental
+                {t("common:experimental")}
               </span>
             )}
           </div>
@@ -132,7 +134,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
               }`}
               onClick={handleGithubClick}
             >
-              View on GitHub{" "}
+              {t("home:template.viewOnGithub")}{" "}
               <ArrowLeft className="w-4 h-4 ml-1 transform rotate-180" />
             </a>
           )}
@@ -148,7 +150,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
               settings?.selectedTemplateId !== template.id && "invisible",
             )}
           >
-            Create App
+            {t("home:createApp")}
           </Button>
         </div>
       </div>

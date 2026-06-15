@@ -12,6 +12,7 @@ import {
 import { showError, showSuccess } from "@/lib/toast";
 import { useAppCollections } from "@/hooks/useAppCollections";
 import type { AppCollection } from "@/hooks/useAppCollections";
+import { useTranslation } from "react-i18next";
 
 interface DeleteCollectionDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ export function DeleteCollectionDialog({
   collection,
   onDeleted,
 }: DeleteCollectionDialogProps) {
+  const { t } = useTranslation(["home", "common"]);
   const { deleteCollection } = useAppCollections();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -34,7 +36,7 @@ export function DeleteCollectionDialog({
     setIsDeleting(true);
     try {
       await deleteCollection(collection.id);
-      showSuccess(`Collection "${collection.name}" deleted`);
+      showSuccess(t("home:collections.deleted", { name: collection.name }));
       onOpenChange(false);
       onDeleted?.();
     } catch (error) {
@@ -56,12 +58,16 @@ export function DeleteCollectionDialog({
       <DialogContent className="max-w-sm p-4">
         <DialogHeader className="pb-2">
           <DialogTitle>
-            Delete collection {collection ? `"${collection.name}"` : ""}?
+            {t("home:collections.deleteCollectionTitle", {
+              name: collection?.name ?? "",
+            })}
           </DialogTitle>
           <DialogDescription className="text-xs">
             {count > 0
-              ? `The ${count} app${count === 1 ? "" : "s"} in this collection won't be deleted — they'll just be uncollected.`
-              : "This collection will be removed."}
+              ? t("home:collections.deleteCollectionDescriptionWithApps", {
+                  count,
+                })
+              : t("home:collections.deleteCollectionDescriptionEmpty")}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex justify-end gap-2 pt-2">
@@ -71,7 +77,7 @@ export function DeleteCollectionDialog({
             disabled={isDeleting}
             size="sm"
           >
-            Cancel
+            {t("common:cancel")}
           </Button>
           <Button
             variant="destructive"
@@ -84,12 +90,12 @@ export function DeleteCollectionDialog({
             {isDeleting ? (
               <>
                 <Loader2 className="h-3 w-3 animate-spin" />
-                Deleting...
+                {t("common:deleting")}
               </>
             ) : (
               <>
                 <Trash2 className="h-4 w-4" />
-                Delete
+                {t("common:delete")}
               </>
             )}
           </Button>

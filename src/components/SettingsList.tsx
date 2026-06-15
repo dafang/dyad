@@ -6,29 +6,75 @@ import { useAtom } from "jotai";
 import { activeSettingsSectionAtom } from "@/atoms/viewAtoms";
 import {
   SECTION_IDS,
-  getVisibleSettingsSearchIndex,
+  getLocalizedVisibleSettingsSearchIndex,
 } from "@/lib/settingsSearchIndex";
 import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
 import Fuse from "fuse.js";
 import { SearchIcon, XIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type SettingsSection = {
   id: string;
-  label: string;
+  labelKey: string;
+  defaultLabel: string;
 };
 
 const SETTINGS_SECTIONS: SettingsSection[] = [
-  { id: SECTION_IDS.general, label: "General" },
-  { id: SECTION_IDS.workflow, label: "Workflow" },
-  { id: SECTION_IDS.ai, label: "AI" },
-  { id: SECTION_IDS.providers, label: "Model Providers" },
-  { id: SECTION_IDS.telemetry, label: "Telemetry" },
-  { id: SECTION_IDS.integrations, label: "Integrations" },
-  { id: SECTION_IDS.agentPermissions, label: "Agent Permissions" },
-  { id: SECTION_IDS.toolsMcp, label: "Tools (MCP)" },
-  { id: SECTION_IDS.advanced, label: "Advanced" },
-  { id: SECTION_IDS.experiments, label: "Experiments" },
-  { id: SECTION_IDS.dangerZone, label: "Danger Zone" },
+  {
+    id: SECTION_IDS.general,
+    labelKey: "settingsSearch.sections.general-settings",
+    defaultLabel: "General",
+  },
+  {
+    id: SECTION_IDS.workflow,
+    labelKey: "settingsSearch.sections.workflow-settings",
+    defaultLabel: "Workflow",
+  },
+  {
+    id: SECTION_IDS.ai,
+    labelKey: "settingsSearch.sections.ai-settings",
+    defaultLabel: "AI",
+  },
+  {
+    id: SECTION_IDS.providers,
+    labelKey: "settingsSearch.sections.provider-settings",
+    defaultLabel: "Model Providers",
+  },
+  {
+    id: SECTION_IDS.telemetry,
+    labelKey: "settingsSearch.sections.telemetry",
+    defaultLabel: "Telemetry",
+  },
+  {
+    id: SECTION_IDS.integrations,
+    labelKey: "settingsSearch.sections.integrations",
+    defaultLabel: "Integrations",
+  },
+  {
+    id: SECTION_IDS.agentPermissions,
+    labelKey: "settingsSearch.sections.agent-permissions",
+    defaultLabel: "Agent Permissions",
+  },
+  {
+    id: SECTION_IDS.toolsMcp,
+    labelKey: "settingsSearch.sections.tools-mcp",
+    defaultLabel: "Tools (MCP)",
+  },
+  {
+    id: SECTION_IDS.advanced,
+    labelKey: "settingsSearch.sections.advanced",
+    defaultLabel: "Advanced",
+  },
+  {
+    id: SECTION_IDS.experiments,
+    labelKey: "settingsSearch.sections.experiments",
+    defaultLabel: "Experiments",
+  },
+  {
+    id: SECTION_IDS.dangerZone,
+    labelKey: "settingsSearch.sections.danger-zone",
+    defaultLabel: "Danger Zone",
+  },
 ];
 
 const fuseOptions = {
@@ -44,13 +90,18 @@ const fuseOptions = {
 };
 
 export function SettingsList({ show }: { show: boolean }) {
+  const { t } = useTranslation("settings");
   const [activeSection, setActiveSection] = useAtom(activeSettingsSectionAtom);
   const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const hideDyadProUi = shouldHideDyadProUi();
   const settingsSearchIndex = useMemo(
-    () => getVisibleSettingsSearchIndex({ hideDyadProUi }),
-    [hideDyadProUi],
+    () =>
+      getLocalizedVisibleSettingsSearchIndex({
+        hideDyadProUi,
+        t: (key, options) => t(key, options),
+      }),
+    [hideDyadProUi, t],
   );
   const fuse = useMemo(
     () => new Fuse(settingsSearchIndex, fuseOptions),
@@ -107,7 +158,7 @@ export function SettingsList({ show }: { show: boolean }) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-shrink-0 p-4">
-        <h2 className="text-lg font-semibold tracking-tight">Settings</h2>
+        <h2 className="text-lg font-semibold tracking-tight">{t("title")}</h2>
       </div>
       <div className="flex-shrink-0 px-4 pb-2">
         <div className="relative">
@@ -115,8 +166,8 @@ export function SettingsList({ show }: { show: boolean }) {
           <input
             ref={inputRef}
             type="text"
-            placeholder="Search settings..."
-            aria-label="Search settings"
+            placeholder={t("settingsSearch.placeholder")}
+            aria-label={t("settingsSearch.ariaLabel")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-md border border-input bg-transparent pl-8 pr-8 py-1.5 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -128,7 +179,7 @@ export function SettingsList({ show }: { show: boolean }) {
                 inputRef.current?.focus();
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              aria-label="Clear search"
+              aria-label={t("settingsSearch.clearSearch")}
             >
               <XIcon className="h-3.5 w-3.5" />
             </button>
@@ -159,7 +210,7 @@ export function SettingsList({ show }: { show: boolean }) {
               ))
             ) : (
               <div className="px-3 py-4 text-sm text-muted-foreground text-center">
-                No settings found
+                {t("settingsSearch.noSettingsFound")}
               </div>
             )
           ) : (
@@ -174,7 +225,7 @@ export function SettingsList({ show }: { show: boolean }) {
                     : "hover:bg-sidebar-accent",
                 )}
               >
-                {section.label}
+                {t(section.labelKey, { defaultValue: section.defaultLabel })}
               </button>
             ))
           )}

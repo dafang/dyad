@@ -5,11 +5,13 @@ import { showError, showSuccess } from "@/lib/toast";
 import { ipc } from "@/ipc/types";
 import { FolderOpen, RotateCcw } from "lucide-react";
 import { webHostCapabilities } from "@/lib/web_host_capabilities";
+import { useTranslation } from "react-i18next";
+import { HttpInvokeAbortError } from "@/ipc/contracts/core";
 
 export function CustomAppsFolderSelector() {
+  const { t } = useTranslation("settings");
   const [isSelectingPath, setIsSelectingPath] = useState(false);
-  const [customAppsFolder, setCustomAppsFolder] =
-    useState<string>("Loading...");
+  const [customAppsFolder, setCustomAppsFolder] = useState<string>("");
   const [isPathAvailable, setIsPathAvailable] = useState(true);
   const [isPathDefault, setIsPathDefault] = useState(true);
 
@@ -22,9 +24,7 @@ export function CustomAppsFolderSelector() {
     setIsSelectingPath(true);
     try {
       if (webHostCapabilities.isLocalWeb) {
-        showError(
-          "Browser folder selection cannot grant the local server a stable writable folder path yet. New apps use the local Web data directory.",
-        );
+        showError(t("general.customAppsFolder.webModeSelectionUnavailable"));
         return;
       }
       // Call the IPC method to select folder
@@ -33,14 +33,17 @@ export function CustomAppsFolderSelector() {
         // Save the custom path to settings
         await ipc.system.setCustomAppsFolder(result.path);
         await fetchCustomAppsFolder();
-        showSuccess("Custom apps folder updated successfully");
+        showSuccess(t("general.customAppsFolder.updated"));
       } else if (result.path === null && result.canceled === false) {
-        showError(
-          "Unable to use selected folder. Please ensure it is a valid directory with write permissions.",
-        );
+        showError(t("general.customAppsFolder.invalidSelection"));
       }
-    } catch (error: any) {
-      showError(`Failed to set custom apps folder: ${error.message}`);
+    } catch (error: unknown) {
+      if (isTransientInvokeAbort(error)) return;
+      showError(
+        t("general.customAppsFolder.setFailed", {
+          message: error instanceof Error ? error.message : String(error),
+        }),
+      );
     } finally {
       setIsSelectingPath(false);
     }
@@ -52,9 +55,14 @@ export function CustomAppsFolderSelector() {
       await ipc.system.setCustomAppsFolder(null);
       // Update UI to show default directory
       await fetchCustomAppsFolder();
-      showSuccess("Dyad apps folder reset successfully");
-    } catch (error: any) {
-      showError(`Failed to reset Dyad Apps folder path: ${error.message}`);
+      showSuccess(t("general.customAppsFolder.resetSuccess"));
+    } catch (error: unknown) {
+      if (isTransientInvokeAbort(error)) return;
+      showError(
+        t("general.customAppsFolder.resetFailed", {
+          message: error instanceof Error ? error.message : String(error),
+        }),
+      );
     }
   };
 
@@ -65,8 +73,13 @@ export function CustomAppsFolderSelector() {
       setCustomAppsFolder(path);
       setIsPathAvailable(isPathAvailable);
       setIsPathDefault(isPathDefault);
-    } catch (error: any) {
-      showError(`Failed to fetch Dyad apps folder path: ${error.message}`);
+    } catch (error: unknown) {
+      if (isTransientInvokeAbort(error)) return;
+      showError(
+        t("general.customAppsFolder.fetchFailed", {
+          message: error instanceof Error ? error.message : String(error),
+        }),
+      );
     }
   };
 
@@ -74,7 +87,9 @@ export function CustomAppsFolderSelector() {
     <div className="space-y-4">
       <div className="space-y-2">
         <div className="flex gap-2">
-          <Label className="text-sm font-medium">Customize Apps Folder</Label>
+          <Label className="text-sm font-medium">
+            {t("general.customAppsFolder.label")}
+          </Label>
 
           <Button
             onClick={handleSelectCustomAppsFolder}
@@ -85,7 +100,9 @@ export function CustomAppsFolderSelector() {
             data-testid="customize-apps-folder-button"
           >
             <FolderOpen className="w-4 h-4" />
-            {isSelectingPath ? "Selecting..." : "Select A Folder"}
+            {isSelectingPath
+              ? t("general.selecting")
+              : t("general.customAppsFolder.selectFolder")}
           </Button>
 
           {!isPathDefault && (
@@ -96,7 +113,7 @@ export function CustomAppsFolderSelector() {
               className="flex items-center gap-2"
             >
               <RotateCcw className="w-4 h-4" />
-              Reset to Default
+              {t("general.resetToDefault")}
             </Button>
           )}
         </div>
@@ -105,13 +122,15 @@ export function CustomAppsFolderSelector() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  {isPathDefault ? "Default Folder:" : "Custom Folder:"}
+                  {isPathDefault
+                    ? t("general.customAppsFolder.defaultFolder")
+                    : t("general.customAppsFolder.customFolder")}
                 </span>
               </div>
               <p
                 className={`text-sm font-mono ${isPathAvailable ? "text-gray-700 dark:text-gray-300" : "text-red-800 dark:text-red-400"} break-all max-h-32 overflow-y-auto`}
               >
-                {customAppsFolder}
+                {customAppsFolder || t("general.customAppsFolder.loading")}
               </p>
             </div>
           </div>
@@ -121,13 +140,27 @@ export function CustomAppsFolderSelector() {
         <div className="text-sm text-gray-500 dark:text-gray-400">
           <p>
             {webHostCapabilities.isLocalWeb
-              ? "In Web mode, new apps are stored under the local Web server data directory. Browser folder pickers cannot currently grant a reusable writable path to the local server."
+              ? t("general.customAppsFolder.webModeDescription")
               : isPathAvailable
-                ? "This is the top-level folder that Dyad will store new applications in."
-                : "Your apps folder is inaccessible. Make sure that the folder exists and has write permissions, or change it."}
+                ? t("general.customAppsFolder.availableDescription")
+                : t("general.customAppsFolder.unavailableDescription")}
           </p>
         </div>
       </div>
     </div>
+  );
+}
+
+function isTransientInvokeAbort(error: unknown): boolean {
+  if (error instanceof HttpInvokeAbortError) {
+    return true;
+  }
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  return (
+    error.name === "AbortError" ||
+    error.message === "Failed to fetch" ||
+    error.message.includes("HTTP invoke aborted")
   );
 }

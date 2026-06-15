@@ -2,17 +2,20 @@ import { toast } from "sonner";
 import type { ChatMode } from "./schemas";
 import type { ChatModeFallbackReason } from "./chatMode";
 import { isLocalWebRuntime } from "./runtime_client";
+import i18n from "@/i18n";
 
 export function getChatModeDisplayName(mode: ChatMode, isPro: boolean): string {
   switch (mode) {
     case "build":
-      return "Build";
+      return i18n.t("chat:chatMode.build");
     case "ask":
-      return "Ask";
+      return i18n.t("chat:chatMode.ask");
     case "local-agent":
-      return isPro || isLocalWebRuntime() ? "Agent" : "Basic Agent";
+      return isPro || isLocalWebRuntime()
+        ? i18n.t("chat:chatMode.agent")
+        : i18n.t("chat:chatMode.basicAgent");
     case "plan":
-      return "Plan";
+      return i18n.t("chat:chatMode.plan");
   }
 }
 
@@ -40,13 +43,15 @@ export function showChatModeFallbackToast({
   toastId?: string;
 }) {
   const modeName = getChatModeDisplayName(effectiveMode, isPro);
-  const message = `Quota exhausted. Using ${modeName} mode.`;
+  const message = i18n.t("chat:chatMode.fallbackQuotaExhausted", {
+    mode: modeName,
+  });
 
   toast.warning(message, {
     id: toastId,
     duration: 8000,
     action: {
-      label: "Switch mode",
+      label: i18n.t("chat:chatMode.switchMode"),
       onClick: () => {
         const trigger = document.querySelector<HTMLElement>(
           '[data-testid="chat-mode-selector"]',
@@ -60,7 +65,9 @@ export function showChatModeFallbackToast({
         if (toastId) {
           toast.dismiss(toastId);
         }
-        toast.info("Open a chat to switch modes.", { duration: 5000 });
+        toast.info(i18n.t("chat:chatMode.openChatToSwitch"), {
+          duration: 5000,
+        });
       },
     },
   });

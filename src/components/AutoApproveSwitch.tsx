@@ -16,12 +16,12 @@ export function AutoApproveSwitch({
     <div className="flex items-center space-x-2">
       <Switch
         id="auto-approve"
-        aria-label="Auto-approve"
+        aria-label={t("workflow.autoApprove")}
         checked={isEnabled}
         onCheckedChange={() => {
           updateSettings({ autoApproveChanges: !isEnabled });
           if (!isEnabled && showToast) {
-            showInfo("You can disable auto-approve in the Settings.");
+            showInfo(t("workflow.autoApproveDisableHint"));
           }
         }}
       />

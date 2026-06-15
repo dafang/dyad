@@ -4,6 +4,7 @@ import { arch, platform } from "node:os";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
+import { streamText } from "ai";
 import { desc, eq, inArray, isNotNull, like } from "drizzle-orm";
 import log from "electron-log";
 
@@ -47,11 +48,23 @@ import {
   getLanguageModels,
   getLanguageModelsByProviders,
 } from "../shared/language_model_helpers";
+import {
+  getThemeGenerationModelOptions,
+  resolveBuiltinModelAlias,
+} from "../shared/remote_language_model_catalog";
 import { installPnpm } from "./node_environment_service";
 import {
   checkoutVersionHandler,
   revertVersionHandler,
 } from "../handlers/version_handlers";
+import {
+  createThemeGenerationService,
+  HIGH_FIDELITY_META_PROMPT,
+  LOCAL_WEB_SELECTED_THEME_MODEL_ID,
+  THEME_GENERATION_META_PROMPT,
+} from "@/pro/main/ipc/services/theme_generation_service";
+import { getModelClient } from "../utils/get_model_client";
+import { cancelOrphanedBaseStream } from "../utils/stream_text_utils";
 import type {
   AppSearchResult,
   McpConsentValue,
@@ -92,6 +105,20 @@ export function createDefaultLocalWebCoreService(
       userDataPath: settingsStore.userDataPath,
       settingsStore,
     });
+  const themeGenerationService = createThemeGenerationService({
+    tempDir: path.join(settingsStore.userDataPath, "theme-images"),
+    readSettings: settingsStore.readSettings,
+    resolveModelAlias: resolveBuiltinModelAlias,
+    getModelClient,
+    streamText,
+    cancelOrphanedBaseStream,
+    prompts: {
+      inspired: THEME_GENERATION_META_PROMPT,
+      "high-fidelity": HIGH_FIDELITY_META_PROMPT,
+    },
+    requireDyadPro: false,
+    logger,
+  });
 
   return createLocalWebCoreService({
     findAppById: (appId) =>
@@ -230,6 +257,25 @@ export function createDefaultLocalWebCoreService(
       installPnpm({ readSettings: settingsStore.readSettings }),
     getTemplates: async () => localTemplatesData,
     getThemes: async () => themesData,
+    getThemeGenerationModelOptions: async () => {
+      const options = await getThemeGenerationModelOptions();
+      const selectedModel = settingsStore.readSettings().selectedModel;
+      if (selectedModel.provider.startsWith("custom::")) {
+        return [
+          {
+            id: LOCAL_WEB_SELECTED_THEME_MODEL_ID,
+            label: selectedModel.name,
+          },
+          ...options,
+        ];
+      }
+      return options;
+    },
+    saveThemeImage: (params) => themeGenerationService.saveThemeImage(params),
+    cleanupThemeImages: (params) =>
+      themeGenerationService.cleanupThemeImages(params),
+    generateThemePrompt: (params) =>
+      themeGenerationService.generateThemePrompt(params),
     getLanguageModelProviders,
     getLanguageModels: (providerId) => getLanguageModels({ providerId }),
     getLanguageModelsByProviders,

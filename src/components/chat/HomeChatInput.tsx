@@ -17,7 +17,6 @@ import {
 import { useSettings } from "@/hooks/useSettings";
 import { homeChatInputValueAtom, homeSelectedAppAtom } from "@/atoms/chatAtoms";
 import { useAtom } from "jotai";
-import { useState } from "react";
 import { useStreamChat } from "@/hooks/useStreamChat";
 import { useAttachments } from "@/hooks/useAttachments";
 import { AttachmentsList } from "./AttachmentsList";
@@ -36,15 +35,17 @@ import { AppSearchDialog } from "../AppSearchDialog";
 import { useVoiceToText } from "@/hooks/useVoiceToText";
 import { useUserBudgetInfo } from "@/hooks/useUserBudgetInfo";
 import { ipc } from "@/ipc/types";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { showError } from "@/lib/toast";
 import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
+import { useTranslation } from "react-i18next";
 
 export function HomeChatInput({
   onSubmit,
 }: {
   onSubmit: (options?: HomeSubmitOptions) => void;
 }) {
+  const { t } = useTranslation("chat");
   const posthog = usePostHog();
   const [inputValue, setInputValue] = useAtom(homeChatInputValueAtom);
   const [selectedApp, setSelectedApp] = useAtom(homeSelectedAppAtom);
@@ -80,14 +81,18 @@ export function HomeChatInput({
     }
   }, [settings?.enableSelectAppFromHomeChatInput, setSelectedApp]);
 
-  const typingText = useTypingPlaceholder([
-    "an ecommerce store...",
-    "an information page...",
-    "a landing page...",
-  ]);
+  const placeholderExamples = useMemo(
+    () => [
+      t("placeholderExamples.ecommerceStore"),
+      t("placeholderExamples.informationPage"),
+      t("placeholderExamples.landingPage"),
+    ],
+    [t],
+  );
+  const typingText = useTypingPlaceholder(placeholderExamples);
   const placeholder = selectedApp
-    ? `Send a message to ${selectedApp.name}...`
-    : `Ask Dyad to build ${typingText ?? ""}`;
+    ? t("sendMessageToApp", { appName: selectedApp.name })
+    : t("askDyadToBuildWithPrompt", { prompt: typingText ?? "" });
 
   // Use the attachments hook
   const {
@@ -254,7 +259,7 @@ export function HomeChatInput({
                 <TooltipTrigger
                   render={
                     <button
-                      aria-label="Cancel generation (unavailable here)"
+                      aria-label={t("cancelGenerationUnavailable")}
                       className="px-2 py-2 mb-0.5 mr-1 text-muted-foreground rounded-lg opacity-50 cursor-not-allowed transition-colors duration-150"
                     />
                   }
@@ -262,7 +267,7 @@ export function HomeChatInput({
                   <StopCircleIcon size={20} />
                 </TooltipTrigger>
                 <TooltipContent>
-                  Cancel generation (unavailable here)
+                  {t("cancelGenerationUnavailable")}
                 </TooltipContent>
               </Tooltip>
             ) : (
@@ -272,14 +277,14 @@ export function HomeChatInput({
                     <button
                       onClick={handleCustomSubmit}
                       disabled={!inputValue.trim() && attachments.length === 0}
-                      aria-label="Send message"
+                      aria-label={t("sendMessage")}
                       className="px-2 py-2 mb-0.5 mr-1 text-muted-foreground hover:text-primary rounded-lg transition-colors duration-150 disabled:opacity-30 disabled:hover:text-muted-foreground cursor-pointer disabled:cursor-default"
                     />
                   }
                 >
                   <SendHorizontalIcon size={20} />
                 </TooltipTrigger>
-                <TooltipContent>Send message</TooltipContent>
+                <TooltipContent>{t("sendMessage")}</TooltipContent>
               </Tooltip>
             )}
           </div>

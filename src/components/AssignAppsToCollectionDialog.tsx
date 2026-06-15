@@ -15,6 +15,7 @@ import { showError, showSuccess } from "@/lib/toast";
 import { useAppCollections } from "@/hooks/useAppCollections";
 import type { ListedApp } from "@/ipc/types/app";
 import type { AppCollection } from "@/hooks/useAppCollections";
+import { useTranslation } from "react-i18next";
 
 interface AssignAppsToCollectionDialogProps {
   open: boolean;
@@ -31,6 +32,7 @@ export function AssignAppsToCollectionDialog({
   collections,
   onAssigned,
 }: AssignAppsToCollectionDialogProps) {
+  const { t } = useTranslation(["home", "common"]);
   const { assignApps, createCollection } = useAppCollections();
   const [selectedCollectionId, setSelectedCollectionId] = useState<
     number | null
@@ -64,9 +66,10 @@ export function AssignAppsToCollectionDialog({
       const target = collections.find((c) => c.id === selectedCollectionId);
       await assignApps({ collectionId: selectedCollectionId, appIds });
       showSuccess(
-        `Added ${apps.length} app${apps.length === 1 ? "" : "s"} to "${
-          target?.name ?? "collection"
-        }"`,
+        t("home:collections.addedAppsToCollection", {
+          count: apps.length,
+          name: target?.name ?? t("home:collections.collectionFallback"),
+        }),
       );
       onAssigned?.();
       onOpenChange(false);
@@ -80,14 +83,17 @@ export function AssignAppsToCollectionDialog({
   const handleCreateAndAssign = async () => {
     const trimmed = newCollectionName.trim();
     if (!trimmed) {
-      showError("Collection name is required");
+      showError(t("home:collections.nameRequired"));
       return;
     }
     setIsSubmitting(true);
     try {
       await createCollection({ name: trimmed, appIds });
       showSuccess(
-        `Added ${apps.length} app${apps.length === 1 ? "" : "s"} to "${trimmed}"`,
+        t("home:collections.addedAppsToCollection", {
+          count: apps.length,
+          name: trimmed,
+        }),
       );
       onAssigned?.();
       onOpenChange(false);
@@ -108,10 +114,12 @@ export function AssignAppsToCollectionDialog({
       <DialogContent className="max-w-md p-4">
         <DialogHeader className="pb-2">
           <DialogTitle>
-            Add {apps.length} app{apps.length === 1 ? "" : "s"} to a collection
+            {t("home:collections.addAppsToCollectionTitle", {
+              count: apps.length,
+            })}
           </DialogTitle>
           <DialogDescription className="text-xs">
-            Apps already in another collection will be moved.
+            {t("home:collections.appsAlreadyInAnotherMove")}
           </DialogDescription>
         </DialogHeader>
 
@@ -121,14 +129,14 @@ export function AssignAppsToCollectionDialog({
               htmlFor="new-collection-name-input"
               className="text-xs font-medium text-muted-foreground"
             >
-              New collection name
+              {t("home:collections.newCollectionName")}
             </label>
             <Input
               id="new-collection-name-input"
               data-testid="assign-apps-new-collection-name"
               value={newCollectionName}
               onChange={(e) => setNewCollectionName(e.target.value)}
-              placeholder="e.g. Work"
+              placeholder={t("home:collections.namePlaceholder")}
               autoFocus
               disabled={isSubmitting}
             />
@@ -137,7 +145,7 @@ export function AssignAppsToCollectionDialog({
           <>
             <Input
               type="text"
-              placeholder="Search collections..."
+              placeholder={t("home:collections.searchCollections")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-(--background-lighter)"
@@ -151,8 +159,8 @@ export function AssignAppsToCollectionDialog({
               {filteredCollections.length === 0 ? (
                 <div className="p-3 text-center text-xs text-muted-foreground">
                   {collections.length === 0
-                    ? "No collections yet. Create one below."
-                    : "No collections match your search."}
+                    ? t("home:collections.noCollectionsCreateBelow")
+                    : t("home:collections.noCollectionsMatch")}
                 </div>
               ) : (
                 filteredCollections.map((col) => {
@@ -172,8 +180,9 @@ export function AssignAppsToCollectionDialog({
                       <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
                       <span className="flex-1 truncate">{col.name}</span>
                       <span className="text-[10px] text-muted-foreground shrink-0">
-                        {col.appIds.length} app
-                        {col.appIds.length === 1 ? "" : "s"}
+                        {t("home:appsPage.appCount", {
+                          count: col.appIds.length,
+                        })}
                       </span>
                     </button>
                   );
@@ -188,7 +197,7 @@ export function AssignAppsToCollectionDialog({
               data-testid="assign-apps-create-new-toggle"
             >
               <Plus className="h-3 w-3" />
-              Create new collection
+              {t("home:collections.createNewCollection")}
             </button>
           </>
         )}
@@ -205,7 +214,7 @@ export function AssignAppsToCollectionDialog({
                 disabled={isSubmitting}
                 size="sm"
               >
-                Back
+                {t("common:back")}
               </Button>
               <Button
                 onClick={handleCreateAndAssign}
@@ -217,10 +226,10 @@ export function AssignAppsToCollectionDialog({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-3 w-3 animate-spin" />
-                    Creating...
+                    {t("common:creating")}
                   </>
                 ) : (
-                  "Create & add"
+                  t("home:collections.createAndAdd")
                 )}
               </Button>
             </>
@@ -232,7 +241,7 @@ export function AssignAppsToCollectionDialog({
                 disabled={isSubmitting}
                 size="sm"
               >
-                Cancel
+                {t("common:cancel")}
               </Button>
               <Button
                 onClick={handleAssignToExisting}
@@ -244,10 +253,10 @@ export function AssignAppsToCollectionDialog({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-3 w-3 animate-spin" />
-                    Adding...
+                    {t("home:collections.adding")}
                   </>
                 ) : (
-                  `Add ${apps.length} app${apps.length === 1 ? "" : "s"}`
+                  t("home:collections.addAppsCount", { count: apps.length })
                 )}
               </Button>
             </>

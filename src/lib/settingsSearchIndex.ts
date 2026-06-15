@@ -515,3 +515,29 @@ export function getVisibleSettingsSearchIndex({
     (item) => item.id !== SETTING_IDS.enableCloudSandbox,
   );
 }
+
+type SettingsSearchTranslator = (
+  key: string,
+  options: { defaultValue: string },
+) => string;
+
+export function getLocalizedVisibleSettingsSearchIndex({
+  hideDyadProUi = false,
+  t,
+}: {
+  hideDyadProUi?: boolean;
+  t: SettingsSearchTranslator;
+}): SearchableSettingItem[] {
+  return getVisibleSettingsSearchIndex({ hideDyadProUi }).map((item) => ({
+    ...item,
+    label: t(`settingsSearch.items.${item.id}.label`, {
+      defaultValue: item.label,
+    }),
+    description: t(`settingsSearch.items.${item.id}.description`, {
+      defaultValue: item.description,
+    }),
+    sectionLabel: t(`settingsSearch.sections.${item.sectionId}`, {
+      defaultValue: item.sectionLabel,
+    }),
+  }));
+}

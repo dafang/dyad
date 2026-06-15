@@ -15,6 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { shouldHideDyadProUi } from "@/lib/dyad_pro_ui";
+import { useTranslation } from "react-i18next";
 
 export function ChatErrorBox({
   onDismiss,
@@ -27,6 +28,7 @@ export function ChatErrorBox({
   isDyadProEnabled: boolean;
   onStartNewChat?: () => void;
 }) {
+  const { t } = useTranslation("chat");
   const { messagesLimit } = useFreeAgentQuota();
   const hideDyadProUi = shouldHideDyadProUi();
 
@@ -35,7 +37,7 @@ export function ChatErrorBox({
       <ChatErrorContainer onDismiss={onDismiss}>
         {error}
         {hideDyadProUi ? (
-          <span className="ml-1">Switch to another model.</span>
+          <span className="ml-1">{t("errorBox.switchToAnotherModel")}</span>
         ) : (
           <>
             <span className="ml-1">
@@ -43,10 +45,10 @@ export function ChatErrorBox({
                 href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=free-quota-error"
                 variant="primary"
               >
-                Access with Dyad Pro
+                {t("errorBox.accessWithDyadPro")}
               </ExternalLink>
             </span>{" "}
-            or switch to another model.
+            {t("errorBox.orSwitchModel")}
           </>
         )}
       </ChatErrorContainer>
@@ -74,12 +76,12 @@ export function ChatErrorBox({
               href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=rate-limit-error"
               variant="primary"
             >
-              Upgrade to Dyad Pro
+              {t("errorBox.upgradeToDyadPro")}
             </ExternalLink>
           )}
 
           <ExternalLink href="https://dyad.sh/docs/help/ai-rate-limit">
-            Troubleshooting guide
+            {t("errorBox.troubleshootingGuide")}
           </ExternalLink>
         </div>
       </ChatErrorContainer>
@@ -90,22 +92,21 @@ export function ChatErrorBox({
     if (hideDyadProUi) {
       return (
         <ChatInfoContainer onDismiss={onDismiss}>
-          The configured AI key is not valid. Check your provider settings and
-          try again.
+          {t("errorBox.invalidConfiguredAiKey")}
         </ChatInfoContainer>
       );
     }
     return (
       <ChatInfoContainer onDismiss={onDismiss}>
         <span>
-          Looks like you don't have a valid Dyad Pro key.{" "}
+          {t("errorBox.invalidProKey")}{" "}
           <ExternalLink
             href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=invalid-pro-key-error"
             variant="primary"
           >
-            Upgrade to Dyad Pro
+            {t("errorBox.upgradeToDyadPro")}
           </ExternalLink>{" "}
-          today.
+          {t("errorBox.today")}
         </span>
       </ChatInfoContainer>
     );
@@ -114,22 +115,21 @@ export function ChatErrorBox({
     if (hideDyadProUi) {
       return (
         <ChatInfoContainer onDismiss={onDismiss}>
-          You have used all of your configured AI credits this month. Check your
-          provider account or switch models.
+          {t("errorBox.configuredCreditsUsed")}
         </ChatInfoContainer>
       );
     }
     return (
       <ChatInfoContainer onDismiss={onDismiss}>
         <span>
-          You have used all of your Dyad AI credits this month.{" "}
+          {t("errorBox.creditsUsed")}{" "}
           <ExternalLink
             href="https://academy.dyad.sh/subscription?utm_source=dyad-app&utm_medium=app&utm_campaign=exceeded-budget-error"
             variant="primary"
           >
-            Reload or upgrade your subscription
+            {t("errorBox.reloadOrUpgrade")}
           </ExternalLink>{" "}
-          and get more AI credits
+          {t("errorBox.getMoreCredits")}
         </span>
       </ChatInfoContainer>
     );
@@ -147,15 +147,14 @@ export function ChatErrorBox({
   if (error.includes("FREE_AGENT_QUOTA_EXCEEDED")) {
     return (
       <ChatErrorContainer onDismiss={onDismiss}>
-        You have used all {messagesLimit} free Agent messages for today. Please
-        switch to Build mode or try again later.
+        {t("errorBox.freeAgentQuotaExceeded", { count: messagesLimit })}
         <div className="mt-2 space-y-2 space-x-2">
           {!hideDyadProUi && (
             <ExternalLink
               href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=free-agent-quota-exceeded"
               variant="primary"
             >
-              Upgrade to Dyad Pro
+              {t("errorBox.upgradeToDyadPro")}
             </ExternalLink>
           )}
         </div>
@@ -184,16 +183,14 @@ export function ChatErrorBox({
               onClick={onStartNewChat}
               className="cursor-pointer inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500"
             >
-              <span>Start new chat</span>
+              <span>{t("errorBox.startNewChat")}</span>
               <MessageSquarePlus size={18} />
             </TooltipTrigger>
-            <TooltipContent>
-              Starting a new chat can fix some issues
-            </TooltipContent>
+            <TooltipContent>{t("errorBox.startNewChatTooltip")}</TooltipContent>
           </Tooltip>
         )}
         <ExternalLink href="https://www.dyad.sh/docs/faq">
-          Read docs
+          {t("errorBox.readDocs")}
         </ExternalLink>
       </div>
     </ChatErrorContainer>

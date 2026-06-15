@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/tooltip";
 import { CheckIcon } from "lucide-react";
 import { ProviderIcon } from "@/components/ProviderIcon";
+import { useTranslation } from "react-i18next";
 
 const SCROLL_AREA_CLASS = "max-h-100 overflow-y-auto scrollbar-on-hover";
 
@@ -75,6 +76,7 @@ function tierFor(dollarSigns: number | undefined): Tier {
 
 export function ModelPicker() {
   const { settings, updateSettings } = useSettings();
+  const { t } = useTranslation("chat");
   const queryClient = useQueryClient();
   const { isTrial } = useTrialModelRestriction();
   const hideDyadProUi = shouldHideDyadProUi();
@@ -183,6 +185,8 @@ export function ModelPicker() {
   }
   const selectedModel = settings?.selectedModel;
   const modelDisplayName = getModelDisplayName();
+  const displayModelName =
+    modelDisplayName === "Auto" ? t("modelPicker.auto") : modelDisplayName;
   // Split providers into primary and secondary groups (excluding auto)
   const providerEntries =
     !loading && modelsByProviders
@@ -384,17 +388,17 @@ export function ModelPicker() {
       <DropdownMenuTrigger
         className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border-none bg-transparent shadow-none text-foreground/80 hover:text-foreground hover:bg-muted/60 h-7 max-w-[130px] px-2 gap-1.5 cursor-pointer"
         data-testid="model-picker"
-        title={modelDisplayName}
+        title={displayModelName}
       >
         <span className="truncate">
           {modelDisplayName === "Auto" && (
             <>
               <span className="text-xs text-muted-foreground/70">
-                Model:
+                {t("modelPicker.modelLabel")}
               </span>{" "}
             </>
           )}
-          {modelDisplayName}
+          {displayModelName}
         </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[17rem]" align="start">
@@ -429,7 +433,7 @@ export function ModelPicker() {
               }}
             >
               <div className="flex justify-between items-center w-full gap-2">
-                <span className="text-[13px]">Auto</span>
+                <span className="text-[13px]">{t("modelPicker.auto")}</span>
                 <span className="flex items-center gap-1.5">
                   <span
                     className={cn(PILL_CLASS, "bg-primary/10 text-primary")}
@@ -447,12 +451,12 @@ export function ModelPicker() {
         {!isTrial &&
           (loading ? (
             <div className="text-xs text-center py-2 text-muted-foreground">
-              Loading models...
+              {t("modelPicker.loadingModels")}
             </div>
           ) : !modelsByProviders ||
             Object.keys(modelsByProviders).length === 0 ? (
             <div className="text-xs text-center py-2 text-muted-foreground">
-              No cloud models available
+              {t("modelPicker.noCloudModels")}
             </div>
           ) : (
             /* Cloud models loaded */

@@ -1,4 +1,26 @@
-export const INSPIRATION_PROMPTS = [
+export type InspirationPromptLocaleKey =
+  | "todoListApp"
+  | "landingPage"
+  | "signUpForm"
+  | "moodJournalTracker"
+  | "interactiveStoryGame"
+  | "recipeFinderMealPlanner"
+  | "personalFinanceDashboard"
+  | "travelMemoryMap"
+  | "aiWritingAssistant"
+  | "habitStreakTracker"
+  | "newsletterCreator"
+  | "musicDiscoveryApp"
+  | "portfolioViewer3d"
+  | "aiImageGenerator"
+  | "pomodoroFocusTimer"
+  | "virtualAvatarBuilder";
+
+export const INSPIRATION_PROMPTS: Array<{
+  icon: React.ReactNode;
+  label: string;
+  localeKey: InspirationPromptLocaleKey;
+}> = [
   {
     icon: (
       <svg
@@ -22,6 +44,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "TODO list app",
+    localeKey: "todoListApp",
   },
   {
     icon: (
@@ -40,6 +63,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Landing Page",
+    localeKey: "landingPage",
   },
   {
     icon: (
@@ -58,6 +82,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Sign Up Form",
+    localeKey: "signUpForm",
   },
   {
     icon: (
@@ -82,6 +107,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Mood Journal & Tracker",
+    localeKey: "moodJournalTracker",
   },
   {
     icon: (
@@ -100,6 +126,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Interactive Story Game",
+    localeKey: "interactiveStoryGame",
   },
   {
     icon: (
@@ -118,6 +145,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Recipe Finder & Meal Planner",
+    localeKey: "recipeFinderMealPlanner",
   },
   {
     icon: (
@@ -136,6 +164,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Personal Finance Dashboard",
+    localeKey: "personalFinanceDashboard",
   },
   {
     icon: (
@@ -160,6 +189,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Travel Memory Map",
+    localeKey: "travelMemoryMap",
   },
   {
     icon: (
@@ -178,6 +208,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "AI Writing Assistant",
+    localeKey: "aiWritingAssistant",
   },
   {
     icon: (
@@ -196,6 +227,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Habit Streak Tracker",
+    localeKey: "habitStreakTracker",
   },
   {
     icon: (
@@ -214,6 +246,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Newsletter Creator",
+    localeKey: "newsletterCreator",
   },
   {
     icon: (
@@ -232,6 +265,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Music Discovery App",
+    localeKey: "musicDiscoveryApp",
   },
   {
     icon: (
@@ -250,6 +284,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "3D Portfolio Viewer",
+    localeKey: "portfolioViewer3d",
   },
   {
     icon: (
@@ -268,6 +303,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "AI Image Generator",
+    localeKey: "aiImageGenerator",
   },
   {
     icon: (
@@ -286,6 +322,7 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Pomodoro Focus Timer",
+    localeKey: "pomodoroFocusTimer",
   },
   {
     icon: (
@@ -304,5 +341,6 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Virtual Avatar Builder",
+    localeKey: "virtualAvatarBuilder",
   },
 ];

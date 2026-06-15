@@ -37,6 +37,7 @@ import {
 } from "./lib/posthogTelemetry";
 import { LocalWebTransportConfigError } from "./lib/local_web_transport";
 import { getRuntimeMode } from "./lib/runtime_client";
+import { HttpInvokeAbortError } from "./ipc/contracts/core";
 
 interface MyMeta extends Record<string, unknown> {
   showErrorToast: boolean;
@@ -61,6 +62,9 @@ const queryClient = new QueryClient({
   },
   queryCache: new QueryCache({
     onError: (error, query) => {
+      if (error instanceof HttpInvokeAbortError) {
+        return;
+      }
       if (query.meta?.showErrorToast) {
         showError(error);
       }
@@ -68,6 +72,9 @@ const queryClient = new QueryClient({
   }),
   mutationCache: new MutationCache({
     onError: (error, _variables, _context, mutation) => {
+      if (error instanceof HttpInvokeAbortError) {
+        return;
+      }
       if (mutation.meta?.showErrorToast) {
         showError(error);
       }

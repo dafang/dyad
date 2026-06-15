@@ -19,6 +19,13 @@ import type {
   SystemDebugInfo,
   Template,
   Theme,
+  GenerateThemeFromUrlParams,
+  GenerateThemePromptParams,
+  GenerateThemePromptResult,
+  SaveThemeImageParams,
+  SaveThemeImageResult,
+  CleanupThemeImagesParams,
+  ThemeGenerationModelOption,
   UserBudgetInfo,
   Version,
 } from "../types";
@@ -93,6 +100,12 @@ export interface LocalWebCoreServiceDependencies {
   installPnpm(): Promise<InstallPnpmResult>;
   getTemplates(): Promise<Template[]>;
   getThemes(): Promise<Theme[]>;
+  getThemeGenerationModelOptions(): Promise<ThemeGenerationModelOption[]>;
+  saveThemeImage(params: SaveThemeImageParams): Promise<SaveThemeImageResult>;
+  cleanupThemeImages(params: CleanupThemeImagesParams): Promise<void>;
+  generateThemePrompt(
+    params: GenerateThemePromptParams,
+  ): Promise<GenerateThemePromptResult>;
   getLanguageModelProviders(): Promise<LanguageModelProvider[]>;
   getLanguageModels(providerId: string): Promise<LanguageModel[]>;
   getLanguageModelsByProviders(): Promise<Record<string, LanguageModel[]>>;
@@ -246,6 +259,33 @@ export class LocalWebCoreService {
 
   getCustomThemes(): Promise<CustomTheme[]> {
     return this.deps.listCustomThemes();
+  }
+
+  getThemeGenerationModelOptions(): Promise<ThemeGenerationModelOption[]> {
+    return this.deps.getThemeGenerationModelOptions();
+  }
+
+  saveThemeImage(params: SaveThemeImageParams): Promise<SaveThemeImageResult> {
+    return this.deps.saveThemeImage(params);
+  }
+
+  cleanupThemeImages(params: CleanupThemeImagesParams): Promise<void> {
+    return this.deps.cleanupThemeImages(params);
+  }
+
+  generateThemePrompt(
+    params: GenerateThemePromptParams,
+  ): Promise<GenerateThemePromptResult> {
+    return this.deps.generateThemePrompt(params);
+  }
+
+  async generateThemeFromUrl(
+    _params: GenerateThemeFromUrlParams,
+  ): Promise<GenerateThemePromptResult> {
+    throw new DyadError(
+      "Website URL theme generation is not available in Local Web mode yet.",
+      DyadErrorKind.Precondition,
+    );
   }
 
   getAppTheme(appId: number): Promise<string | null> {

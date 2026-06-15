@@ -16,6 +16,7 @@ import { Save, Edit2, Loader2 } from "lucide-react";
 import { showError } from "@/lib/toast";
 import { toast } from "sonner";
 import type { CustomTheme } from "@/ipc/types";
+import { useTranslation } from "react-i18next";
 
 interface EditThemeDialogProps {
   theme: CustomTheme;
@@ -33,6 +34,7 @@ export function EditThemeDialog({
   onUpdateTheme,
   trigger,
 }: EditThemeDialogProps) {
+  const { t } = useTranslation(["home", "common"]);
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [draft, setDraft] = useState({
@@ -93,11 +95,16 @@ export function EditThemeDialog({
         description: draft.description.trim() || undefined,
         prompt: draft.prompt.trim(),
       });
-      toast.success("Theme updated successfully");
+      toast.success(t("home:editTheme.themeUpdated"));
       setOpen(false);
     } catch (error) {
       showError(
-        `Failed to update theme: ${error instanceof Error ? error.message : "Unknown error"}`,
+        t("home:editTheme.failedUpdateTheme", {
+          error:
+            error instanceof Error
+              ? error.message
+              : t("home:customTheme.unknownError"),
+        }),
       );
     } finally {
       setIsSaving(false);
@@ -121,26 +128,26 @@ export function EditThemeDialog({
         <DialogTrigger
           className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}
           data-testid="edit-theme-button"
-          title="Edit theme"
+          title={t("home:editTheme.title")}
         >
           <Edit2 className="h-4 w-4" />
         </DialogTrigger>
       )}
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Theme</DialogTitle>
+          <DialogTitle>{t("home:editTheme.title")}</DialogTitle>
           <DialogDescription>
-            Modify your custom theme settings and prompt.
+            {t("home:editTheme.description")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 mt-4">
           <div className="space-y-2">
             <label htmlFor="edit-theme-name" className="text-sm font-medium">
-              Theme Name
+              {t("home:editTheme.themeName")}
             </label>
             <Input
               id="edit-theme-name"
-              placeholder="Theme name"
+              placeholder={t("home:editTheme.themeNamePlaceholder")}
               value={draft.name}
               onChange={(e) =>
                 setDraft((d) => ({ ...d, name: e.target.value }))
@@ -152,11 +159,11 @@ export function EditThemeDialog({
               htmlFor="edit-theme-description"
               className="text-sm font-medium"
             >
-              Description (optional)
+              {t("home:editTheme.descriptionOptional")}
             </label>
             <Input
               id="edit-theme-description"
-              placeholder="A brief description of your theme"
+              placeholder={t("home:editTheme.descriptionPlaceholder")}
               value={draft.description}
               onChange={(e) =>
                 setDraft((d) => ({ ...d, description: e.target.value }))
@@ -165,12 +172,12 @@ export function EditThemeDialog({
           </div>
           <div className="space-y-2">
             <label htmlFor="edit-theme-prompt" className="text-sm font-medium">
-              Theme Prompt
+              {t("home:editTheme.themePrompt")}
             </label>
             <Textarea
               id="edit-theme-prompt"
               ref={textareaRef}
-              placeholder="Enter your theme system prompt..."
+              placeholder={t("home:editTheme.themePromptPlaceholder")}
               value={draft.prompt}
               onChange={(e) => {
                 setDraft((d) => ({ ...d, prompt: e.target.value }));
@@ -183,7 +190,7 @@ export function EditThemeDialog({
         </div>
         <DialogFooter className="mt-4">
           <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
-            Cancel
+            {t("common:cancel")}
           </Button>
           <Button
             onClick={handleSave}
@@ -192,11 +199,11 @@ export function EditThemeDialog({
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {t("common:saving")}
               </>
             ) : (
               <>
-                <Save className="mr-2 h-4 w-4" /> Save
+                <Save className="mr-2 h-4 w-4" /> {t("common:save")}
               </>
             )}
           </Button>

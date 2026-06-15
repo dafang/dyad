@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import {
   THINKING_EFFORT_DEFAULT,
   THINKING_EFFORT_OPTIONS,
-  getThinkingEffortOption,
   type ThinkingEffortLevel,
 } from "@/lib/thinkingEffort";
 
@@ -25,9 +24,10 @@ export const ThinkingBudgetSelector: React.FC = () => {
 
   // Determine the current value
   const currentValue = settings?.thinkingBudget || THINKING_EFFORT_DEFAULT;
-
-  // Find the current option to display its description
-  const currentOption = getThinkingEffortOption(currentValue);
+  const currentLabel =
+    currentValue === THINKING_EFFORT_DEFAULT
+      ? `${t(`ai.thinkingEffort.${currentValue}.label`)} ${t("ai.thinkingEffort.defaultSuffix")}`
+      : t(`ai.thinkingEffort.${currentValue}.label`);
 
   return (
     <div className="space-y-1">
@@ -43,21 +43,21 @@ export const ThinkingBudgetSelector: React.FC = () => {
           onValueChange={(v) => v && handleValueChange(v)}
         >
           <SelectTrigger className="w-[180px]" id="thinking-budget">
-            <SelectValue placeholder={t("ai.selectThinkingBudget")} />
+            <SelectValue>{currentLabel}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {THINKING_EFFORT_OPTIONS.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.value === THINKING_EFFORT_DEFAULT
-                  ? `${option.label} (default)`
-                  : option.label}
+                  ? `${t(`ai.thinkingEffort.${option.value}.label`)} ${t("ai.thinkingEffort.defaultSuffix")}`
+                  : t(`ai.thinkingEffort.${option.value}.label`)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
       <div className="text-sm text-gray-500 dark:text-gray-400">
-        {currentOption.description}
+        {t(`ai.thinkingEffort.${currentValue}.description`)}
       </div>
     </div>
   );

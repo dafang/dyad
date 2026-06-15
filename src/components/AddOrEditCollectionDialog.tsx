@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { buildCollectionNameByAppId } from "@/lib/appCollections";
 import type { ListedApp } from "@/ipc/types/app";
 import type { AppCollection } from "@/hooks/useAppCollections";
+import { useTranslation } from "react-i18next";
 
 interface AddOrEditCollectionDialogProps {
   open: boolean;
@@ -38,6 +39,7 @@ export function AddOrEditCollectionDialog({
   allApps,
   collections,
 }: AddOrEditCollectionDialogProps) {
+  const { t } = useTranslation(["home", "common"]);
   const isEdit = !!collection;
   const { createCollection, updateCollection } = useAppCollections();
 
@@ -80,7 +82,7 @@ export function AddOrEditCollectionDialog({
   const handleSubmit = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
-      showError("Collection name is required");
+      showError(t("home:collections.nameRequired"));
       return;
     }
     setIsSubmitting(true);
@@ -92,10 +94,10 @@ export function AddOrEditCollectionDialog({
           name: trimmed,
           appIds: finalAppIds,
         });
-        showSuccess(`Collection "${trimmed}" updated`);
+        showSuccess(t("home:collections.updated", { name: trimmed }));
       } else {
         await createCollection({ name: trimmed, appIds: finalAppIds });
-        showSuccess(`Collection "${trimmed}" created`);
+        showSuccess(t("home:collections.created", { name: trimmed }));
       }
       onOpenChange(false);
     } catch (error) {
@@ -115,12 +117,14 @@ export function AddOrEditCollectionDialog({
       <DialogContent className="max-w-md p-4">
         <DialogHeader className="pb-2">
           <DialogTitle>
-            {isEdit ? "Edit collection" : "Add collection"}
+            {isEdit
+              ? t("home:collections.editCollection")
+              : t("home:collections.addCollection")}
           </DialogTitle>
           <DialogDescription className="text-xs">
             {isEdit
-              ? "Rename this collection or change which apps belong to it."
-              : "Group related apps together."}
+              ? t("home:collections.editDescription")
+              : t("home:collections.addDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -130,14 +134,14 @@ export function AddOrEditCollectionDialog({
               htmlFor="collection-name-input"
               className="text-xs font-medium text-muted-foreground"
             >
-              Name
+              {t("home:collections.name")}
             </label>
             <Input
               id="collection-name-input"
               data-testid="collection-name-input"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Work"
+              placeholder={t("home:collections.namePlaceholder")}
               autoFocus
               disabled={isSubmitting}
             />
@@ -145,7 +149,7 @@ export function AddOrEditCollectionDialog({
 
           <div>
             <span className="text-xs font-medium text-muted-foreground block mb-1">
-              Apps in this collection
+              {t("home:collections.appsInCollection")}
             </span>
 
             <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
@@ -156,7 +160,7 @@ export function AddOrEditCollectionDialog({
                 <ul className="flex flex-wrap gap-1.5 items-center">
                   {selectedApps.length === 0 && (
                     <li className="text-xs text-muted-foreground">
-                      No apps yet.
+                      {t("home:collections.noAppsYet")}
                     </li>
                   )}
                   {selectedApps.map((app) => {
@@ -172,16 +176,20 @@ export function AddOrEditCollectionDialog({
                         {inOther && (
                           <span
                             className="text-[10px] text-muted-foreground italic"
-                            title={`Currently in "${inOther}" — saving will move it.`}
+                            title={t("home:collections.currentlyInMoveTitle", {
+                              name: inOther,
+                            })}
                           >
-                            (move)
+                            {t("home:collections.moveBadge")}
                           </span>
                         )}
                         <button
                           type="button"
                           onClick={() => toggleApp(app.id, false)}
                           className="text-muted-foreground hover:text-foreground"
-                          aria-label={`Remove ${app.name}`}
+                          aria-label={t("home:collections.removeApp", {
+                            name: app.name,
+                          })}
                           data-testid={`collection-remove-app-${app.id}`}
                         >
                           <X className="h-3 w-3" />
@@ -199,7 +207,7 @@ export function AddOrEditCollectionDialog({
                       )}
                       disabled={isSubmitting || pickableApps.length === 0}
                       data-testid="collection-add-apps-picker-trigger"
-                      aria-label="Add apps"
+                      aria-label={t("home:collections.addApps")}
                     >
                       <Plus className="h-3 w-3" />
                     </PopoverTrigger>
@@ -210,7 +218,7 @@ export function AddOrEditCollectionDialog({
                 <div className="max-h-64 overflow-y-auto p-1">
                   {pickableApps.length === 0 ? (
                     <div className="text-xs text-muted-foreground p-3 text-center">
-                      All apps already added.
+                      {t("home:collections.allAppsAlreadyAdded")}
                     </div>
                   ) : (
                     pickableApps.map((app) => {
@@ -228,7 +236,9 @@ export function AddOrEditCollectionDialog({
                           </span>
                           {inOther && (
                             <span className="text-[10px] text-muted-foreground italic shrink-0">
-                              in "{inOther}"
+                              {t("home:collections.inCollection", {
+                                name: inOther,
+                              })}
                             </span>
                           )}
                         </button>
@@ -248,7 +258,7 @@ export function AddOrEditCollectionDialog({
             disabled={isSubmitting}
             size="sm"
           >
-            Cancel
+            {t("common:cancel")}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -260,12 +270,12 @@ export function AddOrEditCollectionDialog({
             {isSubmitting ? (
               <>
                 <Loader2 className="h-3 w-3 animate-spin" />
-                Saving...
+                {t("common:saving")}
               </>
             ) : isEdit ? (
-              "Save"
+              t("common:save")
             ) : (
-              "Create"
+              t("common:create")
             )}
           </Button>
         </DialogFooter>

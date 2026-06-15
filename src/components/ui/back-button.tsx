@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface BackButtonProps {
   onClick?: () => void;
@@ -13,13 +14,15 @@ interface BackButtonProps {
 
 export function BackButton({
   onClick,
-  label = "Go Back",
+  label,
   className,
   fallbackTo = "/",
   ...rest
 }: BackButtonProps) {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const navigate = useNavigate();
+  const resolvedLabel = label ?? t("goBack");
 
   const handleClick = () => {
     if (onClick) {
@@ -45,7 +48,7 @@ export function BackButton({
       {...rest}
     >
       <ArrowLeft className="h-4 w-4 transition-transform duration-200 ease-out group-hover:-translate-x-1" />
-      <span className="text-sm font-medium">{label}</span>
+      <span className="text-sm font-medium">{resolvedLabel}</span>
     </Button>
   );
 }

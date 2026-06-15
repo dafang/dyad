@@ -14,13 +14,23 @@ import type { LocalWebHostCapabilities } from "@/server/local_web_host_capabilit
 import { createLocalWebHostCapabilities } from "@/server/local_web_host_capabilities";
 import type { LocalWebSettingsStore } from "@/server/local_web_settings";
 import { createLocalWebSettingsStore } from "@/server/local_web_settings";
-import { getDefaultLocalWebUserDataPath } from "@/server/local_web_paths";
+import {
+  createLocalWebPathResolver,
+  getDefaultLocalWebUserDataPath,
+  type LocalWebPathResolver,
+} from "@/server/local_web_paths";
 import type { LocalWebRpcService } from "@/server/local_web_rpc_registry";
+import {
+  analyzeVisualEditingComponent,
+  applyVisualEditingChanges,
+} from "@/pro/main/ipc/services/visual_editing_service";
 import { and, eq } from "drizzle-orm";
+import { apps } from "@/db/schema";
 
 export interface DefaultLocalWebIntegrationServiceOptions {
   settingsStore?: LocalWebSettingsStore;
   hostCapabilities?: LocalWebHostCapabilities;
+  pathResolver?: LocalWebPathResolver;
 }
 
 export function createDefaultLocalWebIntegrationService(
@@ -33,6 +43,12 @@ export function createDefaultLocalWebIntegrationService(
     });
   const hostCapabilities =
     options.hostCapabilities ?? createLocalWebHostCapabilities();
+  const pathResolver =
+    options.pathResolver ??
+    createLocalWebPathResolver({
+      userDataPath: settingsStore.userDataPath,
+      settingsStore,
+    });
   const unsupported = (feature: string): never => {
     throw new DyadError(
       `${feature} is not available in Local Web mode yet.`,
@@ -209,12 +225,17 @@ export function createDefaultLocalWebIntegrationService(
       timestamp: new Date().toISOString(),
       chatId: 0,
     }),
-    applyVisualEditingChanges: () => unsupported("Visual editing changes"),
-    analyzeComponent: async () => ({
-      isDynamic: false,
-      hasStaticText: false,
-      hasImage: false,
-    }),
+    applyVisualEditingChanges: async (params) => {
+      await applyVisualEditingChanges(params, {
+        findAppById,
+        resolveAppPath: (appPath) => pathResolver.getDyadAppPath(appPath),
+      });
+    },
+    analyzeComponent: (params) =>
+      analyzeVisualEditingComponent(params, {
+        findAppById,
+        resolveAppPath: (appPath) => pathResolver.getDyadAppPath(appPath),
+      }),
     getAppUpgrades: async () => [],
     executeAppUpgrade: () => unsupported("App upgrade execution"),
     isCapacitorApp: async () => false,
@@ -232,6 +253,12 @@ export function createDefaultLocalWebIntegrationService(
     },
     openFilePath: async () => unsupported("Opening local files"),
   };
+}
+
+async function findAppById(appId: number) {
+  return db.query.apps.findFirst({
+    where: eq(apps.id, appId),
+  });
 }
 
 function parseJsonField(value: unknown, field: string): void {

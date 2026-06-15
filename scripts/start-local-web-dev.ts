@@ -137,16 +137,8 @@ async function handlePageRequest(
       return;
     }
 
-    await new Promise<void>((resolve, reject) => {
-      vite!.middlewares(request, response, (error?: unknown) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-        resolve();
-      });
-    });
-    if (!response.writableEnded) {
+    await runViteMiddleware(request, response);
+    if (!response.writableEnded && !response.destroyed) {
       if (isSpaNavigationRequest(request)) {
         await sendWebHtml(originalUrl, response, runtime);
         return;
@@ -158,6 +150,44 @@ async function handlePageRequest(
     response.statusCode = 500;
     response.end(error instanceof Error ? error.stack : String(error));
   }
+}
+
+function runViteMiddleware(
+  request: IncomingMessage,
+  response: ServerResponse,
+): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    let settled = false;
+
+    const cleanup = () => {
+      response.off("finish", onFinished);
+      response.off("close", onClosed);
+    };
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve();
+    };
+    const fail = (error: unknown) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(error);
+    };
+    const onFinished = () => settle();
+    const onClosed = () => settle();
+
+    response.once("finish", onFinished);
+    response.once("close", onClosed);
+    vite!.middlewares(request, response, (error?: unknown) => {
+      if (error) {
+        fail(error);
+        return;
+      }
+      settle();
+    });
+  });
 }
 
 async function sendWebHtml(

@@ -27,11 +27,10 @@ export function ReleaseChannelSelector() {
   const handleReleaseChannelChange = (value: ReleaseChannel) => {
     updateSettings({ releaseChannel: value });
     if (value === "stable") {
-      toast("Using Stable release channel", {
-        description:
-          "You'll stay on your current version until a newer stable release is available, or you can manually downgrade now.",
+      toast(t("general.releaseChannelStableToast"), {
+        description: t("general.releaseChannelStableToastDescription"),
         action: {
-          label: "Download Stable",
+          label: t("general.downloadStable"),
           onClick: () => {
             if (webHostCapabilities.isLocalWeb) {
               void webHostCapabilities.openExternalUrl(
@@ -44,15 +43,14 @@ export function ReleaseChannelSelector() {
         },
       });
     } else {
-      toast("Using Beta release channel", {
-        description:
-          "You will need to restart Dyad for your settings to take effect.",
+      toast(t("general.releaseChannelBetaToast"), {
+        description: t("general.restartRequiredDescription"),
         action: {
-          label: "Restart Dyad",
+          label: t("general.restartDyad"),
           onClick: async () => {
             if (webHostCapabilities.isLocalWeb) {
               const result = await webHostCapabilities.restartApp();
-              toast("Restart from terminal", {
+              toast(t("general.restartFromTerminal"), {
                 description: getWebHostUnsupportedMessage(result),
               });
               return;
@@ -63,6 +61,10 @@ export function ReleaseChannelSelector() {
       });
     }
   };
+  const currentReleaseChannelLabel =
+    settings.releaseChannel === "beta"
+      ? t("general.beta")
+      : t("general.stable");
 
   return (
     <div className="space-y-1">
@@ -78,7 +80,7 @@ export function ReleaseChannelSelector() {
           onValueChange={(v) => v && handleReleaseChannelChange(v)}
         >
           <SelectTrigger className="w-32" id="release-channel">
-            <SelectValue />
+            <SelectValue>{currentReleaseChannelLabel}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="stable">{t("general.stable")}</SelectItem>

@@ -21,10 +21,12 @@ import {
   X,
 } from "lucide-react";
 import { selectedChatIdAtom } from "@/atoms/chatAtoms";
+import { useTranslation } from "react-i18next";
 
 const MAX_DISPLAYED_OPTIONS = 3;
 
 export function QuestionnaireInput() {
+  const { t } = useTranslation(["chat", "common"]);
   const [questionnaireMap, setQuestionnaireMap] = useAtom(
     pendingQuestionnaireAtom,
   );
@@ -133,7 +135,7 @@ export function QuestionnaireInput() {
 
     // For radio/select: if custom option selected, use the typed text
     if (response === CUSTOM_OPTION) {
-      return additionalText || "(no answer)";
+      return additionalText || t("chat:questionnaire.noAnswer");
     }
 
     let formattedResponse: string;
@@ -151,7 +153,7 @@ export function QuestionnaireInput() {
       return additionalText;
     }
 
-    return formattedResponse || "(no answer)";
+    return formattedResponse || t("chat:questionnaire.noAnswer");
   };
 
   // Check if the current question has a valid answer
@@ -238,15 +240,17 @@ export function QuestionnaireInput() {
           aria-expanded={isExpanded}
           aria-label={
             isExpanded
-              ? "Collapse questionnaire"
-              : `Expand questionnaire: ${currentQuestion.question}`
+              ? t("chat:questionnaire.collapse")
+              : t("chat:questionnaire.expand", {
+                  question: currentQuestion.question,
+                })
           }
         >
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             {isExpanded ? (
               <>
                 <ClipboardList className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                <span className="text-sm">Questions</span>
+                <span className="text-sm">{t("chat:questionnaire.title")}</span>
               </>
             ) : (
               <>
@@ -262,7 +266,10 @@ export function QuestionnaireInput() {
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 ml-3">
             <span className="text-xs text-muted-foreground tabular-nums">
-              {currentIndex + 1} of {questionnaire.questions.length}
+              {t("chat:questionnaire.position", {
+                current: currentIndex + 1,
+                total: questionnaire.questions.length,
+              })}
             </span>
             {isExpanded ? (
               <ChevronUp className="w-4 h-4 text-muted-foreground" />
@@ -276,7 +283,7 @@ export function QuestionnaireInput() {
           variant="ghost"
           size="icon"
           className="h-7 w-7 text-muted-foreground flex-shrink-0 mr-1.5"
-          aria-label="Dismiss questionnaire"
+          aria-label={t("chat:questionnaire.dismiss")}
         >
           <X size={14} />
         </Button>
@@ -298,7 +305,8 @@ export function QuestionnaireInput() {
                   <Input
                     autoFocus
                     placeholder={
-                      currentQuestion.placeholder || "Type your answer..."
+                      currentQuestion.placeholder ||
+                      t("chat:questionnaire.typeAnswer")
                     }
                     value={(responses[currentQuestion.id] as string) || ""}
                     onChange={(e) =>
@@ -355,7 +363,7 @@ export function QuestionnaireInput() {
                         id={`${currentQuestion.id}-custom`}
                       />
                       <Input
-                        placeholder="Other..."
+                        placeholder={t("chat:questionnaire.other")}
                         className="flex-1 h-7 text-sm"
                         value={additionalTexts[currentQuestion.id] || ""}
                         onFocus={() => {
@@ -430,7 +438,7 @@ export function QuestionnaireInput() {
                     {/* Free-form text input as an inline row (no checkbox) */}
                     <div className="flex items-center py-1 px-2 rounded hover:bg-muted/50 transition-colors">
                       <Input
-                        placeholder="Other..."
+                        placeholder={t("chat:questionnaire.other")}
                         className="flex-1 h-7 text-sm"
                         value={additionalTexts[currentQuestion.id] || ""}
                         onChange={(e) =>
@@ -455,7 +463,7 @@ export function QuestionnaireInput() {
                 size="sm"
               >
                 <ArrowLeft size={14} className="mr-1.5" />
-                Back
+                {t("common:back")}
               </Button>
               <Button
                 onClick={handleNext}
@@ -465,11 +473,11 @@ export function QuestionnaireInput() {
                 {isLastQuestion ? (
                   <>
                     <Send size={14} className="mr-1.5" />
-                    Submit
+                    {t("chat:questionnaire.submit")}
                   </>
                 ) : (
                   <>
-                    Next
+                    {t("chat:questionnaire.next")}
                     <ArrowRight size={14} className="ml-1.5" />
                   </>
                 )}
