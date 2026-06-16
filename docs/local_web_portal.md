@@ -1,7 +1,7 @@
 # Local Web Portal
 
-This guide documents the local Web Portal. The portal is the Dyad React UI
-running in a browser and talking to a Dyad-owned loopback HTTP server on the
+This guide documents the local Web Portal. The portal is the Bzyai React UI
+running in a browser and talking to a Bzyai-owned loopback HTTP server on the
 same machine. Electron desktop remains IPC-first; Web mode selects the HTTP/SSE
 transport through the shared runtime client.
 
@@ -40,7 +40,7 @@ The launcher starts:
 Startup output includes the Web UI URL and API base URL:
 
 ```text
-Dyad Web UI is running
+Bzyai Web UI is running
 Web UI: http://127.0.0.1:5173
 API:    http://127.0.0.1:<port>
 Token:  generated for this local session

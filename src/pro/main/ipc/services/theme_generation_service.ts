@@ -230,7 +230,7 @@ Modern dark theme with purple accents for testing.
 
     if ((this.deps.requireDyadPro ?? true) && !settings.enableDyadPro) {
       throw new DyadError(
-        "Dyad Pro is required for AI theme generation. Please enable Dyad Pro in Settings.",
+        "Bzyai Pro is required for AI theme generation. Please enable Bzyai Pro in Settings.",
         DyadErrorKind.Precondition,
       );
     }

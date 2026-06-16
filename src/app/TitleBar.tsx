@@ -46,7 +46,7 @@ export const TitleBar = () => {
     const handleDeepLink = async () => {
       if (lastDeepLink?.type === "dyad-pro-return") {
         await refreshSettings();
-        // Refetch user budget when Dyad Pro key is set via deep link
+        // Refetch user budget when Bzyai Pro key is set via deep link
         queryClient.invalidateQueries({ queryKey: queryKeys.userBudget.info });
         showDyadProSuccessDialog();
         clearLastDeepLink();

@@ -306,7 +306,7 @@ export function LexicalChatInput({
   onSubmit,
   onPaste,
   excludeCurrentApp,
-  placeholder = "Ask Dyad to build...",
+  placeholder = "Ask Bzyai to build...",
   disabled = false,
   disableSendButton,
   messageHistory = [],

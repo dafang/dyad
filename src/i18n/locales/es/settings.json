@@ -84,10 +84,10 @@
     "errorLoadingSettings": "Error al Cargar la Configuración",
     "couldNotLoadProvider": "No se pudieron cargar los datos del proveedor: {{message}}",
     "couldNotLoadSettings": "No se pudieron cargar los datos de configuración: {{message}}",
-    "enableDyadPro": "Habilitar Dyad Pro",
-    "toggleDyadPro": "Alternar para habilitar Dyad Pro",
+    "enableDyadPro": "Habilitar Bzyai Pro",
+    "toggleDyadPro": "Alternar para habilitar Bzyai Pro",
     "apiKeyEmpty": "La clave API no puede estar vacía.",
-    "errorTogglingPro": "Error al alternar Dyad Pro: {{error}}",
+    "errorTogglingPro": "Error al alternar Bzyai Pro: {{error}}",
     "failedSaveApiKey": "Error al guardar la clave API.",
     "failedDeleteApiKey": "Error al eliminar la clave API."
   },
@@ -99,7 +99,7 @@
     "privacyNotice": "Usamos datos de telemetría anónimos para mejorar el producto. No se recopilan datos personales.",
     "acceptAndContinue": "Aceptar y Continuar",
     "shareAnonymousData": "¿Compartir datos anónimos?",
-    "helpImprove": "Ayuda a mejorar Dyad con datos de uso anónimos.",
+    "helpImprove": "Ayuda a mejorar Bzyai con datos de uso anónimos.",
     "noCodeOrMessages": "Nota: esto no registra tu código ni tus mensajes.",
     "learnMore": "Saber más",
     "accept": "Aceptar",
@@ -178,7 +178,7 @@
   },
   "azure": {
     "configured": "Azure OpenAI Configurado",
-    "configuredDescription": "Dyad usará las credenciales guardadas en Configuración para los modelos de Azure OpenAI.",
+    "configuredDescription": "Bzyai usará las credenciales guardadas en Configuración para los modelos de Azure OpenAI.",
     "usingEnvVars": "Usando Variables de Entorno",
     "usingEnvVarsDescription": "AZURE_API_KEY y AZURE_RESOURCE_NAME están configurados. Los valores guardados a continuación los anularán.",
     "configRequired": "Se Requiere Configuración de Azure OpenAI",
@@ -193,8 +193,8 @@
     "configNeededDescription": "Las peticiones de Azure OpenAI requieren tanto un nombre de recurso como una clave API. Introdúcelos arriba o proporciona las variables de entorno en su lugar.",
     "saveError": "Error al Guardar",
     "envVarsOptional": "Variables de Entorno (opcional)",
-    "envVarsHelpText": "Puedes continuar configurando Azure mediante variables de entorno. Si ambas variables están presentes y no hay configuraciones guardadas, Dyad las usará automáticamente.",
-    "envVarsPrecedence": "Los valores guardados en la Configuración tienen prioridad sobre las variables de entorno. Reinicia Dyad después de cambiar las variables de entorno."
+    "envVarsHelpText": "Puedes continuar configurando Azure mediante variables de entorno. Si ambas variables están presentes y no hay configuraciones guardadas, Bzyai las usará automáticamente.",
+    "envVarsPrecedence": "Los valores guardados en la Configuración tienen prioridad sobre las variables de entorno. Reinicia Bzyai después de cambiar las variables de entorno."
   },
   "vertex": {
     "projectId": "ID del Proyecto",
@@ -268,6 +268,6 @@
     "updateProvider": "Actualizar Proveedor",
     "failedCreate": "Error al crear el proveedor personalizado"
   },
-  "manageDyadPro": "Gestionar Suscripción de Dyad Pro",
-  "setupDyadPro": "Configurar Suscripción de Dyad Pro"
+  "manageDyadPro": "Gestionar Suscripción de Bzyai Pro",
+  "setupDyadPro": "Configurar Suscripción de Bzyai Pro"
 }

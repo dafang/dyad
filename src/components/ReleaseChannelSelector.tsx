@@ -46,7 +46,7 @@ export function ReleaseChannelSelector() {
       toast(t("general.releaseChannelBetaToast"), {
         description: t("general.restartRequiredDescription"),
         action: {
-          label: t("general.restartDyad"),
+          label: t("general.restartBzyai"),
           onClick: async () => {
             if (webHostCapabilities.isLocalWeb) {
               const result = await webHostCapabilities.restartApp();

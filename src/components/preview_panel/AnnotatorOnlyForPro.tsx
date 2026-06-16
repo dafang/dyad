@@ -41,7 +41,7 @@ export const AnnotatorOnlyForPro = ({ onGoBack }: AnnotatorOnlyForProProps) => {
         <p className="text-muted-foreground mb-10 text-center max-w-md text-base leading-relaxed">
           {hideDyadProUi
             ? "Screenshot annotation is not available in this web build."
-            : "Unlock the ability to annotate screenshots and enhance your workflow with Dyad Pro."}
+            : "Unlock the ability to annotate screenshots and enhance your workflow with Bzyai Pro."}
         </p>
 
         {/* Get Pro Button */}
@@ -51,7 +51,7 @@ export const AnnotatorOnlyForPro = ({ onGoBack }: AnnotatorOnlyForProProps) => {
             size="lg"
             className="px-8 shadow-md hover:shadow-lg transition-all"
           >
-            Get Dyad Pro
+            Get Bzyai Pro
           </Button>
         )}
       </div>

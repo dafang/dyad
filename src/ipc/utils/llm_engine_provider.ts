@@ -378,7 +378,7 @@ function getDyadEngineApiKey(apiKey: string | undefined): string {
   const loadedApiKey = loadApiKey({
     apiKey,
     environmentVariableName: "DYAD_PRO_API_KEY",
-    description: "Dyad Pro API key",
+    description: "Bzyai Pro API key",
   });
   const normalizedApiKey = normalizeProviderApiKeyInput(loadedApiKey);
   const invalidCharacter = findInvalidProviderApiKeyCharacter(normalizedApiKey);

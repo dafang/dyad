@@ -3,7 +3,7 @@ doc_type: dev-guide
 slug: local-web-portal-maintenance
 component: local-web-portal
 status: current
-summary: How to maintain the customized local Web Portal while upstream Dyad continues to ship Electron-first changes.
+summary: How to maintain the customized local Web Portal while upstream Bzyai continues to ship Electron-first changes.
 tags:
   - web
   - electron
@@ -17,20 +17,20 @@ last_reviewed: 2026-06-12
 
 ## Overview
 
-This guide is for maintainers of the customized Dyad Web UI. Upstream Dyad is
+This guide is for maintainers of the customized Bzyai Web UI. Upstream Bzyai is
 still Electron-first: new product work usually lands as renderer changes plus
 Electron IPC handlers. The customized Web version keeps the same React renderer,
 but swaps the host boundary from Electron IPC to a browser page talking to a
 loopback Node HTTP server.
 
-Use this guide when rebasing or merging a newer official Dyad release into this
+Use this guide when rebasing or merging a newer official Bzyai release into this
 Web branch. It summarizes the Web-specific changes that must be preserved and
 the steps required to expose new upstream Electron capabilities in Web mode.
 
 ## Current Web Architecture
 
 The current Web edition is a local Web Portal, not the cloud-hosted product.
-The browser loads the normal Dyad renderer and calls a Dyad-owned local server
+The browser loads the normal Bzyai renderer and calls a Bzyai-owned local server
 on the same machine.
 
 The main runtime path is:
@@ -46,7 +46,7 @@ The main runtime path is:
 5. Push events and stream updates go through `/api/events` or invoke-stream
    forwarding.
 6. Runtime and preview operations are served by local Web services that wrap the
-   existing Dyad app runtime, process, git, preview, terminal, and workflow
+   existing Bzyai app runtime, process, git, preview, terminal, and workflow
    code.
 
 Electron desktop remains IPC-first. Do not convert desktop to the local HTTP
@@ -165,7 +165,7 @@ server as part of Web maintenance.
 
 ## Upstream Sync Workflow
 
-Follow this process when official Dyad publishes a new Electron-first version
+Follow this process when official Bzyai publishes a new Electron-first version
 and you need to bring it into the Web branch.
 
 ### 1. Prepare The Merge

@@ -23,7 +23,7 @@ export class ChatActions {
 
   getChatInput() {
     return this.page.locator(
-      `${visibleTestId("chat-input-container")} [data-lexical-editor="true"][aria-placeholder^="Ask Dyad to build"], ${visibleTestId("home-chat-input-container")} [data-lexical-editor="true"][aria-placeholder^="Ask Dyad to build"]`,
+      `${visibleTestId("chat-input-container")} [data-lexical-editor="true"][aria-placeholder^="Ask Bzyai to build"], ${visibleTestId("home-chat-input-container")} [data-lexical-editor="true"][aria-placeholder^="Ask Bzyai to build"]`,
     );
   }
 

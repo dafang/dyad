@@ -47,7 +47,7 @@ export function registerImageGenerationHandlers() {
 
       if (!apiKey) {
         throw new DyadError(
-          "Dyad Pro API key is required for image generation",
+          "Bzyai Pro API key is required for image generation",
           DyadErrorKind.Auth,
         );
       }

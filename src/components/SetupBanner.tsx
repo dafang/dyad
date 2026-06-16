@@ -343,7 +343,7 @@ export function SetupBanner() {
                   leadingIcon={
                     <img
                       src={logo}
-                      alt="Dyad Logo"
+                      alt="Bzyai Logo"
                       className="w-6 h-6 mr-0.5"
                     />
                   }

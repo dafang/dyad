@@ -451,7 +451,7 @@ Modern theme extracted from website for testing.
 
       if (!settings.enableDyadPro) {
         throw new Error(
-          "Dyad Pro is required for AI theme generation. Please enable Dyad Pro in Settings.",
+          "Bzyai Pro is required for AI theme generation. Please enable Bzyai Pro in Settings.",
         );
       }
 
@@ -519,7 +519,10 @@ Modern theme extracted from website for testing.
       // Get API key for Dyad Engine
       const apiKey = settings.providerSettings?.auto?.apiKey?.value;
       if (!apiKey) {
-        throw new DyadError("Dyad Pro API key is required", DyadErrorKind.Auth);
+        throw new DyadError(
+          "Bzyai Pro API key is required",
+          DyadErrorKind.Auth,
+        );
       }
 
       // Crawl the website

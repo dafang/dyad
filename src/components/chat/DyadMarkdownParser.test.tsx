@@ -1,6 +1,15 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("jotai/utils", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("jotai/utils")>();
+  const { atom } = await import("jotai");
+  return {
+    ...actual,
+    atomWithStorage: <T,>(_key: string, initialValue: T) => atom(initialValue),
+  };
+});
+
 import * as parserModule from "@/lib/streamingMessageParser";
 import type {
   Block as ParserBlock,

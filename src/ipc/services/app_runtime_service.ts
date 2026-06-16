@@ -93,7 +93,7 @@ export function formatCloudSandboxError(error: unknown) {
 
   switch (error.code) {
     case "sandbox_pro_required":
-      return "Dyad Pro is required to use cloud sandboxes.";
+      return "Bzyai Pro is required to use cloud sandboxes.";
     case "sandbox_insufficient_credits":
       return "You need at least 1 credit available to start a cloud sandbox.";
     case "sandbox_billing_unavailable":

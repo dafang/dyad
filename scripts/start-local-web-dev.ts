@@ -66,7 +66,7 @@ async function main(): Promise<void> {
   page.server.on("request", handlePageRequest);
   await writeLocalWebConfigFile(page.url, runtime);
 
-  console.info("Dyad Web UI is running");
+  console.info("Bzyai Web UI is running");
   console.info(`Web UI: ${page.url}`);
   console.info(`API:    ${runtime.server.info.baseUrl}`);
   console.info(`Config: ${configOutputPath}`);
@@ -121,7 +121,7 @@ async function handlePageRequest(
   response: ServerResponse,
 ): Promise<void> {
   if (!vite || !runtime) {
-    sendText(response, 503, "Dyad Web is still starting");
+    sendText(response, 503, "Bzyai Web is still starting");
     return;
   }
 

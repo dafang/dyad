@@ -28,7 +28,7 @@ export function AutoUpdateSwitch() {
           toast(t("general.autoUpdateChanged"), {
             description: t("general.restartRequiredDescription"),
             action: {
-              label: t("general.restartDyad"),
+              label: t("general.restartBzyai"),
               onClick: async () => {
                 if (webHostCapabilities.isLocalWeb) {
                   const result = await webHostCapabilities.restartApp();

@@ -2,7 +2,7 @@
 
 ## MustardScript Attachment Scripts
 
-Dyad uses MustardScript for local-agent attachment inspection. The tool is
+Bzyai uses MustardScript for local-agent attachment inspection. The tool is
 read-only: it exposes `read_file`, `list_files`, and `file_stats`, and does not
 expose shell execution, network access, environment variables, or write
 capabilities.

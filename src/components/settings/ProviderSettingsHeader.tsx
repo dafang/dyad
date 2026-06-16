@@ -38,8 +38,8 @@ function getKeyButtonText({
       return isConfigured ? "Manage API Key" : "Setup API Key";
     }
     return isConfigured
-      ? "Manage Dyad Pro Subscription"
-      : "Setup Dyad Pro Subscription";
+      ? "Manage Bzyai Pro Subscription"
+      : "Setup Bzyai Pro Subscription";
   }
   return isConfigured ? "Manage API Keys" : "Setup API Key";
 }

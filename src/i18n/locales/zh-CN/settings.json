@@ -29,7 +29,7 @@
     "runtimeModeDocker": "Docker（实验性）",
     "runtimeModeCloud": "云沙箱 (Pro)",
     "runtimeModeUpdateFailed": "更新运行时模式失败：{{message}}",
-    "runtimeModeCloudLockedDescription": "云沙箱是 Dyad Pro 功能。",
+    "runtimeModeCloudLockedDescription": "云沙箱是 Bzyai Pro 功能。",
     "runtimeModeUpgradeToPro": "升级到 Pro",
     "runtimeModeDockerDescriptionBefore": "Docker 模式为",
     "runtimeModeDockerDescriptionAfter": "，并要求",
@@ -60,8 +60,8 @@
     "nodePathReset": "已恢复为系统 Node.js 路径",
     "nodePathResetFailed": "重置 Node.js 路径失败：{{message}}",
     "autoUpdateChanged": "自动更新设置已更改",
-    "restartRequiredDescription": "需要重启 Dyad 后设置才会生效。",
-    "restartDyad": "重启 Dyad",
+    "restartRequiredDescription": "需要重启 Bzyai 后设置才会生效。",
+    "restartBzyai": "重启 Bzyai",
     "restartFromTerminal": "请从终端重启",
     "customAppsFolder": {
       "label": "自定义应用文件夹",
@@ -70,15 +70,15 @@
       "defaultFolder": "默认文件夹：",
       "customFolder": "自定义文件夹：",
       "webModeDescription": "在 Web 模式下，新应用会存储在本地 Web 服务器数据目录中。浏览器文件夹选择器目前无法向本地服务器授予可复用的可写路径。",
-      "availableDescription": "这是 Dyad 用来存放新应用的顶层文件夹。",
+      "availableDescription": "这是 Bzyai 用来存放新应用的顶层文件夹。",
       "unavailableDescription": "您的应用文件夹不可访问。请确认该文件夹存在且具有写入权限，或更换文件夹。",
       "webModeSelectionUnavailable": "浏览器文件夹选择器目前无法向本地服务器授予稳定的可写路径。新应用会使用本地 Web 数据目录。",
       "updated": "自定义应用文件夹已更新",
       "invalidSelection": "无法使用所选文件夹。请确认它是有效目录且具有写入权限。",
       "setFailed": "设置自定义应用文件夹失败：{{message}}",
-      "resetSuccess": "Dyad 应用文件夹已恢复默认",
-      "resetFailed": "恢复 Dyad 应用文件夹路径失败：{{message}}",
-      "fetchFailed": "获取 Dyad 应用文件夹路径失败：{{message}}"
+      "resetSuccess": "Bzyai 应用文件夹已恢复默认",
+      "resetFailed": "恢复 Bzyai 应用文件夹路径失败：{{message}}",
+      "fetchFailed": "获取 Bzyai 应用文件夹路径失败：{{message}}"
     }
   },
   "workflow": {
@@ -198,10 +198,10 @@
     "errorLoadingSettings": "加载设置出错",
     "couldNotLoadProvider": "无法加载提供商数据：{{message}}",
     "couldNotLoadSettings": "无法加载配置数据：{{message}}",
-    "enableDyadPro": "启用 Dyad Pro",
-    "toggleDyadPro": "切换以启用 Dyad Pro",
+    "enableDyadPro": "启用 Bzyai Pro",
+    "toggleDyadPro": "切换以启用 Bzyai Pro",
     "apiKeyEmpty": "API 密钥不能为空。",
-    "errorTogglingPro": "切换 Dyad Pro 时出错：{{error}}",
+    "errorTogglingPro": "切换 Bzyai Pro 时出错：{{error}}",
     "failedSaveApiKey": "保存 API 密钥失败。",
     "failedDeleteApiKey": "删除 API 密钥失败。",
     "contextCompactionDescription": "自动压缩较长对话以保持在上下文限制内。原始消息会保留在应用数据目录中。"
@@ -214,7 +214,7 @@
     "privacyNotice": "我们使用匿名遥测数据来改进产品。不会收集个人数据。",
     "acceptAndContinue": "接受并继续",
     "shareAnonymousData": "分享匿名数据？",
-    "helpImprove": "通过匿名使用数据帮助改进 Dyad。",
+    "helpImprove": "通过匿名使用数据帮助改进 Bzyai。",
     "noCodeOrMessages": "注意：这不会记录您的代码或消息。",
     "learnMore": "了解更多",
     "accept": "接受",
@@ -285,7 +285,7 @@
     "oauthDisconnectFailed": "断开 OAuth 失败",
     "plaintextTitle": "OAuth token 和客户端密钥未使用系统加密存储",
     "plaintextDescriptionBefore": "系统密钥环不可用（在 Linux 上通常表示未安装 ",
-    "plaintextDescriptionAfter": "），因此 HTTP MCP 服务器的 OAuth token 和预注册客户端密钥会以未加密形式写入本地数据库。任何能读取 Dyad 数据目录的进程都可以解码它们。客户端密钥尤其敏感，因为它们不会过期。请安装密钥环服务后重新连接，并重新输入预注册客户端密钥以升级存储方式。",
+    "plaintextDescriptionAfter": "），因此 HTTP MCP 服务器的 OAuth token 和预注册客户端密钥会以未加密形式写入本地数据库。任何能读取 Bzyai 数据目录的进程都可以解码它们。客户端密钥尤其敏感，因为它们不会过期。请安装密钥环服务后重新连接，并重新输入预注册客户端密钥以升级存储方式。",
     "useOAuth": "使用 OAuth",
     "oauthRequiredForRemote": "大多数远程服务器都需要。",
     "advancedOAuthOptions": "高级 OAuth 选项",
@@ -394,7 +394,7 @@
       },
       "setting-custom-apps-folder": {
         "label": "自定义应用文件夹",
-        "description": "设置 Dyad 存放新应用的顶层文件夹"
+        "description": "设置 Bzyai 存放新应用的顶层文件夹"
       },
       "setting-default-chat-mode": {
         "label": "默认聊天模式",
@@ -534,7 +534,7 @@
   },
   "azure": {
     "configured": "Azure OpenAI 已配置",
-    "configuredDescription": "Dyad 将使用设置中保存的凭据来访问 Azure OpenAI 模型。",
+    "configuredDescription": "Bzyai 将使用设置中保存的凭据来访问 Azure OpenAI 模型。",
     "usingEnvVars": "使用环境变量",
     "usingEnvVarsDescription": "AZURE_API_KEY 和 AZURE_RESOURCE_NAME 已设置。下方保存的值将覆盖它们。",
     "configRequired": "需要配置 Azure OpenAI",
@@ -549,8 +549,8 @@
     "configNeededDescription": "Azure OpenAI 请求需要资源名称和 API 密钥。请在上方输入，或提供环境变量。",
     "saveError": "保存错误",
     "envVarsOptional": "环境变量（可选）",
-    "envVarsHelpText": "您可以继续通过环境变量配置 Azure。如果两个变量都存在且未保存设置，Dyad 将自动使用它们。",
-    "envVarsPrecedence": "设置中保存的值优先于环境变量。更改环境变量后请重启 Dyad。"
+    "envVarsHelpText": "您可以继续通过环境变量配置 Azure。如果两个变量都存在且未保存设置，Bzyai 将自动使用它们。",
+    "envVarsPrecedence": "设置中保存的值优先于环境变量。更改环境变量后请重启 Bzyai。"
   },
   "vertex": {
     "projectId": "项目 ID",
@@ -624,6 +624,6 @@
     "updateProvider": "更新提供商",
     "failedCreate": "创建自定义提供商失败"
   },
-  "manageDyadPro": "管理 Dyad Pro 订阅",
-  "setupDyadPro": "设置 Dyad Pro 订阅"
+  "manageDyadPro": "管理 Bzyai Pro 订阅",
+  "setupDyadPro": "设置 Bzyai Pro 订阅"
 }

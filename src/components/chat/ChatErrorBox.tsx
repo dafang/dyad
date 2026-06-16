@@ -58,9 +58,9 @@ export function ChatErrorBox({
   // Important, this needs to come after the "free quota tier" check
   // because it also includes this URL in the error message
   //
-  // Sometimes Dyad Pro can return rate limit errors and we do not want to
-  // show the upgrade to Dyad Pro link in that case because they are
-  // already on the Dyad Pro plan.
+  // Sometimes Bzyai Pro can return rate limit errors and we do not want to
+  // show the upgrade to Bzyai Pro link in that case because they are
+  // already on the Bzyai Pro plan.
   if (
     !isDyadProEnabled &&
     (error.includes("Resource has been exhausted") ||
@@ -174,7 +174,7 @@ export function ChatErrorBox({
               href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=general-error"
               variant="primary"
             >
-              Upgrade to Dyad Pro
+              Upgrade to Bzyai Pro
             </ExternalLink>
           )}
         {isDyadProEnabled && onStartNewChat && (

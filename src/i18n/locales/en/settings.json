@@ -29,7 +29,7 @@
     "runtimeModeDocker": "Docker (experimental)",
     "runtimeModeCloud": "Cloud Sandbox (Pro)",
     "runtimeModeUpdateFailed": "Failed to update runtime mode: {{message}}",
-    "runtimeModeCloudLockedDescription": "Cloud sandboxes are a Dyad Pro feature.",
+    "runtimeModeCloudLockedDescription": "Cloud sandboxes are a Bzyai Pro feature.",
     "runtimeModeUpgradeToPro": "Upgrade to Pro",
     "runtimeModeDockerDescriptionBefore": "Docker mode is",
     "runtimeModeDockerDescriptionAfter": "and requires",
@@ -60,8 +60,8 @@
     "nodePathReset": "Reset to system Node.js path",
     "nodePathResetFailed": "Failed to reset Node.js path: {{message}}",
     "autoUpdateChanged": "Auto-update settings changed",
-    "restartRequiredDescription": "You will need to restart Dyad for your settings to take effect.",
-    "restartDyad": "Restart Dyad",
+    "restartRequiredDescription": "You will need to restart Bzyai for your settings to take effect.",
+    "restartBzyai": "Restart Bzyai",
     "restartFromTerminal": "Restart from terminal",
     "customAppsFolder": {
       "label": "Customize Apps Folder",
@@ -70,15 +70,15 @@
       "defaultFolder": "Default Folder:",
       "customFolder": "Custom Folder:",
       "webModeDescription": "In Web mode, new apps are stored under the local Web server data directory. Browser folder pickers cannot currently grant a reusable writable path to the local server.",
-      "availableDescription": "This is the top-level folder that Dyad will store new applications in.",
+      "availableDescription": "This is the top-level folder that Bzyai will store new applications in.",
       "unavailableDescription": "Your apps folder is inaccessible. Make sure that the folder exists and has write permissions, or change it.",
       "webModeSelectionUnavailable": "Browser folder selection cannot grant the local server a stable writable folder path yet. New apps use the local Web data directory.",
       "updated": "Custom apps folder updated successfully",
       "invalidSelection": "Unable to use selected folder. Please ensure it is a valid directory with write permissions.",
       "setFailed": "Failed to set custom apps folder: {{message}}",
-      "resetSuccess": "Dyad apps folder reset successfully",
-      "resetFailed": "Failed to reset Dyad Apps folder path: {{message}}",
-      "fetchFailed": "Failed to fetch Dyad apps folder path: {{message}}"
+      "resetSuccess": "Bzyai apps folder reset successfully",
+      "resetFailed": "Failed to reset Bzyai Apps folder path: {{message}}",
+      "fetchFailed": "Failed to fetch Bzyai apps folder path: {{message}}"
     }
   },
   "workflow": {
@@ -198,10 +198,10 @@
     "errorLoadingSettings": "Error Loading Settings",
     "couldNotLoadProvider": "Could not load provider data: {{message}}",
     "couldNotLoadSettings": "Could not load configuration data: {{message}}",
-    "enableDyadPro": "Enable Dyad Pro",
-    "toggleDyadPro": "Toggle to enable Dyad Pro",
+    "enableDyadPro": "Enable Bzyai Pro",
+    "toggleDyadPro": "Toggle to enable Bzyai Pro",
     "apiKeyEmpty": "API Key cannot be empty.",
-    "errorTogglingPro": "Error toggling Dyad Pro: {{error}}",
+    "errorTogglingPro": "Error toggling Bzyai Pro: {{error}}",
     "failedSaveApiKey": "Failed to save API key.",
     "failedDeleteApiKey": "Failed to delete API key.",
     "contextCompactionDescription": "Automatically compact long conversations to stay within context limits. Original messages are preserved in the app data directory."
@@ -214,7 +214,7 @@
     "privacyNotice": "We use anonymous telemetry data to improve the product. No personal data is collected.",
     "acceptAndContinue": "Accept and Continue",
     "shareAnonymousData": "Share anonymous data?",
-    "helpImprove": "Help improve Dyad with anonymous usage data.",
+    "helpImprove": "Help improve Bzyai with anonymous usage data.",
     "noCodeOrMessages": "Note: this does not log your code or messages.",
     "learnMore": "Learn more",
     "accept": "Accept",
@@ -285,7 +285,7 @@
     "oauthDisconnectFailed": "Failed to disconnect OAuth",
     "plaintextTitle": "OAuth tokens and client secrets are not stored with system encryption",
     "plaintextDescriptionBefore": "The system keyring is unavailable (on Linux this usually means ",
-    "plaintextDescriptionAfter": " is not installed), so OAuth tokens and pre-registered client secrets for HTTP MCP servers are written to the local database without encryption. Any process that can read Dyad's data directory can decode them. Client secrets are especially sensitive because they do not expire. Install a keyring service, reconnect, and re-enter any pre-registered client secrets to upgrade storage.",
+    "plaintextDescriptionAfter": " is not installed), so OAuth tokens and pre-registered client secrets for HTTP MCP servers are written to the local database without encryption. Any process that can read Bzyai's data directory can decode them. Client secrets are especially sensitive because they do not expire. Install a keyring service, reconnect, and re-enter any pre-registered client secrets to upgrade storage.",
     "useOAuth": "Use OAuth",
     "oauthRequiredForRemote": "Most remote servers require this.",
     "advancedOAuthOptions": "Advanced OAuth options",
@@ -394,7 +394,7 @@
       },
       "setting-custom-apps-folder": {
         "label": "Customize Apps Folder",
-        "description": "Set the top-level folder that Dyad will store new applications in"
+        "description": "Set the top-level folder that Bzyai will store new applications in"
       },
       "setting-default-chat-mode": {
         "label": "Default Chat Mode",
@@ -534,7 +534,7 @@
   },
   "azure": {
     "configured": "Azure OpenAI Configured",
-    "configuredDescription": "Dyad will use the credentials saved in Settings for Azure OpenAI models.",
+    "configuredDescription": "Bzyai will use the credentials saved in Settings for Azure OpenAI models.",
     "usingEnvVars": "Using Environment Variables",
     "usingEnvVarsDescription": "AZURE_API_KEY and AZURE_RESOURCE_NAME are set. Values saved below will override them.",
     "configRequired": "Azure OpenAI Configuration Required",
@@ -549,8 +549,8 @@
     "configNeededDescription": "Azure OpenAI requests require both a resource name and API key. Enter them above or supply the environment variables instead.",
     "saveError": "Save Error",
     "envVarsOptional": "Environment Variables (optional)",
-    "envVarsHelpText": "You can continue to configure Azure via environment variables. If both variables are present and no settings are saved, Dyad will use them automatically.",
-    "envVarsPrecedence": "Values saved in Settings take precedence over environment variables. Restart Dyad after changing environment variables."
+    "envVarsHelpText": "You can continue to configure Azure via environment variables. If both variables are present and no settings are saved, Bzyai will use them automatically.",
+    "envVarsPrecedence": "Values saved in Settings take precedence over environment variables. Restart Bzyai after changing environment variables."
   },
   "vertex": {
     "projectId": "Project ID",
@@ -624,6 +624,6 @@
     "updateProvider": "Update Provider",
     "failedCreate": "Failed to create custom provider"
   },
-  "manageDyadPro": "Manage Dyad Pro Subscription",
-  "setupDyadPro": "Setup Dyad Pro Subscription"
+  "manageDyadPro": "Manage Bzyai Pro Subscription",
+  "setupDyadPro": "Setup Bzyai Pro Subscription"
 }

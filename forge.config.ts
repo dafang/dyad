@@ -147,7 +147,7 @@ const config: ForgeConfig = {
     ],
     protocols: [
       {
-        name: "Dyad",
+        name: "Bzyai",
         schemes: ["dyad"],
       },
     ],

@@ -20,7 +20,7 @@ instruction.
 ## Prerequisites
 
 All models are routed through the Dyad Engine gateway, so you only need one
-credential: a Dyad Pro API key, exposed as `DYAD_PRO_API_KEY`.
+credential: a Bzyai Pro API key, exposed as `DYAD_PRO_API_KEY`.
 
 The suite is skipped entirely when `DYAD_PRO_API_KEY` is unset — no tests will
 fail, they just won't run. This keeps regular `vitest run` safe for contributors

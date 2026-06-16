@@ -92,7 +92,7 @@ function formatSettingsLines(
     lines.splice(
       3,
       0,
-      `- Dyad Pro Enabled: ${settings.enableDyadPro ?? "n/a"}`,
+      `- Bzyai Pro Enabled: ${settings.enableDyadPro ?? "n/a"}`,
     );
   }
 
@@ -104,7 +104,7 @@ function formatSystemInfoSection(
   userBudget: UserBudgetInfo | undefined,
 ): string {
   return `## System Information
-- Dyad Version: ${debugInfo.dyadVersion}
+- Bzyai Version: ${debugInfo.dyadVersion}
 - Platform: ${debugInfo.platform}
 - Architecture: ${debugInfo.architecture}
 - Node Version: ${debugInfo.nodeVersion || "n/a"}
@@ -457,7 +457,7 @@ ${formatLogsSection(debugInfo)}
       skipInitial={!hasNavigated.current}
     >
       <DialogHeader>
-        <DialogTitle>Need help with Dyad?</DialogTitle>
+        <DialogTitle>Need help with Bzyai?</DialogTitle>
       </DialogHeader>
       <DialogDescription>
         If you need help or want to report an issue, here are some options:
@@ -470,7 +470,7 @@ ${formatLogsSection(debugInfo)}
             onClick={() => setIsHelpBotOpen(true)}
             className="w-full py-6 border-primary/50 shadow-sm shadow-primary/10 transition-all hover:shadow-md hover:shadow-primary/15"
           >
-            <SparklesIcon className="mr-2 h-5 w-5" /> Chat with Dyad help bot
+            <SparklesIcon className="mr-2 h-5 w-5" /> Chat with Bzyai help bot
             (Pro)
           </Button>
         ) : (
@@ -530,7 +530,7 @@ ${formatLogsSection(debugInfo)}
               <span className="text-sm font-semibold">Non-AI issues</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Includes error logs to troubleshoot non-AI issues with Dyad (UI
+              Includes error logs to troubleshoot non-AI issues with Bzyai (UI
               bugs, crashes, setup problems, etc.).
             </p>
             <Button
@@ -597,7 +597,7 @@ ${formatLogsSection(debugInfo)}
           </ReviewDetailsSection>
 
           <ReviewDetailsSection title="System Information" mono={false}>
-            <p>Dyad Version: {debugBundle.system.dyadVersion}</p>
+            <p>Bzyai Version: {debugBundle.system.dyadVersion}</p>
             <p>Platform: {debugBundle.system.platform}</p>
             <p>Architecture: {debugBundle.system.architecture}</p>
             <p>

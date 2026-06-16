@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { canUsePreviewAdvancedTools } from "./previewFeatureAccess";
 
 describe("canUsePreviewAdvancedTools", () => {
-  it("allows local Web builds that hide Dyad Pro UI", () => {
+  it("allows local Web builds that hide Bzyai Pro UI", () => {
     expect(
       canUsePreviewAdvancedTools({
         hideDyadProUi: true,

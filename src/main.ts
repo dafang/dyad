@@ -958,7 +958,7 @@ async function handleDeepLinkReturn(url: string) {
         apiKey,
       });
     } catch (error) {
-      showDeepLinkSettingsError("save Dyad Pro settings", error);
+      showDeepLinkSettingsError("save Bzyai Pro settings", error);
       return;
     }
     // Send message to renderer to trigger re-render
